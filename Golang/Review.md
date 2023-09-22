@@ -1,6 +1,6 @@
 # Review
 
-## 变量
+## 程序结构
 
 `var name type = expression`
 
@@ -117,3 +117,43 @@ func init() { /* ... */}
 
 init 函数：会在程序开始时自动执行，不能被调用和被引用。
 
+## 方法
+
+### 方法声明
+
+Go语言中，接收者不是用特殊名（this、self）；而是我们自己选择接收者名字，跟其他参数变量一样。
+
+由于接收者会频繁使用，因此最好能够选择简短且在整个方法中名称保持一致的名字。
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type Point struct {
+	X, Y float64
+}
+
+func Distance(p, q Point) float64 {
+	return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+
+func (p Point) Distance(q Point) float64 {
+	return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+
+func main() {
+	p := Point{1, 2}
+	q := Point{4, 6}
+	fmt.Println(Distance(p, q))
+	fmt.Println(p.Distance(q))
+}
+
+```
+
+上面两个Distance函数声明没有冲突，第一个声明一个包级别的函数（成为geometry.Distance）。第二个声明一个类型Point的方法，因此它的名字是Point.Distance。
+
+> Point 结构类型中声明一个叫做 x 的方法会与字段 x 冲突
