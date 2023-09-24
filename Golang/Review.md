@@ -1,6 +1,6 @@
 # Review
 
-## 变量
+## 程序结构
 
 `var name type = expression`
 
@@ -116,4 +116,248 @@ func init() { /* ... */}
 ```
 
 init 函数：会在程序开始时自动执行，不能被调用和被引用。
+
+## 方法
+
+### 方法声明
+
+Go语言中，接收者不是用特殊名（this、self）；而是我们自己选择接收者名字，跟其他参数变量一样。
+
+由于接收者会频繁使用，因此最好能够选择简短且在整个方法中名称保持一致的名字。
+
+```go
+package main
+
+import (
+	"fmt"
+	"math"
+)
+
+type Point struct {
+	X, Y float64
+}
+
+func Distance(p, q Point) float64 {
+	return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+
+func (p Point) Distance(q Point) float64 {
+	return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+
+func main() {
+	p := Point{1, 2}
+	q := Point{4, 6}
+	fmt.Println(Distance(p, q))
+	fmt.Println(p.Distance(q))
+}
+
+```
+
+上面两个Distance函数声明没有冲突，第一个声明一个包级别的函数（成为geometry.Distance）。第二个声明一个类型Point的方法，因此它的名字是Point.Distance。
+
+> Point 结构类型中声明一个叫做 x 的方法会与字段 x 冲突
+
+```go
+package geometry
+
+import (
+	"math"
+)
+
+type Point struct {
+	X, Y float64
+}
+
+func Distance(p, q Point) float64 {
+	return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+
+func (p Point) Distance(q Point) float64 {
+	return math.Hypot(q.X-p.X, q.Y-p.Y)
+}
+
+type Path []Point
+
+func (path Path) Distance() float64 {
+	sum := 0.0
+	for i := range path {
+		if i > 0 {
+			sum += path[i-1].Distance(path[i]) // a方法
+		}
+	}
+	return sum
+}
+```
+
+```go
+package main
+
+import (
+	"fmt"
+	"test/geometry"
+)
+
+func main() {
+	p := geometry.Point{1, 2}
+	q := geometry.Point{4, 6}
+	fmt.Println(geometry.Distance(p, q))
+	fmt.Println(p.Distance(q))
+
+	perim := geometry.Path{
+		{1, 1},
+		{5, 1},
+		{5, 4},
+		{1, 1},
+	}
+	fmt.Println(geometry.Path.Distance(perim)) // "12"，独立函数
+	fmt.Println(perim.Distance())              // b方法，"12"，geometry.Path的方法
+}
+```
+
+上面 a、b 的两个方法调用中，编译器会通过方法名和接收者的类型决定调用哪一个函数。在 a 方法中`path[i-1]`是Point类型，因此调用`Point.Distance`；在第二个示例，Perim是Path类型，因此调用`Path.Distance`。
+
+类型拥有的所有方法名都必须是唯一的，但不同的类型可以使用相同的方法名，比如Point和Path类型的Distance方法；方法命名可以比函数更简短，在包外进行调用的时候，例如b方法，能够使用更加简短的名字且省略包的名字。
+
+### 指针接收者的方法
+
+由于主调函数会复制每一个变量，如果函数需要更新一个变量，或者如果一个实参太大而我们希望避免复制整个实参，因此我们必须使用指针来传递变量的地址。
+
+```go
+func (p *Point) ScaleBy(factor float64) {
+	p.X *= factor
+	p.Y *= factor
+}
+```
+
+这个方法的名字是 `(p *Point).ScaleBy`，圆括号是必须的。
+
+在合法的方法调用表达式中，只有符合以下三种形式的语句才能成立。
+
+1. 实参接收者和形参接收者是同一类型，比如都是`T`类型或者`*T`类型：
+2. 实参接收者是T类型的**变量**而形参接收者是*T类型。编译器会隐式地获取变量的地址。
+3. 实参接收者是*T类型而形参接收者是T类型。编译器会隐式地解析引用接收者，获得实际取值。
+
+```go
+package main
+
+import "fmt"
+
+type Point struct {
+	X, Y float64
+}
+
+func (p *Point) ScaleBy(factor float64) { // 这里的 p 为形参接收者
+	p.X *= factor
+	p.Y *= factor
+}
+
+func (q Point) SumBy(factor Point) {
+	fmt.Println("成功")
+}
+
+func main() {
+    var p Point // 这里的 p 为实参接收者
+    
+    // 2/3.编译器会隐式转换
+	p.ScaleBy(2)
+    p.SumBy(p)
+    (&p).SumBy(p)
+	(&p).ScaleBy(2)
+
+	Point{1, 2}.SumBy(p) // 1.都是Point类型
+}
+```
+
+
+
+> ![image-20230923112834243](imgs/image-20230923112834243.png)
+>
+> ![image-20230923113123626](imgs/image-20230923113123626.png)
+>
+>  **不管取地址还是取值都会有两个调用函数**
+
+>  **nil是一个合法的接收者**
+>
+> ![image-20230923153450104](imgs/image-20230923153450104.png)
+
+### 方法变量与表达式
+
+#### 方法变量
+
+可以把方法赋值给一个方法变量，它是一个函数，把方法绑定到接收者上，函数只需要提供实参而不需要提供接收者就能够调用。
+
+`方法变量 := 变量.方法`
+
+```go
+p := Point{1, 2}
+q := Point{4, 6}
+
+distanceFromP := p.Distance     // 方法变量
+fmt.Println(distanceFromP(q))  
+var origin Point                
+fmt.Println(distanceFromP(origin))
+
+scaleP := p.ScaleBy // 方法变量
+scaleP(2)
+```
+
+#### 方法表达式
+
+`方法表达式 := 类型.方法`
+
+与方法变量相关的是方法表达式。和调用一个普通的函数不同，在调用方法的时候必须提供一个接收者作为第一个形参。
+
+```go
+p := Point{1, 2}
+q := Point{4, 6}
+
+distance := Point.Distance     // 方法变量
+fmt.Println(distance(p, q))  
+fmt.Printf("%T\n", distance)   // "func(Point, Point) float64"
+
+scale := (*Point).ScaleBy // 方法变量
+scaleP(&p, 2)
+fmt.Println(p)
+fmt.Printf("%T\n", distance)   // "func(*Point, float64)"
+```
+
+如果需要用一个值表示多种方法，那么方法变量可以帮助调用这个值来处理不同的接收者。
+
+```go
+package main
+
+import "fmt"
+
+type Point struct{ X, Y float64 }
+
+func (p Point) Add(q Point) Point { return Point{p.X + q.X, p.Y + q.Y} }
+func (p Point) Sub(q Point) Point { return Point{p.X - q.X, p.Y - q.Y} }
+
+type Path []Point
+
+func (path Path) TranslateBy(offset Point, add bool) {
+	var op func(p, q Point) Point
+	if add {
+		op = Point.Add
+	} else {
+		op = Point.Sub
+	}
+	for i := range path {
+		// 调用 path[i].Add(offset) 或 path[i].Sub(offset)
+		path[i] = op(path[i], offset)
+	}
+}
+func main() {
+	path := Path{{1, 2}, {3, 4}, {5, 6}}
+	path.TranslateBy(Point{1, 2}, true)
+	fmt.Println(path)
+	path = Path{{1, 2}, {3, 4}, {5, 6}}
+	path.TranslateBy(Point{1, 2}, false)
+	fmt.Println(path)
+	fmt.Printf("%T\n", path.TranslateBy)
+}
+```
+
+
 
