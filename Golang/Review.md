@@ -156,6 +156,7 @@ func main() {
 
 上面两个Distance函数声明没有冲突，第一个声明一个包级别的函数（成为geometry.Distance）。第二个声明一个类型Point的方法，因此它的名字是Point.Distance。
 
+<<<<<<< HEAD
 > Point 结构类型中声明一个叫做 x 的方法会与字段 x 冲突
 
 ```go
@@ -358,6 +359,3 @@ func main() {
 	fmt.Printf("%T\n", path.TranslateBy)
 }
 ```
-
-
-
