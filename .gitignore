@@ -1,6 +1,6 @@
-
 *.jpg
 *.gif
+go.mod
 node_modules
 .commitlintrc.js
 package.json
