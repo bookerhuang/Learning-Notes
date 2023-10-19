@@ -106,6 +106,8 @@ function delay(time){
     setTimeout(resolve,1000)
  })
 }
+
+app.listen(3000)
 ```
 
 ```js
@@ -177,6 +179,7 @@ app.listen(3000)
 Koa-router 请求方式： `get` 、 `put` 、 `post` 、 `patch` 、 `delete` 、 `del`  ，而使用方法就是 `router.方式()`  ，比如 `router.get()` 和 `router.post()` 。而 `router.all()` 会匹配所有的请求方法。
 
 ```js
+// ./routes/user.js
 var Koa = require("koa")
 var Router = require("koa-router")
 

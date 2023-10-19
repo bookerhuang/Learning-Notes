@@ -42,8 +42,6 @@ use go_db;
 db.createCollection("student");
 ```
 
-![image-20230903112857921](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20230903112857921.png)
-
 ## 添加MongoDB依赖
 
 ```shell
