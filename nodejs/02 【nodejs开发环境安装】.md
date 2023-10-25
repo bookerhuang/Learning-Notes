@@ -47,7 +47,7 @@
 
 Windows 安装的 Node.js 的步骤如下。
 
-### 3.1 安装 NVM：
+### 3.1 安装 NVM（Windows）：
 
 （1）我们去 https://github.com/coreybutler/nvm-windows/releases 下载 NVM 的安装包：
 
@@ -116,6 +116,46 @@ npm_mirror: https://npmmirror.com/mirrors/npm/
 ```
 
 - 参考链接：[安装 npm，nvm，node](https://segmentfault.com/a/1190000011114680)
+
+### 3.4 安装 NVM（Linux）：
+
+bash：
+
+```shell
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+or
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
+```
+
+运行上述任一命令都会下载脚本并运行它。该脚本将 nvm 存储库克隆到`~/.nvm`，并尝试将下面代码片段中的源行添加到正确的配置文件（`~/.bash_profile`、`~/.zshrc`、`~/.profile`或`~/.bashrc`）。
+
+```shell
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+```
+
+重新加载`.profile`or`.bashrc`：
+
+```shell
+source ~/.bashrc
+```
+
+**Example:**
+
+```
+$ nvm use 16
+Now using node v16.9.1 (npm v7.21.1)
+$ node -v
+v16.9.1
+$ nvm use 14
+Now using node v14.18.0 (npm v6.14.15)
+$ node -v
+v14.18.0
+$ nvm install 12
+Now using node v12.22.6 (npm v6.14.5)
+$ node -v
+v12.22.6
+```
 
 ## 4.NVM 的常用命令
 

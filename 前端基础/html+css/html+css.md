@@ -5419,3 +5419,4125 @@ width: calc(100% - 80px);
 
 括号里面可以使用 `+` `-` `*` `/` 来进行计算。
 
+# 09 【浮动 常见网页布局】
+
+## 1.浮动
+
+### 1.1 传统网页布局的三种方式
+
+网页布局的本质：用 CSS 来摆放盒子，把盒子摆放到相应位置。
+
+CSS 提供了三种传统布局方式（简单说就是盒子如何进行排列）。
+
+- 普通流（标准流）
+- 浮动
+- 定位
+
+> 这里指的只是传统布局，其实还有一些特殊高级的布局方式。
+
+### 1.2 标准流（普通流/文档流）
+
+所谓的标准流：就是标签按照规定好的默认方式排列。
+
+1. **块级元素会独占一行，从上向下顺序排列。**
+2. **行内元素会按照顺序，从左到右顺序排列，碰到父元素边缘则自动换行。**
+
+以上都是标准流布局，我们前面学习的就是标准流，标准流是最基本的布局方式。
+
+这三种布局方式都是用来摆放盒子的，盒子摆放到合适位置，布局自然就完成了。
+
+**注意：**实际开发中，一个页面基本都包含了这三种布局方式（后面移动端学习新的布局方式） 。
+
+### 1.3 为什么需要浮动？
+
+提问：我们用标准流能很方便的实现如下效果吗？
+
+1. **如何让多个块级盒子（div）水平排列成一行？**
+
+![](imgs/bd8fb5c04c5033987341f65caab7eeb68e6b8fe5.jpg)
+
+比较难，虽然转换为行内块元素可以实现一行显示，但是他们之间会有大的**空白缝隙**，很难控制。
+
+```html
+<head>
+    <title>行内块中间有缝隙</title>
+    <style>
+        div {
+            width: 150px;
+            height: 200px;
+            background-color: #d87093;
+            display: inline-block;
+        }
+    </style>
+</head>
+
+<body>
+    <div>1</div>
+    <div>2</div>
+    <div>3</div>
+</body>
+```
+
+![](imgs/fe6c7f400ff3c81ec6b06a279b3be2235a404bd0.jpg)
+
+2. **如何实现两个盒子的左右对齐？**
+
+![](imgs/a6e6052d09ab7ebb83a3c345d08f6bd4c47c9789.jpg)
+
+总结： 有很多的布局效果，标准流没有办法完成，此时就可以利用浮动完成布局。 因为浮动可以改变元素标签默认的排列方式。
+
+**浮动最典型的应用：可以让多个块级元素一行内排列显示。**
+
+**网页布局第一准则：多个块级元素纵向排列找标准流，多个块级元素横向排列找浮动！**
+
+```html
+<head>
+    <style>
+        div {
+            float: left;
+            width: 150px;
+            height: 200px;
+            background-color: #d87093;
+        }
+    </style>
+</head>
+
+<body>
+    <div>1</div>
+    <div>2</div>
+    <div>3</div>
+</body>
+```
+
+![](imgs/d6caca6f55d050133dcda0376467e41b7f3050d6.jpg)
+
+**拓展：**浮动的盒子不会发生外边距合并！
+
+### ⭕1.4 什么是浮动？
+
+通过浮动可以使一个元素向其父元素的左侧或右侧移动
+
+注意
+
+- 元素设置浮动以后，水平布局的等式便不需要强制成立
+
+- 元素设置浮动以后，会完全从文档流中脱离，不再占用文档流的位置，所以元素下边的还在文档流中的元素会自动向上移动
+
+语法：
+
+```css
+选择器 { float: 属性值;}
+```
+
+| 属性  | 描述                 |
+| ----- | -------------------- |
+| none  | 元素不浮动（默认值） |
+| left  | 元素向左浮动         |
+| right | 元素向右浮动         |
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>什么是浮动</title>
+    <style>
+        .left,
+        .right {
+            float: left;
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="left">左青龙</div>
+    <div class="right">右白虎</div>
+</body>
+
+</html>
+```
+
+![](imgs/86878e7be1acba6b71bcdd88b42bd269d9244429.jpg)
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>什么是浮动</title>
+    <style>
+        .left,
+        .right {
+            float: left;
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+        }
+
+        /* 层叠性 */
+        .right {
+            float: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="left">左青龙</div>
+    <div class="right">右白虎</div>
+</body>
+
+</html>
+```
+
+![](imgs/de37b40546de207efcb6265cd42a2650ed6df8aa.jpg)
+
+### ⭕1.5 浮动的特点
+
+1. 浮动元素会脱离标准流（脱标），不再占据文档流中的位置 
+
+   - 脱离标准普通流的控制（浮） 移动到指定位置（动），（俗称脱标）
+   - 浮动的盒子不再保留原先的位置
+
+   ![image-20220724111930677](imgs/5cd453fc5e03e00386dbda2d76965dc86071a140.png)
+
+   ```html
+   <!doctype html>
+   <html lang="en">
+   
+   <head>
+       <meta charset="UTF-8">
+       <meta name="viewport" content="width=device-width, initial-scale=1.0">
+       <meta http-equiv="X-UA-Compatible" content="ie=edge">
+       <title>浮动特性1</title>
+       <style>
+           /* 设置了浮动（float）的元素会：
+           1.脱离标准普通流的控制（浮）移动到指定位置（动）。
+           2.浮动的盒子不再保留原先的位置 */
+           .box1 {
+               float: left;
+               width: 200px;
+               height: 200px;
+               background-color: pink;
+           }
+   
+           .box2 {
+               width: 300px;
+               height: 300px;
+               background-color: gray;
+           }
+       </style>
+   </head>
+   
+   <body>
+       <div class="box1">浮动的盒子</div>
+       <div class="box2">标准流的盒子</div>
+   </body>
+   
+   </html>
+   ```
+
+   ![image-20220724112035670](imgs/ba21d238dc3b6adfcd00ef9a31c55d783fbcee32.png)
+
+2. 设置浮动以后，元素会向父元素的左侧或右侧移动 
+
+3. 浮动元素默认不会从父元素中移出 
+
+```html
+<style>
+    .box1 {
+        width: 100px;
+        height: 100px;
+        background-color: orange;
+        float: left;
+    }
+
+    .box2 {
+        width: 200px;
+        height: 200px;
+        background-color: red;
+    }
+</style>
+
+<div class="box1"></div>
+<div class="box2"></div>
+```
+
+
+![image-20220725222158877](imgs/1105996f9fc6b78c0bc9ad869353e2a9562bb2e8.png)
+
+4. 浮动元素向左或向右移动时，不会超过前边的浮动元素（先来后到的顺序） 
+
+```html
+<style>
+    .box1 {
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+        float: left;
+    }
+
+    .box2 {
+        width: 200px;
+        height: 200px;
+        background-color: red;
+        float: left;
+    }
+
+    .box3 {
+        width: 200px;
+        height: 200px;
+        background-color: yellow;
+        float: left;
+    }
+</style>
+
+<div class="box1"></div>
+<div class="box2"></div>
+<div class="box3"></div>
+```
+
+
+![image-20220725222223727](imgs/09825cd201962baf8781d414b1f159bbcdc2ab75.png)
+
+5. 浮动元素不会超过上边的浮动的兄弟元素，最多就是和它一样高 
+
+```html
+<style>
+    .box1 {
+        width: 300px;
+        height: 300px;
+        background-color: orange;
+        float: left;
+    }
+
+    .box2 {
+        width: 400px;
+        height: 400px;
+        background-color: red;
+        float: left;
+    }
+
+    .box3 {
+        width: 300px;                                              
+        height: 300px;
+        background-color: yellow;
+        float: right;
+    }
+</style>
+
+<div class="box1"></div>
+<div class="box2"></div>
+<div class="box3"></div>
+```
+
+
+![](imgs/7569bb004155ade09bd684b65bbcdd56446b986a.gif)
+
+6. 如果浮动元素的上边是一个没有浮动的块元素，则浮动元素无法上移 
+
+```html
+<style>
+    .box1 {
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+    }
+
+    .box2 {
+        width: 200px;
+        height: 200px;
+        background-color: red;
+        float: left;
+    }
+</style>
+
+<div class="box1"></div>
+<div class="box2"></div>
+```
+
+
+![image-20220725222310495](imgs/cd653d553cd22fe12feb441059abb8f7d277b661.png)
+
+7. 浮动元素不会盖住文字，文字会自动环绕在浮动元素的周围，所以我们可以利用浮动来设置文字环绕图片的效果
+   ![image-20220725222324110](imgs/d3e2e613025150863be863c094c0754c4435615f.png)
+
+8. 浮动的元素会一行内显示并且元素顶部对齐
+
+- 如果多个盒子都设置了浮动，则它们会按照属性值一行内显示并且顶端对齐排列。
+- 浮动的元素是互相贴靠在一起的（不会有缝隙），如果父级宽度装不下这些浮动的盒子，多出的盒子会另起一行对齐。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>浮动元素特性-浮动元素一行显示</title>
+    <style>
+        div {
+            float: left;
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+        }
+
+        .two {
+            background-color: skyblue;
+            height: 249px;
+        }
+
+        .four {
+            background-color: skyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <div>1</div>
+    <div class="two">2</div>
+    <div>3</div>
+    <div class="four">4</div>
+</body>
+
+</html>
+```
+
+![](imgs/a0b1b641034d6a2ce717ed8234f34c5344300929.jpg)
+
+![](imgs/d9d3170d62958ec18596671257355e151afd4f88.gif)
+
+![](imgs/48cd7e860fa59f9f16dcc9be04f1c165573bfd8f.gif)
+
+9. 浮动的元素会具有行内块元素的特性
+
+任何元素都可以浮动。不管原先是什么模式的元素，添加浮动之后具有行内块元素相似的特性。
+
+- 块级盒子：没有设置宽度时默认宽度和父级一样宽，但是添加浮动后，它的大小根据内容来决定
+- 行内盒子：宽度默认和内容一样宽，直接设置高宽无效，但是添加浮动后，它的大小可以直接设置
+- 浮动的盒子中间是没有缝隙的，是紧挨着一起的
+- **即：默认宽度由内容决定，同时支持指定高宽，盒子之间无空隙**
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>浮动的元素具有行内块元素特点</title>
+    <style>
+        /* 任何元素都可以浮动。不管原先是什么模式的元素，添加浮动之后具有行内块元素相似的特性。 */
+        span,
+        div {
+            float: left;
+            width: 200px;
+            height: 100px;
+            background-color: pink;
+        }
+
+        /* 如果行内元素有了浮动，则不需要转换块级\行内块元素就可以直接给高度和宽度 */
+        p {
+            float: right;
+            height: 200px;
+            background-color: skyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <span>span1</span>
+    <span>span2</span>
+
+    <div>div</div>
+    <p>pppppppppppppp</p>
+</body>
+
+</html>
+```
+
+![](imgs/a59a0c7ac79e8462dba563c8096622d00868a097.jpg)
+
+**注意：之所以顶部没有对齐，原因是 p 标签自带的外边距 > span div 自带的外边距。**
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>浮动的元素具有行内块元素特点</title>
+    <style>
+        * {
+            margin: 0px;
+        }
+
+        /* 任何元素都可以浮动。不管原先是什么模式的元素，添加浮动之后具有行内块元素相似的特性。 */
+        span,
+        div {
+            float: left;
+            width: 200px;
+            height: 100px;
+            background-color: pink;
+        }
+
+        /* 如果行内元素有了浮动,则不需要转换块级\行内块元素就可以直接给高度和宽度 */
+        p {
+            float: right;
+            height: 200px;
+            background-color: skyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <span>span1</span>
+    <span>span2</span>
+
+    <div>div</div>
+    <p>pppppppppppppp</p>
+</body>
+
+</html>
+```
+
+![](imgs/ed63445174668c3b33282eaa64768cb507ec8148.jpg)
+
+简单总结：
+
+- 浮动目前来讲它的主要作用就是让页面中的元素可以水平排列，通过浮动可以制作一些水平方向的布局
+
+- 元素设置浮动以后，将会从文档流中脱离，从文档流中脱离后，元素的一些特点也会发生变化
+
+### ⭕1.6 脱离文档流的特点
+
+块元素：
+
+- 块元素不再独占页面的一行
+
+- 脱离文档流以后，块元素的宽度和高度默认都被内容撑开
+
+```html
+<style>
+    .box1 {
+        background-color: orange;
+        /* float: left; */
+    }
+</style>
+
+<div class="box1">hello</div>
+```
+
+![](imgs/c4886c62e4a5ed8375bd84391b8710f112abe64c.gif)
+
+行内元素：
+
+- 行内元素脱离文档流以后会，特点和块元素一样
+
+```html
+<style>
+    span {
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+        float: left;
+    }
+</style>
+
+<span>I am a Span</span>
+```
+
+![](imgs/91e206de6ead4f59828693bd63963e6e75aa5b13.gif)
+
+脱离文档流之后的特点很像行内块元素，不过存在一些差异
+
+```html
+<style>
+    span {
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+        /* display: inline-block; */
+        float: left;
+    }
+</style>
+
+<span>I am a Span</span>
+<span>I am a Span</span>
+```
+
+![](imgs/dba2e89a2f8fab6bdc4563fd628926afc4ac2e97.gif)
+
+## 2.常见网页布局
+
+### 2.1 页面布局分析
+
+**为了提高网页制作的效率，布局时通常有以下的布局流程：**
+
+1. 必须确定页面的版心（可视区），我们测量可得知
+
+2. 分析页面中的行模块，以及每个行模块中的列模块。其实页面布局，就是一行行罗列而成的
+
+3. 制作 `HTML` 结构。我们还是遵循，先有结构，后有样式的原则。结构永远最重要
+
+4. 开始运用盒子模型的原理，通过 `div` + `CSS` 布局来控制网页的各个模块
+
+### 2.2 初识常见网页布局
+
+![](imgs/7aaf75615b985f97a9072793da93e4221d21273d.jpg)
+
+![](imgs/fe8fffed4be10174685e1dd0fe3cdc729b5f1c1e.jpg)
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>常见网页布局</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        li {
+            list-style: none;
+        }
+
+        .top {
+            height: 50px;
+            background-color: gray;
+        }
+
+        .banner {
+            width: 980px;
+            height: 150px;
+            background-color: gray;
+            margin: 10px auto;
+        }
+
+        .box {
+            width: 980px;
+            margin: 0 auto;
+            height: 300px;
+            background-color: pink;
+        }
+
+        .box li {
+            float: left;
+            width: 237px;
+            height: 300px;
+            background-color: gray;
+            margin-right: 10px;
+        }
+
+        .box .last {
+            margin-right: 0;
+        }
+
+        /* 只要是通栏的盒子（和浏览器一样宽）不需要指定宽度 */
+        .footer {
+            height: 200px;
+            background-color: gray;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top">top</div>
+    <div class="banner">banner</div>
+    <div class="box">
+        <ul>
+            <li>1</li>
+            <li>2</li>
+            <li>3</li>
+            <li class="last">4</li>
+        </ul>
+    </div>
+    <div class="footer">footer</div>
+</body>
+
+</html>
+```
+
+![](imgs/59d4b256d05999072b2729d0c66a06ce83d8befb.jpg)
+
+### 2.3 完整布局
+
+**整体样式**
+
+![image-20220725222522959](imgs/84ee9bf4d0117d87f8fb54fe1847027008293a9a.png)
+
+**目的**
+
+1. 熟悉布局（块元素、浮动）
+
+2. 公共css部分复用
+
+3. 复习语义标签
+
+#### ⭕**代码**
+
+```html
+<!-- 页眉 -->
+<header></header>
+<!-- 主体 -->
+<main>
+    <!-- 左边栏 -->
+    <nav></nav>
+    <!-- 中心 -->
+    <article>
+        <!-- 内容上 -->
+        <div class="top"></div>
+        <!-- 内容下 -->
+        <div class="bottom">
+            <!-- 内容左 -->
+            <div class="left"></div>
+            <!-- 内容中 -->
+            <div class="middle"></div>
+            <!-- 内容右 -->
+            <div class="right"></div>
+        </div>
+    </article>
+    <!-- 右边栏 -->
+    <aside></aside>
+</main>
+<!-- 页脚 -->
+<footer></footer>
+```
+
+**css代码**
+
+```css
+/* 公共部分 */
+header,
+main,
+footer {
+    width: 1000px;
+    margin: 10px auto;
+}
+
+main nav,
+main article,
+main aside {
+    float: left;
+    /* 虽然设置浮动了，但整体大小是被内容撑开的，所以设置一个高度 */
+    height: 100%;
+}
+
+.bottom .left,
+.bottom .middle,
+.bottom .right {
+    float: left;
+    width: 220px;
+    height: 100%;
+}
+
+/* ==========整体布局-上========== */
+header {
+    height: 100px;
+    background-color: silver;
+}
+
+/* ==========整体布局-中========== */
+main {
+    height: 400px;
+    background-color: #bfa;
+}
+
+
+/* ------左边栏------ */
+main nav {
+    width: 150px;
+    background-color: red;
+}
+
+/* ------中心------ */
+main article {
+    width: 680px;
+    background-color: green;
+    margin: 0 10px;
+}
+
+/* ---上--- */
+article .top {
+    height: 190px;
+    background-color: yellow;
+    margin-bottom: 10px;
+}
+
+/* ---下--- */
+article .bottom {
+    height: 200px;
+    background-color: orange;
+}
+
+
+/* 左 */
+.bottom .left {
+    background-color: lightblue;
+}
+
+/* 中 */
+.bottom .middle {
+    background-color: gray;
+    margin: 0 10px;
+}
+
+/* 右 */
+.bottom .right {
+    background-color: wheat;
+}
+
+/* ------右边栏------ */
+main aside {
+    width: 150px;
+    background-color: blue;
+}
+
+/* ==========整体布局-下========== */
+footer {
+    height: 100px;
+    background-color: tomato;
+}
+```
+
+**效果**
+
+![image-20220725222543224](imgs/a62dbaabc73bf46c3ec3498bccf4bada91c0e911.png)
+
+# 10 【高度塌陷与BFC】
+
+## ⭕1.高度塌陷
+
+在浮动布局中，父元素的高度默认是被子元素撑开的
+
+当子元素浮动后，其会完全脱离文档流，子元素从文档流中脱离将会无法撑起父元素的高度，导致父元素的高度丢失
+
+父元素高度丢失以后，其下的元素会自动上移，导致页面的布局混乱
+
+![](imgs/cb831d42c016c9f6ddd693d5c1d9135dafa780fc.gif)
+
+所以高度塌陷是浮动布局中比较常见的一个问题，这个问题我们必须要进行处理！
+
+## ⭕2.BFC
+
+BFC（Block Formatting Context）块级格式化环境
+
+- BFC是一个CSS中的一个隐含的属性，可以为一个元素开启BFC
+
+- 开启BFC该元素会变成一个独立的布局区域
+
+元素开启BFC后的特点：
+
+- 不会被浮动元素覆盖
+
+- 父子元素外边距不会重叠
+
+- 可以包含浮动的元素
+
+可以通过一些特殊方式来开启元素的BFC：
+
+-  设置为浮动（不推荐）：很明显下方元素被覆盖了，总不能让所有元素都浮动吧
+
+![](imgs/649066ea4f2cfd1f758f76fbaa8264fdd39087e0.gif)
+
+-  设置为行内块元素（不推荐）：不再独占一行，宽度变了，同时与下方元素产生了一点空隙
+
+![](imgs/d5d8b3c4b8e93a6456bb0bd6eb62a992011eaaa8.gif)
+
+- 设置`overflow`为非`visible`值：既没有覆盖元素，也保持了独占一方的特性（保持了宽度），与下方元素也保持了最初的间隙
+  常用的方式为元素设置`overflow:hidden`（`overflow:auto`也是ok的） 开启其BFC， 以使其可以包含浮动元素
+  `overflow:scroll` 会有滚动条，可能并不需要的，所以不太推荐
+
+![](imgs/86fb66d46989bcb8168f3f2cac7b1a668806ddc8.gif)
+
+不过，这种方式也存在一定问题，如下，`overflow`并没有完全清除div2布局上受到的影响
+
+**总结**
+
+- 可以通过变成浮动元素，来防止自身被浮动元素覆盖（有点“以毒攻毒”那味了）
+
+- 可以设置行内块，来防止自身及其他元素被浮动元素覆盖（如果说浮动是“独善其身”，那行内块就有点“兼济天下”的意思）
+
+- 可以设置`overflow`属性，包含浮动元素（既“独善其身”，又“兼济天下”，但仍有缺陷）
+
+## 3.为什么需要清除浮动？
+
+**问题**
+
+由于父级盒子很多情况下不方便给高度，但是子盒子浮动又不占有位置，最后父级盒子高度为 0 时，就会影响下面的标准流盒子。
+
+![](imgs/4059beaa8f82849bf8cb17059a2a734fcc6ff663.png)
+
+- 由于浮动元素不再占用原文档流的位置，所以它会对后面的元素排版产生影响
+
+- 此时一但父盒子下面有其他盒子，那么布局就会发生严重混乱！
+
+**实际开发**
+
+我们前面浮动元素有一个标准流的父元素，他们有一个共同的特点，都是有高度的。
+
+但是，所有的父盒子都必须有高度吗？
+
+答案：不一定！比如，一个产品列表，随着时期的不同，产品数量也不同，所需的盒子大小也会随之改变，那么直接固定盒子高度的形式显然就是不行的。再比如，文章之类的盒子，不同的文章字数是不相同的，那么显然盒子也不能直接固定高度。
+
+理想中的状态，让子盒子撑开父亲。有多少孩子，我父盒子就有多高。
+
+但是不给父盒子高度会有问题吗？
+
+答案：会！但有方法解决（清除浮动）。
+
+## 4.清除浮动本质
+
+- 清除浮动的本质是清除浮动元素造成的影响
+- 如果父盒子本身有高度，则不需要清除浮动
+- 清除浮动之后，父级就会根据浮动的子盒子自动检测高度。父级有了高度，就不会影响下面的标准流了
+
+## ⭕5.clear
+
+我们这里设计三个兄弟元素，对前两个元素进行`float`的浮动属性设置，看下效果
+
+![](imgs/d25085f2343f9c84051968881b615aa725ac8b8f.gif)
+
+由于box1的浮动，导致box3位置上移也就是box3受到了box1浮动的影响，位置发生了改变（注意，这里文字并没有被覆盖，这个就是“文字环绕”的问题）
+
+如果我们不希望某个元素因为其他元素浮动的影响而改变位置，可以通过`clear`属性来清除浮动元素对当前元素所产生的影响
+
+`clear`作用：清除浮动元素对当前元素所产生的影响（本质是为元素添加一个`margin-top`属性，值由浏览器自动计算）
+
+语法：
+
+```css
+选择器 { clear: 属性值; }
+```
+
+| 属性值 | 描述                                                         |
+| ------ | ------------------------------------------------------------ |
+| left   | 不允许左侧有浮动元素（清除左侧浮动元素对当前元素的影响）     |
+| right  | 不允许右侧有浮动元素（清除右侧浮动元素对当前元素的影响）     |
+| both   | 清除两侧中影响较大一侧元素的影响（注意，这里不是同时清除两侧的影响） |
+
+**我们实际工作中，几乎只用 `clear: both;`**
+
+清除浮动的策略是：闭合浮动。
+
+![](imgs/482e25bf375df1a8754999ca878557795ef5916d.gif)
+
+## 6.清除浮动方法
+
+1. 额外标签法也称为隔墙法，是 W3C 推荐的做法。(实际开发不推荐)
+2. 父级添加 overflow 属性
+3. 父级添加 after 伪元素
+4. 父级添加 双伪元素
+
+## ⭕7.清除浮动 —— 额外标签法
+
+额外标签法也称为隔墙法，是 W3C 推荐的做法。
+
+额外标签法会在浮动元素末尾添加一个空的标签。例如 `<div style="clear: both"></div>`，或者其他标签（如 `<br>` 等）。
+
+- 优点： 通俗易懂，书写方便
+- 缺点： 添加许多无意义的标签，结构化较差
+
+注意： 要求这个新的空标签必须是**块级元素**。
+
+总结：
+
+- 清除浮动本质是？
+
+清除浮动的本质是清除浮动元素脱离标准流造成的影响。
+
+- 清除浮动策略是？
+
+闭合浮动。只让浮动在父盒子内部影响，不影响父盒子外面的其他盒子。
+
+- 额外标签法？
+
+**隔墙法，就是在最后一个浮动的子元素后面添加一个额外空标签（块级标签），添加清除浮动样式。**
+
+实际工作可能会遇到，但是不常用。
+
+![](imgs/30becfe12a0e171a34a9e8db15b4409ea8f65554.gif)
+
+## 8.清除浮动 —— 父级添加 overflow
+
+可以给父级添加 `overflow` 属性，将其属性值设置为 `hidden`、 `auto` 或 `scroll`。
+
+子不教，父之过，注意是给父元素添加代码。
+
+- 优点：代码简洁
+- 缺点：无法显示溢出的部分
+
+![](imgs/e23ffa49c186f2edb08208ec3f391d6bb3dc7bb0.gif)
+
+
+
+## 9.清除动 —— ::after 伪元素法
+
+`::after` 方式是额外标签法的升级版，也是给父元素添加代码。
+
+原理：自动在父盒子里的末尾添加一个 行内盒子，我们将它转换为 块级盒子，就间接实现了额外标签法。
+
+```css
+.clearfix::after {
+	content: "";
+	display: block;
+	clear: both;
+}
+```
+
+注意：类名不一定非要是 clearfix，但是还是推荐这么写以提高可读性。
+
+- 优点：没有增加标签，结构更简单
+- 缺点：需要单独照顾低版本浏览器
+- 代表网站： 百度、淘宝网、网易等
+
+![](imgs/a854b5157e221b7dc8bcf08959dc0daf8088fd84.gif)
+
+**Q1：这里使用了一个伪元素选择器**`::after`**，那有人会问了，跟在box2下直接定义一个box3有什么区别呢？**
+
+A：我们知道，网页的结构思想是：结构+表现+行为。在box2下直接定义一个box3，属于结构；而使用伪元素选择器，属于表现
+
+而高度塌陷问题属于表现问题，所以在css中定义`::after`更符合网页的编程思想
+
+**Q2：为什么需要使用**`display: block`**呢？**
+
+A：因为默认情况下，`::after`伪元素是一个行内元素，如果不转为块元素，将仍然撑不起box1的高度
+
+## 10.清除浮动 —— 双伪元素清除浮动
+
+在前面说过垂直布局中边距重叠的问题：相邻的垂直方向外边距会发生重叠现象
+
+![](imgs/13849d664b6d535a4414241cbeba62df09cabc56.gif)
+
+如上图所示，子元素设置了一个`margin-top`之后，父元素跟随子元素一起进行了移动
+
+即我们之前说的父子元素间相邻外边距，子元素会传递给父元素（上外边距）
+
+可以用刚才说的伪元素选择器啊
+
+好，我们先来看下效果
+
+![](imgs/d70a7ba96684a0ad1d06d0cecc59d8ad4318eedc.gif)
+
+貌似是没有任何变化，到底是什么地方不对呢？
+
+我们再来回顾下使用`after`伪元素的心路历程：
+
+- 使用无内容的box3撑起box1 => 表现代替结构（`::after`代替box3）
+
+- `clear`清除浮动对元素产生的影响（还记得`clear`的原理么？）
+
+其实就是给元素设置了一个`margin-top`属性，不过这个在开发者工具中是看不到的
+
+既然如此，就相当于在box2下面添加一个box3，然后给box3设置一个`margin-top`属性
+
+到此为止，
+
+∵  相邻的垂直方向外边距 这个条件仍然满足
+
+∴  会发生重叠现象这个结论也依然成立
+
+具体点就是，父子元素间相邻外边距，子元素会传递给父元素（上外边距），表现为box1和box2同步往下移动
+
+那我们应该怎么做才能解决这个问题？
+
+当然是让两个元素垂直外边距不相邻啊
+
+![](imgs/9d74fadb9013339de1fa2c8c32dfc8adb08f99b8.gif)
+
+我们用了`before`伪元素选择器，目的当然是让box1和box2的外边距不相邻，但是好像并没有效果
+
+我们再换成`display: inline-block`属性看看
+
+![](imgs/3381254561f84eb6a4f1dcef017de4da8655eb04.gif)
+
+好像是解决了父元素布局的问题，但是子元素怎么还往下跑了一段距离？ 是谁给的勇气？
+
+因为`inline-block`兼顾行内元素和块元素的特点，既可以设置宽高也不独占一行
+
+在没有设置宽高时，会存在一个默认高度，所以`inline-block`仍然行不通
+
+还有一个属性，`display: table`
+
+![](imgs/a72aad33407c91c8e96163f2efc13a51497d3dd7.gif)
+
+**Q1：为什么没有使用clear属性？**
+
+A：不是说了吗？`clear`是为了清除浮动对布局的影响，我们现在没有浮动的元素啊，我们要讨论的也不是浮动的问题
+
+**Q2：display不是还有一个**`none`**属性么，为什么不用呢？**
+
+A：`none`属性是不占据位置，但是也不能让元素相邻的外边距分离啊
+
+**Q3：为什么**`table`值就可以呢？
+
+A：这个也是开启BFC的方法，而且，应该牢记的是，元素开启BFC后的其中一个特点就是 父子元素外边距不会重叠。当然，这里也需要合理选择伪元素选择器，使其外边距不相邻才行
+
+另外，总结一下：
+
+- 高度塌陷问题，一般用`::after`
+
+- 外边距重叠问题，一般用`::before`
+
+`clearfix` 这个样式就可以同时解决高度塌陷和外边距重叠的问题
+
+当你在遇到这些问题时，直接使用`clearfix`这个类即可，他就可以帮你轻松搞定css中的两大难题
+
+额外标签法的升级版，也是给给父元素添加代码。
+
+原理：自动在父盒子里的两端添加两个行内盒子，并把它们转换为 表格，间接实现了额外标签法。
+
+```css
+.clearfix::before,
+.clearfix::after{
+    content: '';
+    display: table;
+    clear: both;
+}
+
+```
+
+其中`.clearfix::before`是为了解决外边距重叠问题
+
+```css
+.clearfix::before{
+    content: '';
+    display: table;
+}
+```
+
+`.clearfix::after`是为了解决高度塌陷问题
+
+````css
+.clearfix::after{
+    content: '';
+    display: table;
+    clear: both;
+}
+````
+
+![image-20220726232650221](imgs/860ffdab3225425988275d40550df694e7b5cb57.png)
+
+## ⭕11.清除浮动总结
+
+为什么需要清除浮动？
+
+- 父级没高度
+- 子盒子浮动了
+- 影响下面布局了，我们就应该清除浮动了
+
+| 清除浮动的方式         | 优点               | 缺点                                 |
+| ---------------------- | ------------------ | ------------------------------------ |
+| 额外标签法（隔墙法）   | 通俗易懂，书写方便 | 添加许多无意义的标签，结构化较差     |
+| 父级 overflow: hidden; | 书写简单           | 溢出隐藏                             |
+| 父级 after 伪元素      | 结构语义化正确     | 由于 IE6~7 不支持 :after，兼容性问题 |
+| 父级双伪元素           | 结构语义化正确     | 由于 IE6~7 不支持 :after，兼容性问题 |
+
+# 11 【定位】
+
+## 1.为什么需要定位？
+
+提问： 以下情况使用标准流或者浮动能实现吗？
+
+1. 某个元素可以**自由**的在一个盒子内移动位置，并且压住其他盒子。
+
+2. 当我们滚动窗口的时候，盒子是**固定**屏幕某个位置的。
+
+以上效果，标准流或浮动都无法快速实现，此时需要定位来实现。
+
+所以：
+
+1. 浮动可以让多个块级盒子一行没有缝隙排列显示， 经常用于横向排列盒子。
+2. 定位则是可以让盒子自由的在某个盒子内移动位置或者固定屏幕中某个位置，并且可以压住其他盒子。
+
+## ⭕2.定位组成
+
+定位：将盒子定在某一个位置，所以定位也是在摆放盒子， 按照定位的方式移动盒子。
+
+`定位 = 定位模式 + 边偏移`
+
+- 定位模式用于指定一个元素在文档中的定位方式
+- 边偏移则决定了该元素的最终位置
+
+**（1）定位模式**
+
+定位模式决定元素的定位方式，它通过 CSS 的 `position` 属性来设置，其值可以分为四个。
+
+| 值         | 语义     |
+| ---------- | -------- |
+| `static`   | 静态定位 |
+| `relative` | 相对定位 |
+| `absolute` | 绝对定位 |
+| `fixed`    | 固定定位 |
+| `sticky`   | 粘滞定位 |
+
+**（2）边偏移**
+
+边偏移就是定位的盒子移动的最终位置。有 `top`、`bottom`、`left` 和 `right` 4 个属性。
+
+注意：可以为负值。
+
+| 边偏移属性 | 实例           | 描述                                           |
+| ---------- | -------------- | ---------------------------------------------- |
+| `top`      | `top: 80px`    | 顶端偏移量，定位元素相对于其父元素上边线的距离 |
+| `bottom`   | `bottom: 80px` | 底部偏移量，定位元素相对于其父元素下边线的距离 |
+| `left`     | `left: 80px`   | 左侧偏移量，定位元素相对于其父元素左边线的距离 |
+| `rigth`    | `right: 80px`  | 右侧偏移量，定位元素相对于其父元素右边线的距离 |
+
+## ⭕3.相对定位
+
+### 3.1 基本使用
+
+相对定位是元素在移动位置的时候**相对于它原来的位置**来说的定位。
+
+语法：
+
+```css
+选择器 { position: relative; }
+```
+
+当元素开启相对定位以后，可以通过偏移量来设置元素的位置
+
+| offset属性 | 含义                         |
+| ---------- | ---------------------------- |
+| `top`      | 定位元素和定位位置的上边距离 |
+| `bottom`   | 定位元素和定位位置的下边距离 |
+| `left`     | 定位元素和定位位置的左侧距离 |
+| `right`    | 定位元素和定位位置的右侧距离 |
+
+定位元素垂直方向的位置由`top`和`bottom`两个属性控制，通常情况下只会使用其中之一
+
+- `top`值越大，定位元素越靠下
+
+- `bottom`值越大，定位元素靠上
+
+定位元素水平方向的位置由`left`和`right`两个属性控制，通常情况下只会使用其中之一
+
+- `left`越大，定位元素越靠右
+
+- `right`越大，定位元素越靠左
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>相对定位</title>
+    <style>
+        .box1 {
+            position: relative;
+            top: 100px;
+            left: 100px;
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+        }
+
+        .box2 {
+            width: 200px;
+            height: 200px;
+            background-color: deeppink;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box1">
+
+    </div>
+    <div class="box2">
+
+    </div>
+
+</body>
+
+</html>
+```
+
+<img src="imgs/1252ef4ee4160a9c7790f7623587083ef2f7fd36.gif"  />
+
+### 3.2 相对定位的特点
+
+**相对定位的特点：（务必记住）**
+
+1.  当元素开启相对定位以后，如果不设置偏移量元素，则元素不会发生任何变化（这里注意，不仅仅是位置） 
+
+2.  相对定位是**参照于元素在文档流中的位置**进行定位的（可以理解为相对于自身原始位置） 
+
+3.  相对定位会**提升元素的层级**（表现为可以覆盖其他元素） 
+
+4.  相对定位**不会改变元素的性质**：块还是块，行内还是行内 
+
+![](imgs/c8d39525e6b3132cf246403f731ef558a36f4820.gif)
+
+**Q1：如果给上述三个div都设置相对定位，那么它们的层级关系会是什么样的呢？或者说谁会被谁覆盖呢？**
+
+A：我们直接进行测试验证
+
+![](https://i0.hdslb.com/bfs/album/ad0d5f7dce73ac8029b91762208f68e69a0ab7e8.png)
+
+可以看到覆盖关系是：box3 >> box2 >> box1
+
+可以大概猜测：**在页面文档流中，越靠下的元素开启相对定位后，其层级越高（没有设置层级或层级`z-index`设置相同值时，优先显示靠下的元素）**
+
+**Q2：相对定位的第三个特点相对定位会提升元素的层级，是不是就类似于浮动一样脱离了文档流？**
+
+A：我们可以对比下，浮动和相对定位的区别
+
+- 参考系不同：浮动的参考系是其父元素；相对定位是相对于自身
+
+- 可移动方向不同：浮动只能左右移动；相对定位是上下左右移动
+
+- 影响不同：浮动会影响页面布局（包括下方元素位置影响和高度塌陷问题）；相对定位不对影响页面布局
+
+- 性质不同：浮动会改变元素的性质（不再独占一行，其宽高都会被内容撑开）；相对定位不会改变元素的性质
+
+- 文字环绕：浮动不会覆盖文字；相对定位可以覆盖文字（这个可以自行验证，不再赘述）
+
+当然，浮动和相对定位也有其相似之处
+
+- 浮动和相对定位都是移动位置
+
+- 浮动和相对定位不会从父元素中移出
+
+可以看出，浮动和相对定位的区别是更多的
+
+最后回答一点：浮动脱离了文档流，不再占据页面位置；相对定位仍然占据页面位置
+
+**Q3：相对定位的第四个特点相对定位不会改变元素的性质：块还是块，行内还是行内，但是上述例子中元素开启相对定位后好像就不再独占一行了，这个怎么理解？**
+
+A：相比于浮动元素的特点，相对定位不会改变元素的性质其实是一个相对不容易理解的问题。其位置发生改变以后，布局并没有产生影响，因为它的结构仍然占据着原来的那个位置。只是其内容发生了移动。
+
+**Q4：相对定位的第四个特点中块还是块，行内还是行内，意味着行内元素也可以使用相对定位是吗？**
+
+A：是的
+
+## ⭕4.绝对定位
+
+绝对定位是元素在移动位置的时候**相对于它祖先元素**来说的定位（拼爹型）。
+
+语法：
+
+```css
+选择器 { position: absolute; }
+```
+
+绝对定位的特点：（务必记住）
+
+1. 开启绝对定位后，如果不设置偏移量，元素的位置不会发生变化
+
+2. 绝对定位**不再占有原先的位置**（脱标），并且**脱标的程度大于浮动**（会压住浮动）
+
+3. 绝对定位会**改变元素的性质**：行内变成块，块的宽高被内容撑开（与相对定位相反）
+
+4. 绝对定位会**使元素提升一个层级**
+
+5. 如果没有祖先元素或者祖先元素没有定位，则以浏览器为准定位（Document 文档）
+
+6. 如果祖先元素有定位（相对、绝对、固定定位），则以**最近一级的有定位祖先元素为参考点**移动位置
+
+![](imgs/8f0016e21d1cd43fe35c7a71cf51068d4f9bd6af.gif)
+
+## ⭕5.布局
+
+### 5.1 水平方向的布局
+
+我们之前说过，水平方向的布局等式：
+
+```css
+margin-left + border-left + padding-left + width + padding-right + border-right + margin-right = 其父元素的宽度
+```
+
+当使用绝对定位时，需要添加`left`和`right`两个值（此时规则和之前一样，只是多添加了两个值）
+
+```css
+left + margin-left + border-left + padding-left + width + padding-right + border-right + margin-right + right = 其父元素的宽度
+```
+
+当发生过度约束时
+
+- 如果9个值中没有`auto`，则自动调整`right`值以使等式满足（之前7个值是`margin-right`）
+
+- 如果9个值中有`auto`，则自动调整`auto`的值以使等式满足
+
+可设置`auto`的值：`margin-left`/`margin-right` /`width`/`left`/`right`
+
+**因为`left`和`right`的值默认是`auto`，所以如果没有设置`left`和`right`，当等式不满足时，则会自动调整这两个值**
+
+### 5.2 水平居中
+
+```html
+<style>
+    .box1 {
+        width: 500px;
+        height: 500px;
+        background-color: #bfa;
+        position: relative;
+    }
+
+    .box2 {
+        width: 100px;
+        height: 100px;
+        background-color: orange;
+        /* 左右外边距设置为auto */
+        margin-left: auto;
+        margin-right: auto;
+        /* 绝对定位 */
+        position: absolute;
+        left: 0;
+        right: 0;
+    }
+</style>
+
+<div class="box1">
+    <div class="box2"></div>
+</div>
+```
+
+![image-20220727230449308](imgs/dacb961ba950eea5d1d2af36e0d2bdbcb4288fa7.png)
+
+### 5.3 垂直方向的布局
+
+垂直方向布局的等式的也必须要满足
+
+```css
+top + margin-top + border-top + padding-top + height + padding-bottom + border-bottom + margin-bottom + top = 其父元素的高度
+```
+
+### 5.4 垂直居中
+
+```css
+.box2 {
+    width: 100px;
+    height: 100px;
+    background-color: orange;
+    /* 左右外边距设置为auto */
+    margin-top: auto;
+    margin-bottom: auto;
+    /* 绝对定位 */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+}
+```
+
+![image-20220727230549386](imgs/18a634217ebcab0cfaa9f411f90cb351d5557160.png)
+
+### 5.5 水平垂直居中
+
+目前，我们可以根据绝对定位进行元素的水平垂直双方向居中，所以这个方法只是其中之一
+
+```css
+.box2 {
+    width: 100px;
+    height: 100px;
+    background-color: orange;
+    /* 左右外边距设置为auto */
+    margin: auto;
+    /* 绝对定位 */
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+```
+
+![image-20220727230720123](imgs/fc30c32dd054568b17df1fbccce519edc36f7569.png)
+
+### ⭕5.6 小结
+
+- 水平布局等式：`left + margin-left + border-left + padding-left + width + padding-right + border-right + margin-right + right = 其父元素的宽度`
+
+- 垂直布局等式：`top + margin-top + border-top + padding-top + height + padding-bottom + border-bottom + margin-bottom + top = 其父元素的高度`
+
+- 只是在没有`auto`时，会自动调整`top`/`bottom`/`left`/`right`
+
+## ⭕6.子绝父相的由来
+
+弄清楚这个口诀，就明白了绝对定位和相对定位的使用场景。
+
+这个 “子绝父相” 太重要了，是我们学习定位的口诀，是定位中最常用的一种方式这句话的意思是：子级是绝对定位的话，父级要用相对定位。
+
+1. **子级绝对定位，不会占有位置，可以放到父盒子里面的任何一个地方，不会影响其他的兄弟盒子**
+2. **父盒子需要加定位限制子盒子在父盒子内显示**
+3. **父盒子布局时，需要占有位置，因此父亲只能是相对定位**
+
+这就是子绝父相的由来，所以相对定位经常用来作为绝对定位的父级。
+
+总结： 因为父级需要占有位置，因此是相对定位， 子盒子不需要占有位置，则是绝对定位。
+
+当然，子绝父相不是永远不变的，如果父元素不需要占有位置，“子绝父绝” 也会遇到。
+
+**思考：为什么非要用定位？浮动不可以吗？**
+
+答案：用浮动做某些布局远远没有定位简单和方便！例如，轮播图。
+
+<img src="imgs/6d46c8349de90907772ed98292807162352be2cc.jpg" />
+
+- 左右两边的图片切换按钮，利用浮动也可以做。但是，假如放置图片的盒子是在切换按钮之前添加的，那么根据浮动元素只能影响后面盒子的特性，切换按钮就只可能在图片底部之下，不可能浮于图片之上！
+- 就算切换按钮用浮动实现了，但是左下角的轮播序号点图如果也用浮动实现，结果就是轮播序号点图会与切换按钮在一行并排浮动！
+
+可见，浮动单纯用于左右排列盒子是非常适合的，但是用于空间层次上排列盒子就不适合了！应该用定位实现。
+
+**重点：竖向上布局找标准流，横向上布局找浮动，空间上布局找定位！**
+
+## ⭕7.固定定位
+
+固定定位是元素固定于浏览器可视区的位置。
+
+主要使用场景： 可以在浏览器页面滚动时元素的位置不会改变。
+
+语法：
+
+```css
+选择器 { position: fixed; }
+```
+
+固定定位的特点（务必记住）：
+
+1. 以**浏览器的可视窗口为参照点**移动元素
+   - 跟父元素没有任何关系
+   - 不随滚动条滚动
+2. 固定定位不再占有原先的位置
+   - 固定定位也是**脱标**的，其实固定定位也可以看做是一种**特殊的绝对定位**。
+
+![](https://i0.hdslb.com/bfs/album/98f66c22a7c5db3703af279fb45facf376715f81.gif)
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>固定定位</title>
+    <style>
+        .dj {
+            position: fixed;
+            top: 100px;
+            left: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="dj">
+        <img src="images/pvp.png" alt="">
+    </div>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+    <p>请尽情吩咐妲己，主人</p>
+
+</body>
+
+</html>
+```
+
+![](https://i0.hdslb.com/bfs/album/7089e3bb19e5fe34e02fee202ad8b8497fe35e1e.gif)
+
+## 8.固定定位小技巧：固定在版心右侧位置
+
+**小算法：**
+
+1. 让固定定位的盒子 `left: 50%`，走到浏览器可视区（也可以看做版心） 一半的位置
+2. 让固定定位的盒子 `margin-left: 版心宽度的一半距离`，多走版心宽度的一半位置
+
+就可以让固定定位的盒子贴着版心右侧对齐了。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>固定定位小技巧-固定到版心右侧</title>
+    <style>
+        .w {
+            width: 800px;
+            height: 1400px;
+            background-color: pink;
+            margin: 0 auto;
+        }
+
+        .fixed {
+            position: fixed;
+            /* 1. 走浏览器宽度的一半 */
+            left: 50%;
+            /* 2. 利用 margin 走版心盒子宽度的一半距离（为了美观多加了 5px）*/
+            margin-left: 405px;
+            width: 50px;
+            height: 150px;
+            background-color: skyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="fixed"></div>
+    <div class="w">版心盒子 800像素</div>
+
+</body>
+
+</html>
+```
+
+![](https://i0.hdslb.com/bfs/album/952448e94696ff7b7149c583858cf8e3322b7db4.gif)
+
+## ⭕9.粘滞定位
+
+粘性定位可以被认为是相对定位和固定定位的混合。
+
+Sticky 粘性的。
+
+语法：
+
+```css
+选择器 { position: sticky; top: 10px; }
+```
+
+粘性定位的特点：
+
+1. 以浏览器的**可视窗口为参照点**移动元素（固定定位特点）
+2. 粘性定位**占有原先的位置**（相对定位特点）
+3. 必须添加 top 、left、right、bottom 其中一个才有效
+4. **粘滞定位可以在元素到达某个位置时将其固定**
+
+跟页面滚动搭配使用。 兼容性较差，IE 不支持。
+
+未来开发的趋势，但目前并不常用（目前用 javascript 来实现粘性定位效果）。
+
+应用举例：
+
+我们拿之前的`w3cschool顶部导航栏`进行下魔改
+
+```css
+/* 设置一个高度 */
+body {
+    height: 3000px;
+}
+
+.menu {
+    width: 1211px;
+    height: 48px;
+    background-color: #E8E7E3;
+    margin: 100px auto;
+    /* 开启粘滞定位 */
+    position: sticky;
+    top: 10px;
+}
+```
+
+![](https://i0.hdslb.com/bfs/album/f617d217d46c2eef16fc0336b085ff1fb04a420f.gif)
+
+## ⭕10.定位的总结
+
+我们通过上面的学习，知道`position`属性有五个可选值
+
+但`static`是默认值，即不开启定位，所以我们只需要对比4种定位方式即可
+
+| 定位方式             | 是否不设置偏移量，元素不会发生改变 | 是否脱离文档流 | 是否改变元素性质 | 是否提升元素层级 | 参考系                     |
+| -------------------- | ---------------------------------- | -------------- | ---------------- | ---------------- | -------------------------- |
+| relative（相对定位） | √                                  | ×              | ×                | √                | 参照于元素在文档流中的位置 |
+| absolute（绝对定位） | ×                                  | √              | √                | √                | 参照于其包含块             |
+| fixed（固定定位）    | ×                                  | √              | √                | √                | 参照于浏览器的视口         |
+| sticky（粘滞定位）   | ×                                  | √              | √                | √                | 参照于浏览器的视口         |
+
+1. 一定记住，相对定位、固定定位、绝对定位 两个大的特点： 1. 是否占有位置（脱标否） 2. 以谁为基准点移动位置。
+2. 学习定位重点学会子绝父相。
+
+## ⭕11.元素层级
+
+对于开启了定位元素，可以通过`z-index`属性来指定元素的层级
+
+- `z-index`需要一个整数作为参数，值越大元素的层级越高，元素的层级越高越优先显示
+
+- 如果元素的层级一样，则优先显示靠下的元素
+
+- 祖先的元素的层级再高，也不会盖住后代元素
+
+语法：
+
+```css
+选择器 { z-index: 1; }
+```
+
+- 数值可以是正整数、负整数或 0，默认是 auto，数值越大，盒子越靠上
+- 如果属性值相同，则按照书写顺序，后来居上
+- 数字后面不能加单位
+- 只有定位的盒子才有 z-index 属性
+
+```html
+<style>
+    div {
+        font-size: 40px;
+    }
+
+    .box1 {
+        width: 200px;
+        height: 200px;
+        background-color: #bfa;
+        position: absolute;
+        top: 0;
+        left: 0;
+    }
+
+    .box2 {
+        width: 200px;
+        height: 200px;
+        background-color: orange;
+        position: absolute;
+        top: 50px;
+        left: 50px;
+    }
+
+    .box3 {
+        width: 200px;
+        height: 200px;
+        background-color: salmon;
+        position: absolute;
+        top: 100px;
+        left: 100px;
+    }
+
+    .box4 {
+        width: 100px;
+        height: 100px;
+        background-color: skyblue;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+    }
+</style>
+
+<div class="box1">1</div>
+<div class="box2">2</div>
+<div class="box3">3
+    <div class="box4">4</div>
+</div>
+```
+
+![](https://i0.hdslb.com/bfs/album/f9a215f23088ff027174f819cad635594787187a.png)
+
+## ⭕12.定位的拓展
+
+**（1）绝对定位的盒子居中**
+
+**加了绝对定位的盒子不能通过 `margin: 0 auto` 水平居中**，但是可以通过以下计算方法实现水平和垂直居中。
+
+1. `left: 50%;`：让盒子的左侧移动到父级元素的水平中心位置。
+2. `margin-left: -0.5widthpx;`：让盒子向左移动自身宽度的一半，垂直居中类似。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>绝对定位水平垂直居中</title>
+    <style>
+        .box {
+            position: absolute;
+            /* 1. left 走 50%  父容器宽度的一半 */
+            left: 50%;
+            /* 2. margin 负值 往左边走 自己盒子宽度的一半 */
+            margin-left: -100px;
+            /* 垂直居中同理 */
+            top: 50%;
+            margin-top: -100px;
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            /* margin: auto; */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box"></div>
+</body>
+
+</html>
+```
+
+![](https://i0.hdslb.com/bfs/album/6a4eca189816a1833b0e882040c408f2593c7a37.jpg)
+
+**（2）定位特殊特性**
+
+**绝对定位和固定定位也和浮动类似。**
+
+1. 行内元素添加绝对或者固定定位，可以直接设置高度和宽度。
+2. 块级元素添加绝对或者固定定位，如果不给宽度或者高度，默认大小是内容的大小。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>定位的特殊特性</title>
+    <style>
+        span {
+            position: absolute;
+            top: 100px;
+            width: 200px;
+            height: 150px;
+            background-color: pink;
+        }
+
+        div {
+            position: absolute;
+            background-color: skyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <span>123</span>
+
+    <div>abcd</div>
+</body>
+
+</html>
+```
+
+![](https://i0.hdslb.com/bfs/album/b338ce9237b782372605c599baff0f5a977c5ec3.jpg)
+
+**（3）脱标的盒子不会触发外边距塌陷**
+
+浮动元素、绝对定位（固定定位）元素的都不会触发外边距合并的问题。
+
+**（4）绝对定位（固定定位）会完全压住盒子**
+
+浮动元素不同，只会压住它下面标准流的盒子，但是不会压住下面标准流盒子里面的文字（图片）。
+
+但是绝对定位（固定定位） 会压住下面标准流所有的内容。
+
+浮动之所以不会压住文字，因为浮动产生的目的最初是为了做文字环绕效果的。 文字会围绕浮动元素。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>浮动产生原来的目的是做文字环绕效果</title>
+    <style>
+        img {
+            float: left;
+        }
+    </style>
+</head>
+
+<body>
+    1993年，在古装片《战神传说》中扮演一个武功超群的渔民；同年，主演动作喜剧片《至尊三十六计之偷天换日》，在片中饰演赌术高明的千门高手钱文迪；此外，他还主演了爱情片《天长地久》，在片中塑造了一个风流不羁的江湖浪子形象。
+    1994年，刘德华投资并主演了剧情片《天与地》，在片中饰演面对恶势力却毫不退缩的禁毒专员张一鹏。1995年，主演赛车励志片《烈火战车》，在片中饰演叛逆、倔强的阿祖，并凭借该片获得第15届香港电影金像奖最佳男主角提名；同年在动作片《大冒险家》中演绎了立仁从小时候父母双亡到长大后进入泰国空军的故事。
+    1996年，主演黑帮题材的电影《新上海滩》，在片中饰演对冯程程痴情一片的丁力。1997年，担任剧情片《香港制造》的制作人；同年，主演爱情片《天若有情之烽火佳人》，在片中饰演家世显赫的空军少尉刘天伟；12月，与梁家辉联袂主演警匪动作片《黑金》，在片中饰演精明干练、嫉恶如仇的调查局机动组组长方国辉。1998年，主演动作片《龙在江湖》
+    <img src="images/img.jpg" alt="">
+    ，饰演重义气的黑帮成员韦吉祥；同年，出演喜剧片《赌侠1999》；此外，他还担任剧情片《去年烟花特别多》的制作人。
+    1993年，在古装片《战神传说》中扮演一个武功超群的渔民；同年，主演动作喜剧片《至尊三十六计之偷天换日》，在片中饰演赌术高明的千门高手钱文迪；此外，他还主演了爱情片《天长地久》，在片中塑造了一个风流不羁的江湖浪子形象。
+    1994年，刘德华投资并主演了剧情片《天与地》，在片中饰演面对恶势力却毫不退缩的禁毒专员张一鹏。1995年，主演赛车励志片《烈火战车》，在片中饰演叛逆、倔强的阿祖，并凭借该片获得第15届香港电影金像奖最佳男主角提名；同年在动作片《大冒险家》中演绎了立仁从小时候父母双亡到长大后进入泰国空军的故事。
+    1996年，主演黑帮题材的电影《新上海滩》，在片中饰演对冯程程痴情一片的丁力。1997年，担任剧情片《香港制造》的制作人；同年，主演爱情片《天若有情之烽火佳人》，在片中饰演家世显赫的空军少尉刘天伟；12月，与梁家辉联袂主演警匪动作片《黑金》，在片中饰演精明干练、嫉恶如仇的调查局机动组组长方国辉。1998年，主演动作片《龙在江湖》，饰演重义气的黑帮成员韦吉祥；同年，出演喜剧片《赌侠1999》；此外，他还担任剧情片《去年烟花特别多》的制作人。
+</body>
+
+</html>
+```
+
+![](https://i0.hdslb.com/bfs/album/66a190f6bd7af52405aaf36a357298f1b3939a96.jpg)
+
+---
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>定位会完全压住标准流盒子内容</title>
+    <style>
+        .box {
+            /* 1.浮动的元素不会压住下面标准流的文字 */
+            /* float: left; */
+            /* 2. 绝对定位（固定定位） 会压住下面标准流所有的内容。 */
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            background-color: pink;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box"></div>
+    <p>阁下何不同风起，扶摇直上九万里</p>
+</body>
+
+</html>
+```
+
+![1](https://i0.hdslb.com/bfs/album/62062cbaa008f7da0bb3f59450b6d7cc9f1fb6a6.jpg)
+
+# 12 【网页布局总结 元素的显示与隐藏】
+
+## 1.网页布局总结
+
+通过盒子模型，清楚知道大部分 html 标签是一个盒子。
+
+通过 CSS 浮动、定位可以让每个盒子排列成为网页。
+
+一个完整的网页，是标准流、浮动、定位一起完成布局的，每个都有自己的专门用法。
+
+1. 标准流
+
+可以让盒子上下排列或者左右排列，垂直的块级盒子显示就用标准流布局。
+
+2. 浮动
+
+可以让多个块级元素一行显示或者左右对齐盒子，多个块级盒子水平显示就用浮动布局。
+
+3. 定位
+
+定位最大的特点是有层叠的概念，就是可以让多个盒子前后叠压来显示。如果元素自由在某个盒子内移动就用定位布局。
+
+**重点：竖向上布局找标准流，横向上布局找浮动，空间上布局找定位！**
+
+## 2.元素的显示与隐藏
+
+类似网站广告，当我们点击关闭就不见了，但是我们重新刷新页面，会重新出现！
+
+本质：让一个元素在页面中隐藏或者显示出来。
+
+注意：是隐藏，不是删除！
+
+1. display 显示隐藏（脱标）
+2. visibility 显示隐藏（不脱标）
+3. overflow 溢出显示隐藏
+
+### ⭕2.1 display 属性
+
+display 属性用于设置一个元素应如何显示。
+
+- `display: none`：隐藏对象
+- `display：block`：除了转换为块级元素之外，同时还有显示元素的意思
+
+display 隐藏元素后，不再占有原来的位置（**脱标**）。
+
+后面应用及其广泛，搭配 JS 可以做很多的网页特效。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>显示隐藏元素之display</title>
+    <style>
+        .peppa {
+            display: none;
+            /* display: block; */
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+
+        }
+
+        .george {
+            width: 200px;
+            height: 200px;
+            background-color: skyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="peppa">佩奇</div>		<!-- 佩奇被隐藏 -->
+    <div class="george">乔治</div>
+</body>
+
+</html>
+```
+
+![](imgs/81c5b93d5fbf3b54145e758e5da50ecad04a5291.gif)
+
+---
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>显示隐藏元素之display</title>
+    <style>
+        .peppa {
+            /* display: none; */
+            display: block;
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+
+        }
+
+        .george {
+            width: 200px;
+            height: 200px;
+            background-color: skyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="peppa">佩奇</div>		<!-- 佩奇被显示 -->
+    <div class="george">乔治</div>
+</body>
+
+</html>
+```
+
+![](imgs/774f7f156dd6c7bdcf67835ed072424ed6b21ad0.gif)
+
+### ⭕2.2 visibility 可见性
+
+visibility 属性用于指定一个元素应可见还是隐藏。
+
+- `visibility：visible`：元素可视
+- `visibility：hidden`：元素隐藏
+
+visibility **隐藏元素后，继续占有原来的位置**。
+
+如果隐藏元素想要原来位置， 就用 visibility：hidden。
+
+如果隐藏元素不想要原来位置， 就用 display：none（用处更多，重点）。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>显示隐藏元素之display</title>
+    <style>
+        .baba {
+            visibility: hidden;
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+
+        }
+
+        .mama {
+            width: 200px;
+            height: 200px;
+            background-color: skyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="baba">猪爸爸</div>
+    <div class="mama">猪妈妈</div>
+</body>
+
+</html>
+```
+
+![](imgs/f5c087130d5c95e7abd154c76c9446ac43ba6395.gif)
+
+### ⭕2.3 overflow 溢出
+
+overflow 属性指定了如果内容溢出一个元素的框（**超过其指定高度及宽度**）时，会发生什么。
+
+| 属性值    | 描述                                                   |
+| --------- | ------------------------------------------------------ |
+| `visible` | 不剪切内容也不添加滚动条（默认方式）                   |
+| `hidden`  | 不显示超过对象尺寸的内容，超出的部分隐藏掉（并非删除） |
+| `scroll`  | 不管超出的内容否，总是显示滚动条                       |
+| `auto`    | 超出自动显示滚动条，不超出不显示滚动条                 |
+
+一般情况下，我们都不想让溢出的内容显示出来，因为溢出的部分会影响布局。
+
+但是如果有定位的盒子， 请慎用 overflow: hidden 因为它会隐藏多余的部分。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>显示隐藏元素之overflow</title>
+    <style>
+        .peppa {
+            /* overflow: visible; */
+            /* overflow: hidden; */
+            /* scroll 溢出的部分显示滚动条  不溢出也显示滚动条 */
+            /* overflow: scroll; */
+            /* auto 溢出的时候才显示滚动条 不溢出不显示滚动条 */
+            /* overflow: auto; */
+            width: 200px;
+            height: 200px;
+            border: 3px solid pink;
+            margin: 100px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="peppa">
+        小猪佩奇》，又译作《粉红猪小妹》（台湾译为粉红猪），原名为《Peppa
+        Pig》，是由英国人阿斯特利（Astley）、贝克（Baker）、戴维斯（Davis）创作、
+        导演和制作的一部英国学前电视动画片，也是历年来最具潜力的学前儿童品牌。
+        故事围绕小猪佩奇与家人的愉快经历，幽默而有趣，
+        藉此宣扬传统家庭观念与友情，鼓励小朋友们体验生活。
+    </div>
+
+</body>
+
+</html>
+```
+
+![](imgs/6ffd569b509bc2cb6c12ff39c6fca5d125d12622.jpg)
+
+---
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>显示隐藏元素之overflow</title>
+    <style>
+        .peppa {
+            overflow: visible;
+            /* overflow: hidden; */
+            /* scroll 溢出的部分显示滚动条  不溢出也显示滚动条 */
+            /* overflow: scroll; */
+            /* auto 溢出的时候才显示滚动条 不溢出不显示滚动条 */
+            /* overflow: auto; */
+            width: 200px;
+            height: 200px;
+            border: 3px solid pink;
+            margin: 100px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="peppa">
+        小猪佩奇》，又译作《粉红猪小妹》（台湾译为粉红猪），原名为《Peppa
+        Pig》，是由英国人阿斯特利（Astley）、贝克（Baker）、戴维斯（Davis）创作、
+        导演和制作的一部英国学前电视动画片，也是历年来最具潜力的学前儿童品牌。
+        故事围绕小猪佩奇与家人的愉快经历，幽默而有趣，
+        藉此宣扬传统家庭观念与友情，鼓励小朋友们体验生活。
+    </div>
+
+</body>
+
+</html>
+```
+
+![](imgs/6ffd569b509bc2cb6c12ff39c6fca5d125d12622.jpg)
+
+---
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>显示隐藏元素之overflow</title>
+    <style>
+        .peppa {
+            /* overflow: visible; */
+            overflow: hidden;
+            /* scroll 溢出的部分显示滚动条  不溢出也显示滚动条 */
+            /* overflow: scroll; */
+            /* auto 溢出的时候才显示滚动条 不溢出不显示滚动条 */
+            /* overflow: auto; */
+            width: 200px;
+            height: 200px;
+            border: 3px solid pink;
+            margin: 100px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="peppa">
+        小猪佩奇》，又译作《粉红猪小妹》（台湾译为粉红猪），原名为《Peppa
+        Pig》，是由英国人阿斯特利（Astley）、贝克（Baker）、戴维斯（Davis）创作、
+        导演和制作的一部英国学前电视动画片，也是历年来最具潜力的学前儿童品牌。
+        故事围绕小猪佩奇与家人的愉快经历，幽默而有趣，
+        藉此宣扬传统家庭观念与友情，鼓励小朋友们体验生活。
+    </div>
+
+</body>
+
+</html>
+```
+
+![](imgs/d599c0e7291b899f56ac17b012bb64f4d932bec7.jpg)
+
+---
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>显示隐藏元素之overflow</title>
+    <style>
+        .peppa {
+            /* overflow: visible; */
+            /* overflow: hidden; */
+            /* scroll 溢出的部分显示滚动条  不溢出也显示滚动条 */
+            overflow: scroll;
+            /* auto 溢出的时候才显示滚动条 不溢出不显示滚动条 */
+            /* overflow: auto; */
+            width: 200px;
+            height: 200px;
+            border: 3px solid pink;
+            margin: 100px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="peppa">
+        小猪佩奇》，又译作《粉红猪小妹》（台湾译为粉红猪），原名为《Peppa
+        Pig》
+    </div>
+
+</body>
+
+</html>
+```
+
+![](imgs/b4825cf14cfddb329b3881ff7205567999742e81.jpg)
+
+---
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>显示隐藏元素之overflow</title>
+    <style>
+        .peppa {
+            /* overflow: visible; */
+            /* overflow: hidden; */
+            /* scroll 溢出的部分显示滚动条  不溢出也显示滚动条 */
+            /* overflow: scroll; */
+            /* auto 溢出的时候才显示滚动条 不溢出不显示滚动条 */
+            overflow: auto;
+            width: 200px;
+            height: 200px;
+            border: 3px solid pink;
+            margin: 100px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="peppa">
+        小猪佩奇》，又译作《粉红猪小妹》（台湾译为粉红猪），原名为《Peppa
+        Pig》，是由英国人阿斯特利（Astley）、贝克（Baker）、戴维斯（Davis）创作、
+        导演和制作的一部英国学前电视动画片，也是历年来最具潜力的学前儿童品牌。
+        故事围绕小猪佩奇与家人的愉快经历，幽默而有趣，
+        藉此宣扬传统家庭观念与友情，鼓励小朋友们体验生活。
+    </div>
+
+</body>
+
+</html>
+```
+
+![](imgs/3d311f71ec6c16b8a25f610c0f7e4617e8b8588e.jpg)
+
+---
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>显示隐藏元素之overflow</title>
+    <style>
+        .peppa {
+            /* overflow: visible; */
+            /* overflow: hidden; */
+            /* scroll 溢出的部分显示滚动条  不溢出也显示滚动条 */
+            /* overflow: scroll; */
+            /* auto 溢出的时候才显示滚动条 不溢出不显示滚动条 */
+            overflow: auto;
+            width: 200px;
+            height: 200px;
+            border: 3px solid pink;
+            margin: 100px auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="peppa">
+        小猪佩奇》，又译作《粉红猪小妹》（台湾译为粉红猪），原名为《Peppa
+        Pig》
+    </div>
+
+</body>
+
+</html>
+```
+
+![](imgs/52445f84c27e04861d9630c94b98f89559ce0375.jpg)
+
+### ⭕2.4 总结
+
+1. display 显示隐藏元素 但是不保留位置
+2. visibility 显示隐藏元素 但是保留原来的位置
+3. overflow 溢出显示隐藏 但是只是对于溢出的部分处理
+
+# 13 【精灵图 图标字体 CSS三角 鼠标样式 溢出省略号】
+
+## 1.精灵图
+
+### 1.1为什么需要精灵图？
+
+一个网页中往往会应用很多小的背景图像作为修饰，当网页中的图像过多时，服务器就会频繁地接收和发送
+请求图片，造成服务器请求压力过大，这将大大降低页面的加载速度。
+
+因此，为了有效地减少服务器接收和发送请求的次数，提高页面的加载速度，出现了 CSS 精灵技术（也称 CSS Sprites、CSS 雪碧）。
+
+核心原理：将网页中的一些小背景图像整合到一张大图中 ，这样服务器只需要一次请求就可以了。
+
+精灵技术目的：为了有效地减少服务器接收和发送请求的次数，提高页面的加载速度。
+
+### ⭕1.2精灵图（sprites）的使用
+
+使用精灵图核心：
+
+1. 精灵技术主要针对于背景图片使用。就是把多个小背景图片整合到一张大图片中
+2. 这个大图片也称为 sprites 精灵图 或者 雪碧图
+3. 移动背景图片位置以控制显示区域， 此时可以使用 `background-position`
+4. 移动的距离就是这个目标图片的 `x` 和 `y` 坐标。注意网页中的坐标有所不同
+5. 因为一般情况下都是将精灵图往上往左移动，所以两个坐标数值基本是负值
+6. 使用精灵图的时候需要精确测量，每个小背景图片的大小和位置
+
+雪碧图的使用步骤：
+
+1. 先确定要使用的图标
+
+2. 测量图标的大小
+
+3. 根据测量结果创建一个元素
+
+4. 将雪碧图设置为元素的背景图片
+
+5. 设置一个偏移量以显示正确的图片
+
+使用精灵图核心总结：
+
+1. 精灵图主要针对于小的背景图片使用
+2. 主要借助于背景位置来实现 `background-position`
+3. 一般情况下精灵图都是负值（千万注意网页中的坐标： x轴右边走是正值，左边走是负值， y轴同理） 
+
+**示例1**
+
+![image-20220730114845039](imgs/79349732e6734ec1f0cd427263563db20f6ba32c.png)
+
+```css
+a:link {
+    display: block;
+    width: 93px;
+    height: 29px;
+    background: url("assets/背景/练习2-背景/btn.png");
+    /* 默认值，可以不设置 */
+    background-position: 0 0;
+}
+
+a:hover {
+    /* 设置水平方向的一个偏移量；注意是向左移动，所以是负值 */
+    background-position: -93px 0;
+}
+
+a:active {
+    /* 设置水平方向的一个偏移量；注意是向左移动，所以是负值 */
+    background-position: calc(-93px*2) 0;
+}
+```
+
+> 如果不使用雪碧图会因为图片需要临时去发请求加载，会闪一下才出现图片
+
+**示例2**
+
+![image-20220730115700649](imgs/08f3f4d72cb818d52258f7771e118ec3d1a6d645.png)
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>利用精灵图拼出自己名字</title>
+    <style>
+        span {
+            display: inline-block;
+            background: url(images/abcd.jpg) no-repeat;
+        }
+
+        .p {
+            width: 100px;
+            height: 112px;
+            /* background-color: pink; */
+            background-position: -493px -276px;
+        }
+
+        .i {
+            width: 60px;
+            height: 108px;
+            /* background-color: pink; */
+            background-position: -327px -142px;
+        }
+
+        .n {
+            width: 115px;
+            height: 112px;
+            /* background-color: pink; */
+            background-position: -255px -275px;
+        }
+
+        .k {
+            width: 105px;
+            height: 114px;
+            /* background-color: pink; */
+            background-position: -495px -142px;
+        }
+    </style>
+</head>
+
+<body>
+    <span class="p">p</span>
+    <span class="i">i</span>
+    <span class="n">n</span>
+    <span class="k">k</span>
+</body>
+
+</html>
+```
+
+![image-20220730115718371](imgs/68e04db60ce85bfcf38a33c3bc0fd068d08cb410.png)
+
+## ⭕2.图标字体
+
+### 2.1字体图标的产生
+
+字体图标使用场景：主要用于显示网页中通用、常用的一些小图标。
+
+精灵图是有诸多优点的，但是缺点很明显。
+
+1. 图片文件还是比较大的
+2. 图片本身放大和缩小会失真
+3. 一旦图片制作完毕想要更换非常复杂
+
+此时，有一种技术的出现很好的解决了以上问题，就是字体图标 iconfont。
+
+字体图标可以为前端工程师提供一种方便高效的图标使用方式，展示的是图标，但本质却属于字体。
+
+### 2.2字体图标的优点
+
+- 轻量级：一个图标字体要比一系列的图像要小。一旦字体加载了，图标就会马上渲染出来，减少了服务器请求
+- 灵活性：本质其实是文字，可以很随意的改变颜色、产生阴影、透明效果、旋转等
+- 兼容性：几乎支持所有的浏览器，请放心使用
+
+注意： 字体图标不能替代精灵技术，只是对工作中图标部分技术的提升和优化。
+
+总结：
+
+1. 如果遇到一些结构和样式比较简单的小图标，就用字体图标
+2. 如果遇到一些结构和样式复杂一点的小图片，就用精灵图
+
+字体图标是一些网页常见的小图标，我们直接网上下载即可。 因此使用可以分为：
+
+1. 字体图标的下载
+2. 字体图标的引入（引入到我们 html 页面中）
+3. 字体图标的追加（在原有的基础上添加新的小图标）
+
+### 2.3字体图标的下载
+
+推荐下载网站：
+
+- icomoon 字库 [https://icomoon.io/](https://icomoon.io/)
+
+IcoMoon 成立于 2011 年，推出了第一个自定义图标字体生成器，它允许用户选择所需要的图标，使它们成一字型。该字库内容种类繁多，非常全面，唯一的遗憾是国外服务器，打开网速较慢。
+
+- 阿里 iconfont 字库 [https://www.iconfont.cn/](https://www.iconfont.cn/)
+
+这个是阿里妈妈 M2UX 的一个 iconfont 字体图标字库，包含了淘宝图标库和阿里妈妈图标库。可以使用 AI 制作图标上传生成。 重点是，免费！
+
+> 以下内容以 icomoon 字库 为例。
+
+### 2.4字体图标的引入
+
+下载完毕之后，注意原先的文件不要删，后面会用！
+
+1. **把下载包里面的 fonts 文件夹放入页面根目录下**
+
+不同浏览器所支持的字体格式是不一样的，字体图标之所以兼容，就是因为包含了主流浏览器支持的字体文件。
+
+- TureType (.ttf) 格式 .ttf 字体是 Windows 和 Mac 的最常见的字体，支持这种字体的浏览器有 IE9+、Firefox3.5+、Chrome4+、Safari3+、Opera10+、iOS Mobile、Safari4.2+；
+- Web Open Font Format (.woff) 格式 woff 字体，支持这种字体的浏览器有 IE9+、Firefox3.5+、Chrome6+、Safari3.6+、Opera11.1+；
+- Embedded Open Type (.eot) 格式 .eot 字体是 IE 专用字体，支持这种字体的浏览器有 IE4+；
+- SVG (.svg) 格式 .svg 字体是基于 SVG 字体渲染的一种格式，支持这种字体的浏览器有 Chrome4+、Safari3.1+、Opera10.0+、iOS Mobile Safari3.2+；
+
+2. **在 CSS 样式中全局声明字体：简单理解把这些字体文件通过 css 引入到我们页面中**
+
+一定注意字体文件路径的问题。
+
+```css
+@font-face {
+	font-family: 'icomoon';
+	src: url('fonts/icomoon.eot?7kkyc2');
+	src: url('fonts/icomoon.eot?7kkyc2#iefix') format('embedded-opentype'),
+	url('fonts/icomoon.ttf?7kkyc2') format('truetype'),
+	url('fonts/icomoon.woff?7kkyc2') format('woff'),
+	url('fonts/icomoon.svg?7kkyc2#icomoon') format('svg');
+	font-weight: normal;
+	font-style: normal;
+}
+```
+
+3. **html 标签内添加小图标**
+
+复制小图标对应的字符（一个小方框）到 html 中，一般建议放在 `<i></i>` 标签里。 
+
+4. **给标签定义字体**
+
+```css
+span {
+	font-family: "icomoon";
+}
+```
+
+注意：务必保证这个字体和上面 @font-face 里面的字体保持一致（默认为：icomoon）。
+
+### 2.5字体图标的追加
+
+如果工作中，原来的字体图标不够用了，我们便需要添加新的字体图标到原来的字体文件中。
+
+选择 Import Icons 按钮，把原压缩包里面的 selection.json 重新上传，然后选中自己想要新的图标，从新下载压缩包，并替换原来的文件即可。
+
+### 2.6字体图标加载的原理
+
+服务器只需接受一次浏览器请求便可以将 fonts 文件一次性返回，如此而来网页中所有用到 fonts 字体图标的部分便一次性加载好了，大大减轻了服务器压力。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>字体图标的使用</title>
+  <style>
+    /* 字体声明 */
+    @font-face {
+    	font-family: 'icomoon';
+      	src: url('fonts/icomoon.eot?p4ssmb');
+      	src: url('fonts/icomoon.eot?p4ssmb#iefix') format('embedded-opentype'),
+        url('fonts/icomoon.ttf?p4ssmb') format('truetype'),
+        url('fonts/icomoon.woff?p4ssmb') format('woff'),
+        url('fonts/icomoon.svg?p4ssmb#icomoon') format('svg');
+      	font-weight: normal;
+      	font-style: normal;
+      	font-display: block;
+    }
+
+    span {
+      font-family: 'icomoon';
+      font-size: 100px;
+      color: salmon;
+    }
+  </style>
+</head>
+
+<body>
+  <span class="icon-location"></span>
+  <span class="icon-home"></span>
+</body>
+
+</html>
+```
+
+![](imgs/2c7df58371bfd3069e5c1f0efeb51762e40d6079.png)
+
+### 2.7fontawesome
+
+官方网站：https://fontawesome.com/
+
+下载解压完毕之后，直接将css和webfonts移动到项目中即可使用
+
+**示例**
+
+```html
+<link rel="stylesheet" href="/font/fontawesome/css/all.css">
+<style>
+    i {
+        color: green;
+    }
+
+    .fa-venus-mars,
+    .fa-mars-double {
+        color: red;
+    }
+
+    .fa-html5 {
+        color: #E34D22;
+    }
+
+    .fa-css3 {
+        color: blue;
+    }
+
+    .fa-js {
+        color: #D1B514;
+    }
+</style>
+
+<!-- 大小 -->
+<i class="fab fa-weixin fa-lg"></i>
+<i class="fab fa-weixin fa-2x"></i>
+<i class="fab fa-weixin fa-3x"></i>
+<br>
+
+<!-- 边框 -->
+<i class="fab fa-weixin fa-2x fa-border"></i>
+<br>
+
+<!-- 旋转 -->
+<i class="fab fa-weixin fa-2x  fa-rotate-90 "></i>
+<!-- 水平对称 -->
+<i class="fab fa-weixin fa-2x fa-flip-horizontal "></i>
+<!-- 垂直对称 -->
+<i class="fab fa-weixin fa-2x fa-flip-vertical "></i>
+<br>
+
+<!-- 动画 -->
+<i class="fa fa-venus-mars fa-3x fa-spin"></i>
+<i class="fa fa-mars-double  fa-3x fa-pulse"></i>
+<br>
+
+<!-- 列表 -->
+<ul class="fa-ul">
+    <li><i class="fa-li fa fa-check-square"></i>can be used</li>
+    <li><i class="fa-li fa fa-spinner fa-spin"></i>as bullets</li>
+    <li><i class="fa-li fa fa-square"></i>in lists</li>
+</ul>
+<br><br><br>
+
+<!-- 组合 -->
+<span class="fa-stack fa-lg">
+    <i class="fab fa-html5 fa-stack-1x fa-10x"></i>
+    <i class="fab fa-css3 fa-stack-1x fa-4x"></i>
+    <i class="fab fa-js fa-stack-1x fa-2x"></i>
+</span>
+```
+
+![img](imgs/474a5bf8853d60eb190b532f797eb317ff360440.gif)
+
+其中`fas`/`fab`是免费的，其他是收费的
+
+### 2.8图标字体其他使用方式
+
+#### 2.8.1通过伪元素设置
+
+1. 找到要设置图标的元素通过`::before`或`::after`选中
+
+2. 在`content`中设置字体的编码
+
+3. 设置字体的样式 
+
+- - `fab`：`font-family: 'Font Awesome 5 Brands';`
+
+- - `fas`：`font-family: 'Font Awesome 5 Free'; font-weight：900;`
+
+```html
+<style>
+    .poem {
+        width: 200px;
+        height: 300px;
+        margin: auto;
+    }
+
+    li {
+        list-style: none;
+        margin-left: -40px;
+    }
+
+    li::before {
+        content: '\f130';
+        /* font-family: 'Font Awesome 5 Brands'; */
+        font-family: 'Font Awesome 5 Free';
+        font-weight: 900;
+        margin-right: 10px;
+        color: gray;
+    }
+</style>
+
+<div class="poem">
+    <h1>武陵春·春晚</h1>
+    <p> [宋] 李清照</p>
+    <ul>
+        <li>风住尘香花已尽，</li>
+        <li>日晚倦梳头。</li>
+        <li>物是人非事事休，</li>
+        <li>欲语泪先流。</li>
+        <li>闻说双溪春尚好，</li>
+        <li>也拟泛轻舟。</li>
+        <li>只恐双溪舴艋舟，</li>
+        <li>载不动、许多愁。</li>
+    </ul>
+</div>
+```
+
+![image-20220730120953174](imgs/fcc4845ec504034cb034b4c4a5cb22b5e51d949f.png)
+
+#### 2.8.2通过实体设置
+
+通过实体来使用图标字体：`&#x图标编码;`
+
+**示例**
+
+```html
+<i class="fas">&#xf025;</i>
+```
+
+**效果**
+
+<img src="imgs/4c7f8187361c2da3528a48b18f96e43d87834e04.png" alt="image-20220730121105597" style="zoom:33%;" />
+
+### 2.9iconfont
+
+官方网站：https://www.iconfont.cn/
+
+iconfont是阿里的一个图标字体库，海量图标库，图标字体非常丰富
+
+但是版权有点模横两可，如果需要商用，最好联系作者
+
+不过一般情况下，公司企业都会有自己的UI设计团队，会自己去进行设计
+
+这里使用方式大同小异，不过
+
+- iconfont需要添加购物车后再添加至项目然后下载，下载包中有demo.html，详细介绍了使用方式
+
+- iconfont也提供了一种在线方式，直接在`我的项目`中选择`在线链接`可以复制出一份`@font-face`的css代码
+
+![image-20220730121230493](imgs/503068df0736e6f57d00bab0bc8503f8b1fe98c9.png)
+
+**示例**
+
+```html
+<!-- <link rel="stylesheet" href="/font/iconfont/iconfont.css"> -->
+<style>
+    i.iconfont {
+        font-size: 100px;
+    }
+
+    p::before {
+        content: '\e811';
+        font-family: 'iconfont';
+        font-size: 50px;
+    }
+    
+    /* 3、通过在线连接：这里link和@font-face择其一即可  */
+    @font-face {
+        font-family: 'iconfont';
+        /* Project id 2580407 */
+        src: url('//at.alicdn.com/t/font_2580407_c0kpuhebb7r.woff2?t=1622373966454') format('woff2'),
+            url('//at.alicdn.com/t/font_2580407_c0kpuhebb7r.woff?t=1622373966454') format('woff'),
+            url('//at.alicdn.com/t/font_2580407_c0kpuhebb7r.ttf?t=1622373966454') format('truetype');
+    }
+</style>
+
+<!-- 1、通过字符实体设置 -->
+<i class="iconfont">&#xe810;</i>
+<i class="iconfont">&#xe811;</i>
+<i class="iconfont">&#xe812;</i>
+<i class="iconfont">&#xe813;</i>
+
+<!-- 2、通过伪元素设置 -->
+<p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Totam deserunt tempore fugit quos eaque, ipsa rerum
+    suscipit iure cumque aspernatur esse cupiditate nihil quas nulla odit? Sequi accusantium labore maiores.</p>
+
+<!-- 通过class类名是最常用的方式 -->
+<i class="iconfont icon-home"></i>
+```
+
+![image-20220730121302171](imgs/9e2df6fd5cefa3b8cafac42a96e8e012a022bd02.png)
+
+## ⭕3.CSS三角
+
+网页中常见一些三角形，使用 CSS 直接画出来就可以，不必做成图片或者字体图标。
+
+![](imgs/44bf5572e0183206ad7782fd7282365505662f63.png)
+
+CSS 三角是怎么来的？原理如下：
+
+对一个没有大小的盒子设置边框，那么只要边框足够粗，就可以呈现三角效果。
+
+如果只需要一个三角，那么对其他三个边框设置透明色即可。
+
+通常 CSS 三角要配合定位来布局。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CSS 三角制作</title>
+    <style>
+        .box1 {
+            width: 0;
+            height: 0;
+            /* border: 10px solid pink; */
+            border-top: 30px solid hotpink;
+            border-right: 30px solid black;
+            border-bottom: 30px solid skyblue;
+            border-left: 30px solid gray;
+        }
+
+        .box2 {
+            width: 0;
+            height: 0;
+            border: 50px solid transparent;
+            border-left-color: black;
+            margin: 50px;
+        }
+
+        .jd {
+            /* 子绝父相 */
+            position: relative;
+            width: 120px;
+            height: 249px;
+            background-color: black;
+        }
+
+        .jd span {
+            /* 子绝父相 */
+            position: absolute;
+            right: 15px;
+            top: -20px;
+            width: 0;
+            height: 0;
+            /* 下面两行为了照顾兼容性 */
+            line-height: 0;
+            font-size: 0;
+            border: 10px solid transparent;
+            border-bottom-color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box1"></div>
+    <div class="box2"></div>
+    <div class="jd">
+        <span></span>
+    </div>
+</body>
+
+</html>
+```
+
+![](imgs/ef9121715ff71bbd41044a6f760a9466b73de44e.png)
+
+## 4.CSS用户界面样式
+
+### 4.1什么是界面样式
+
+所谓的界面样式，就是更改一些用户操作样式，以提高更好的用户体验。
+
+- 更改用户的鼠标样式
+- 表单轮廓
+- 防止表单域拖拽
+
+### ⭕4.2鼠标样式 cursor
+
+```css
+li { cursor: pointer; }
+```
+
+设置或检索在对象上移动的鼠标指针采用何种系统预定义的光标形状。
+
+| 属性值        | 描述     |
+| ------------- | -------- |
+| `default`     | 默认箭头 |
+| `pointer`     | 小手     |
+| `move`        | 十字移动 |
+| `text`        | 文本竖杠 |
+| `not-allowed` | 禁止     |
+
+注意：除了以上类型，还有其他很多类型。
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>用户界面样式-鼠标样式</title>
+</head>
+
+<body>
+    <ul>
+        <li style="cursor: default;">我是默认的小白鼠标样式</li>
+        <li style="cursor: pointer;">我是鼠标小手样式</li>
+        <li style="cursor: move;">我是鼠标移动样式</li>
+        <li style="cursor: text;">我是鼠标文本样式</li>
+        <li style="cursor: not-allowed;">我是鼠标禁止样式</li>
+    </ul>
+</body>
+
+</html>
+```
+
+![](imgs/92d6dbad7a8128850bc8f3d6879beac45f722740.gif)
+
+### 4.3轮廓线 outline
+
+给表单添加 `outline: 0;` 或者 `outline: none;` 样式之后，就可以去掉默认的边框。
+
+```css
+input { outline: none; }
+```
+
+默认样式：
+
+![](imgs/3fd29e0e274e7c20d78cd1f7fb3351e142c0d608.gif)
+
+修改后样式：
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>轮廓线 outline</title>
+    <style>
+        input {
+            /* 取消表单轮廓 */
+            outline: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 取消表单轮廓 -->
+    <input type="text">
+</body>
+
+</html>
+```
+
+![](imgs/6bdbd8a9b5a15ae33cd5adea36bfcd2cc4662bce.gif)
+
+### ⭕4.4防止拖拽文本域 resize
+
+实际开发中，我们文本域右下角是不允许拖拽的。（会破坏布局！）
+
+```css
+textarea { resize: none; }
+```
+
+默认样式：
+
+![](imgs/8b4999139d290ec62f01f9e75af3f2f74036e27a.gif)
+
+修改后样式：
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>防止拖拽文本域 resize</title>
+    <style>
+        textarea {
+            /* 取消表单轮廓 */
+            outline: none;
+            /* 防止拖拽文本域 */
+            resize: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 防止拖拽文本域 -->
+    <!-- <textarea></textarea>起始标签建议放在一行，因为这样不会导致文本域里文字前有空白，
+    后期可以专门通过 padding 来设置文本周围的留白 -->
+    <textarea name="" id="" cols="30" rows="10"></textarea>
+</body>
+
+</html>
+```
+
+![](imgs/2740cb0f8c7496aaf30432b45ee432fd50fb6906.gif)
+
+## 5.溢出的文字省略号显示
+
+### ⭕5.1单行文本溢出省略号显示
+
+三个必要条件：
+
+```css
+/* 1. 先强制一行内显示文本 */ 
+white-space: nowrap; 	/*（ 默认 normal 自动换行）*/ 
+/* 2. 超出的部分隐藏 */ 
+overflow: hidden; 
+/* 3. 文字用省略号替代超出的部分 */ 
+text-overflow: ellipsis;
+```
+
+案例：
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>单行文本溢出显示省略号</title>
+    <style>
+        div {
+            width: 150px;
+            height: 80px;
+            background-color: pink;
+            margin: 100px auto;
+            /* 这个单词的意思是如果文字显示不开自动换行 */
+            /* white-space: normal; */
+            /* 1.这个单词的意思是如果文字显示不开也必须强制一行内显示 */
+            white-space: nowrap;
+            /* 2.溢出的部分隐藏起来 */
+            overflow: hidden;
+            /* 3.文字溢出的时候用省略号来显示 */
+            text-overflow: ellipsis;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        啥也不说，此处省略一万字
+    </div>
+</body>
+
+</html>
+```
+
+![](imgs/39cdbda226455fc5f5773e665c02dd0930c19e19.png)
+
+### ⭕5.2多行文本溢出省略号显示
+
+多行文本溢出显示省略号，有较大兼容性问题， 适合于 webkit 浏览器或移动端（移动端大部分是 webkit 内核）。
+
+```css
+overflow: hidden;
+text-overflow: ellipsis;
+/* 弹性伸缩盒子模型显示 */
+display: -webkit-box;
+/* 限制在一个块元素显示的文本的行数 */
+-webkit-line-clamp: 2;
+/* 设置或检索伸缩盒对象的子元素的排列方式 */
+-webkit-box-orient: vertical;
+```
+
+更推荐让后台人员来做这个效果，因为后台人员可以设置显示多少个字，操作更简单。
+
+案例：
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>单行文本溢出显示省略号</title>
+    <style>
+        div {
+            width: 150px;
+            height: 65px;
+            background-color: pink;
+            margin: 100px auto;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            /* 弹性伸缩盒子模型显示 */
+            display: -webkit-box;
+            /* 限制在一个块元素显示的文本的行数 */
+            -webkit-line-clamp: 3;
+            /* 设置或检索伸缩盒对象的子元素的排列方式 */
+            -webkit-box-orient: vertical;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        啥也不说，此处省略一万字,啥也不说，此处省略一万字此处省略一万字
+    </div>
+</body>
+
+</html>
+```
+
+Chrome 浏览器效果：
+
+![](imgs/41fdcdbba2909929c6f92f3d72a423225f6a2659.png)
+
+# ⭕14 【布局技巧】
+
+## 1.margin负值的运用
+
+如何实现以下效果呢？
+
+多个盒子紧挨在一起，当鼠标放在其中一个盒子上时该盒子的边框自动变色。
+
+![image-20220731125920552](imgs/17311749cf5513780db25d586fdf9992dca69a90.png)
+
+1. 让每个盒子 margin 往左侧移动 -1px 正好压住相邻盒子边框（否则边框会发生叠加 * 2）
+2. 鼠标经过某个盒子的时候，提高当前盒子的层级即可（如果周围盒子没有定位，则对当前盒子加相对定位（保留位置并显示在其他盒子之上）；如果周围有定位，则提高当前盒子的 z-index）
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>margin负值的巧妙运用</title>
+    <style>
+        ul li {
+            position: relative;
+            float: left;
+            list-style: none;
+            width: 150px;
+            height: 200px;
+            border: 1px solid red;
+            margin-left: -1px;
+        }
+
+        /* ul li:hover {
+           1. 如果盒子没有定位，则鼠标经过添加相对定位即可
+        position: relative;
+        border: 1px solid blue;
+
+       } */
+        ul li:hover {
+            /* 2.如果li都有定位，则利用 z-index提高层级 */
+            z-index: 1;
+            border: 1px solid blue;
+        }
+    </style>
+</head>
+
+<body>
+<ul>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+    <li>4</li>
+    <li>5</li>
+</ul>
+</body>
+
+</html>
+```
+
+![](imgs/4770749c8b172785c95d74eb63c1a8b32414d562.gif)
+
+## 2.文字围绕浮动元素
+
+![image-20220731130042261](imgs/dd98d64047c31e6f2f039a1d6820f8f553a619a3.png)在制作文字位于图片周围的效果时，可以巧妙运用浮动元素不会压住文字的特性。
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>文字围绕浮动元素的妙用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .box {
+            width: 300px;
+            height: 70px;
+            background-color: #d4d4d4;
+            margin: 0 auto;
+            padding: 5px;
+        }
+
+        .pic {
+            float: left;
+            width: 120px;
+            height: 60px;
+            margin-right: 5px;
+        }
+
+        .pic img {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <div class="pic">
+        <img src="images/img.png" alt="">
+    </div>
+    <p>【集锦】热身赛-巴西0-1秘鲁 内马尔替补两人血染赛场</p>
+</div>
+</body>
+</html>
+```
+
+![image-20220731130121823](imgs/11680b737167fce5477684aae1bd5da25c9771b9.png)
+
+## 3.行内块的巧妙运用
+
+![image-20220731130226395](imgs/3cf6e7aac08517762cf131353da7356446d441da.png)
+
+页码在页面中间显示：
+
+1. 把这些链接盒子转换为行内块， 之后给父级指定 `text-align: center;`
+2. 利用行内块元素中间有缝隙，并且给父级添加 `text-align: center;` 行内块元素会水平会居中
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>行内块的巧妙运用</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        .box {
+            text-align: center;
+        }
+
+        .box a {
+            display: inline-block;
+            width: 36px;
+            height: 36px;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+            line-height: 36px;
+            text-decoration: none;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .box .prev,
+        .box .next {
+            width: 85px;
+        }
+
+        .box .current,
+        .box .elp {
+            background-color: #fff;
+            border: none;
+        }
+
+        .box input {
+            height: 36px;
+            width: 45px;
+            border: 1px solid #ccc;
+            outline: none;
+        }
+
+        .box button {
+            width: 60px;
+            height: 36px;
+            background-color: #f7f7f7;
+            border: 1px solid #ccc;
+
+        }
+    </style>
+</head>
+<body>
+<div class="box">
+    <a href="#" class="prev">&lt;&lt;上一页</a>
+    <a href="#" class="current">2</a>
+    <a href="#">3</a>
+    <a href="#">4</a>
+    <a href="#">5</a>
+    <a href="#">6</a>
+    <a href="#" class="elp">...</a>
+    <a href="#" class="next">&gt;&gt;下一页</a>
+    到第
+    <input type="text">
+    页
+    <button>确定</button>
+</div>
+</body>
+</html>
+```
+
+![image-20220731130305517](imgs/0fc7eb3a52ceee8cd40e769cfd224b0b43ca455d.png)
+
+## 4.CSS三角强化
+
+![image-20220731130421657](imgs/ae3cf42bf5bdd0f4f6b80137a5952e0c9e41250a.png)
+
+代码：
+
+```css
+width: 0;
+height: 0;
+border-color: transparent red transparent transparent;
+border-style: solid;
+border-width: 22px 8px 0 0;
+```
+
+案例：
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CSS三角强化的巧妙运用</title>
+    <style>
+        .box1 {
+            width: 0;
+            height: 0;
+            /* 把上边框宽度调大 */
+            /* border-top: 100px solid transparent;
+            border-right: 50px solid skyblue; */
+            /* 左边和下边的边框宽度设置为0 */
+            /* border-bottom: 0 solid blue;
+            border-left: 0 solid green; */
+            /* 1. 只保留右边的边框有颜色 */
+            border-color: transparent red transparent transparent;
+            /* 2. 样式都是solid */
+            border-style: solid;
+            /* 3. 上边框宽度要大， 右边框 宽度稍小， 其余的边框该为 0 */
+            border-width: 100px 50px 0 0;
+        }
+
+        .price {
+            width: 160px;
+            height: 24px;
+            line-height: 24px;
+            border: 1px solid red;
+            margin: 0 auto;
+        }
+
+        .miaosha {
+            position: relative;
+            float: left;
+            width: 90px;
+            height: 100%;
+            background-color: red;
+            text-align: center;
+            color: #fff;
+            font-weight: 700;
+            margin-right: 8px;
+
+        }
+
+        .miaosha i {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 0;
+            height: 0;
+            border-color: transparent #fff transparent transparent;
+            border-style: solid;
+            border-width: 24px 10px 0 0;
+        }
+
+        .origin {
+            font-size: 12px;
+            color: gray;
+            text-decoration: line-through;
+        }
+    </style>
+</head>
+<body>
+<div class="box1"></div>
+<div class="price">
+            <span class="miaosha">
+                ¥1650
+                <i></i>
+            </span>
+    <span class="origin">¥5650</span>
+</div>
+</body>
+</html>
+```
+
+![image-20220731130508908](imgs/853acdcde9f758b7d3e5254d21942389195e5031.png)
+
+## 5.CSS初始化
+
+不同浏览器对有些标签的默认值是不同的，为了消除不同浏览器对 HTML 文本呈现的差异，照顾浏览器的兼容，我们需要对 CSS 初始化。
+
+简单理解：CSS 初始化是指重设浏览器的样式。(也称为 CSS reset）
+
+每个网页都必须首先进行 CSS 初始化。
+
+这里我们以 京东 CSS 初始化代码为例。
+
+**Unicode 编码字体：**
+
+把中文字体的名称用相应的 Unicode 编码来代替，这样就可以有效的避免浏览器解释 CSS 代码时候出现乱码的问题。
+
+比如：
+
+黑体 \9ED1\4F53
+
+宋体 \5B8B\4F53
+
+微软雅黑 \5FAE\8F6F\96C5\9ED1
+
+```css
+/* 把我们所有标签的内外边距清零 */
+* {
+    margin: 0;
+    padding: 0
+}
+
+/* em 和 i 斜体的文字不倾斜 */
+em,
+i {
+    font-style: normal
+}
+
+/* 去掉 li 的小圆点 */
+li {
+    list-style: none
+}
+
+img {
+    /* border 0 照顾低版本浏览器，如果图片外面包含了链接会有边框的问题 */
+    border: 0;
+    /* 取消图片底侧有空白缝隙的问题 */
+    vertical-align: middle
+}
+
+button {
+    /* 当我们鼠标经过 button 按钮的时候，鼠标变成小手 */
+    cursor: pointer
+}
+
+a {
+    color: #666;
+    text-decoration: none
+}
+
+a:hover {
+    color: #c81623
+}
+
+button,
+input {
+    /* "\5B8B\4F53" 就是宋体的意思，这样浏览器兼容性比较好 */
+    font-family: Microsoft YaHei, Heiti SC, tahoma, arial, Hiragino Sans GB, "\5B8B\4F53", sans-serif
+}
+
+body {
+    /* CSS3 抗锯齿形，让文字显示的更加清晰 */
+    -webkit-font-smoothing: antialiased;
+    background-color: #fff;
+    font: 12px/1.5 Microsoft YaHei, Heiti SC, tahoma, arial, Hiragino Sans GB, "\5B8B\4F53", sans-serif;
+    color: #666
+}
+
+.hide,
+.none {
+    display: none
+}
+
+/* 清除浮动 */
+.clearfix:after {
+    visibility: hidden;
+    clear: both;
+    display: block;
+    content: ".";
+    height: 0
+}
+
+.clearfix {
+    *zoom: 1
+}
+```
+
+# 15【背景 渐变色】 
+
+## 1.背景
+
+### ⭕1.1 背景颜色
+
+`background-color` 属性定义了元素的背景颜色。
+
+```css
+background-color: 颜色值;
+```
+
+一般情况下元素背景颜色默认值是 `transparent`（透明），我们也可以手动指定背景颜色为透明色。
+
+```css
+background-color: transparent;
+```
+
+目前 CSS 还支持丰富的渐变色，但是某些浏览器不支持。
+
+```html
+<!doctype html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>渐变</title>
+    <style>
+        #grad1 {
+            height: 200px;
+            /* 浏览器不支持时显示 */
+            background-color: red;
+            /* 线性渐变 - 从上到下（默认情况下）*/
+            background-image: linear-gradient(#e66465, #9198e5);
+        }
+    </style>
+</head>
+
+<body>
+    <h3>线性渐变 - 从上到下</h3>
+    <p>从顶部开始的线性渐变。起点是红色，慢慢过渡到蓝色：</p>
+
+    <div id="grad1"></div>
+
+    <p><strong>注意：</strong> Internet Explorer 9 及之前的版本不支持渐变。</p>
+</body>
+
+</html>
+```
+
+![](imgs/51bcc4bb2aa0d62ad3a40c852d5d6e71d267917a.jpg)
+
+### ⭕1.2 背景图片
+
+`background-image` 属性描述了元素的背景图像，实际开发常用于 **logo** 或者一些**装饰性的小图片**或者是**超大的背景图片**, 优点是非常便于控制位置（精灵图也是一种运用场景）。
+
+```css
+background-image : none | url(url)
+```
+
+| 参数值 | 作用                           |
+| ------ | ------------------------------ |
+| `none` | 无背景图（默认的）             |
+| `url`  | 使用绝对或相对地址指定背景图像 |
+
+注意：背景图片后面的地址，千万不要忘记加 URL， 同时里面的路径不要加引号。
+
+```css
+background-color: pink;
+background-image: url(../images/logo.png);
+/* 1、背景图片不平铺 */
+/* background-repeat: no-repeat; */
+/* 2、默认情况下，背景图片是平铺的 */
+/* background-repeat: repeat; */ /* 页面元素既可以添加背景颜色也可以添加背景图片，只不过背景图片区域会覆盖背景颜色 */
+```
+
+- 如果背景图片大小小于元素，则背景图片会自动在元素中平铺将元素铺满
+
+- 如果背景图片大小大于元素，则背景图片一部分会无法完全显示
+
+- 如果背景图片大小等于元素，则背景图片会直接正常显示
+
+> 可以同时设置背景图片和背景颜色，这样背景颜色将会成为图片的背景色
+
+### ⭕1.3 背景平铺
+
+如果需要在 HTML 页面上对背景图像进行平铺，可以使用 `background-repeat` 属性。
+
+注：平铺可以简单的理解为“重复”。
+
+```css
+background-repeat: repeat | no-repeat | repeat-x | repeat-y
+```
+
+| 参数值      | 作用                                 |
+| ----------- | ------------------------------------ |
+| `repeat`    | 背景图像在纵向和横向上平铺（默认的） |
+| `no-repeat` | 背景图像不平铺                       |
+| `repeat-x`  | 背景图像在横向上平铺                 |
+| `repeat-y`  | 背景图像在纵向上平铺                 |
+
+### ⭕1.4 背景图片位置
+
+利用 `background-position` 属性可以改变图片在背景中的位置。
+
+```css
+background-position: x y;
+```
+
+参数代表的意思是：x 坐标 和 y 坐标，可以使用 `方位名词` 或者 `精确单位`。
+
+| 参数值     | 说明                                              |
+| ---------- | ------------------------------------------------- |
+| `length`   | 百分数 \| 由浮点数字和单位标识符组成的长度值      |
+| `position` | top \| center \| bottom \| left \| rigth 方位名词 |
+
+- 参数是方位名词
+  - 如果指定的两个值都是方位名词，则两个值前后顺序无关，比如 left top 和 top left 效果一致
+  - 使用方位词时必须要同时指定两个值，如果只写一个则第二个默认就是`center`
+
+
+- 参数是精确单位
+  - 如果参数值是精确坐标，那么第一个肯定是 x 坐标，第二个一定是 y 坐标
+  - 如果只指定一个数值，那该数值一定是 x 坐标，**另一个默认垂直居中**
+
+
+- 参数是混合单位
+  - 如果指定的两个值是精确单位和方位名词混合使用，则第一个值是 x 坐标，第二个值是 y 坐标
+
+### ⭕1.5 背景图像固定（背景附着）
+
+`background-attachment` 属性设置背景图像是否固定或者随着页面的其余部分滚动。
+
+`background-attachment` 后期可以制作 `视差滚动` 的效果。
+
+```css
+background-attachment : scroll | fixed
+```
+
+| 参数     | 作用                               |
+| -------- | ---------------------------------- |
+| `scroll` | 默认值，背景图片会跟随元素移动     |
+| `fixed`  | 背景会固定在页面中，不会随元素移动 |
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>超大背景图片</title>
+    <style>
+        body {
+            background-image: url(images/bg.jpg);
+            background-repeat: no-repeat;
+            background-position: center top;
+            /* 把背景图片固定住 */
+            background-attachment: fixed;
+            color: #fff;
+            font-size: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+    <p>天王盖地虎, pink老师一米五</p>
+</body>
+
+</html>
+```
+
+<img src="imgs/4e44cb1421ab81bdc5b236eeef9894e54834fdab.gif" style="zoom: 33%;" />
+
+### ⭕1.6 背景大小
+
+利用 `background-size ` 属性可以设置背景图片的大小。
+
+```css
+background-size: length|percentage|cover|contain;
+```
+
+| 值         | 描述                                                         |
+| :--------- | :----------------------------------------------------------- |
+| length     | 设置背景图片高度和宽度。第一个值设置宽度，第二个值设置的高度。如果只给出一个值，第二个是设置为 **auto**(自动) |
+| percentage | 将计算相对于背景定位区域的百分比。第一个值设置宽度，第二个值设置的高度。如果只给出一个值，第二个是设置为"auto(自动)" |
+| cover      | 此时会保持图像的纵横比并将图像缩放成将完全覆盖背景定位区域的最小大小。 |
+| contain    | 此时会保持图像的纵横比并将图像缩放成将适合背景定位区域的最大大小。 |
+
+### ⭕1.7 背景范围 
+
+利用 `background-clip ` 属性可以设置背景的范围 。
+
+```css
+background-clip: border-box|padding-box|content-box;
+```
+
+| 值          | 说明                                       |
+| :---------- | :----------------------------------------- |
+| border-box  | 默认值，背景会出现在边框的下边             |
+| padding-box | 背景不会出现在边框，只出现在内容区和内边距 |
+| content-box | 背景只会出现在内容区                       |
+
+### 1.8 背景复合写法
+
+为了简化背景属性的代码，我们可以将这些属性合并简写在同一个属性 `background` 中，从而节约代码量。
+当使用简写属性时，没有特定的书写顺序，一般习惯约定顺序为：
+`background`: `背景颜色` `背景图片地址` `背景平铺` `背景图像滚动` `背景图片位置/背景大小`
+
+```css
+    background: #bfa url("assets/dlam.png") no-repeat 100px 100px/200px padding-box content-box;
+```
+
+**注意**
+
+- `background-size`必须写在`background-position`的后边，并且使用/隔开`background-position/background-size`
+
+- `background-origin background-clip` 两个样式，`orgin`要在`clip`的前边
+
+这是实际开发中，我们更提倡的写法。
+
+### ⭕1.9 背景色半透明
+
+CSS3 为我们提供了背景颜色半透明的效果。
+
+```css
+background: rgba(0, 0, 0, 0.3);
+```
+
+- 最后一个参数是 `alpha` 透明度，取值范围在 `0~1` 之间
+- 习惯把 0.3 的 0 省略掉，写为 `background: rgba(0, 0, 0, .3);`
+- 注意：背景半透明是指盒子背景半透明，盒子里面的内容不受影响
+- CSS3 新增属性，是 IE9+ 版本浏览器才支持的
+- 但是现在实际开发，我们不太关注兼容性写法了，可以放心使用
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背景色透明写法</title>
+    <style>
+        div {
+            width: 300px;
+            height: 300px;
+            /* background-color: black; */
+            background: rgba(0, 0, 0, .3);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 只是让背景颜色半透明，盒子里的内容并不受影响 -->
+    <div>dselegent</div>
+</body>
+
+</html>
+```
+
+### ⭕1.10 背景总结
+
+| 属性                   | 作用           | 值                                               |
+| ---------------------- | -------------- | ------------------------------------------------ |
+| `backgroud-color`      | 背景颜色       | 预定义的颜色值 / 十六进制 / RGB代码              |
+| `backgroud-image`      | 背景图片       | url（图片路径）                                  |
+| `backgroud-repeat`     | 是否平铺       | repeat / no-repeat / repeat-x / repeat-y         |
+| `backgroud-position`   | 背景位置       | length / position 分别是 x 和 y 坐标             |
+| `backgroud-attachment` | 背景附着       | scroll（背景滚动）/ fixed（背景固定）            |
+| `背景简写`             | 书写更简单     | 背景颜色 背景图片地址 背景平铺 背景滚动 背景位置 |
+| `背景色半透明`         | 背景颜色半透明 | background: rgba(0, 0, 0, 0.3); 后面必须是4个值  |
+
+背景图片：实际开发常见于 logo 或者一些装饰性的小图片或者是超大的背景图片，优点是非常便于控制位置（精灵图也是一种运用场景）。
+
+## ⭕2.渐变色
+
+### 2.1 线性渐变
+
+通过渐变可以设置一些复杂的背景颜色，可以实现从一个颜色向其他颜色过渡的效果
+
+渐变是图片，需要通过`background-image`来设置
+
+线性渐变，颜色沿着一条直线发生变化 `linear-gradient()`
+
+```css
+# 红色在开头，黄色在结尾，中间是过渡区域
+background-image: linear-gradient(red, yellow);
+```
+
+![image-20220802132720382](imgs/28a1d8cf3423618ef066169b1f7dd67e73999fd0.png)
+
+线性渐变的开头，我们可以指定一个渐变的方向
+
+- `to left`
+
+- `to right`
+
+- `to bottom`
+
+- `to top`
+
+- `deg` deg表示度数
+
+- `turn` 表示圈
+
+```css
+background-image: linear-gradient(to left, red, yellow);
+background-image: linear-gradient(to right, red, yellow);
+background-image: linear-gradient(to top, red, yellow);
+background-image: linear-gradient(to bottom, red, yellow);
+```
+
+上面基本的4个方向的渐变很好理解，我们就不再做过多的一一解释了
+
+我们来看度数的渐变效果
+
+```css
+background-image: linear-gradient(45deg, red, yellow);
+```
+
+![image-20220802132853877](imgs/bc41847aa9b16a18af7938dc38f57fe7ccee5a90.png)
+
+会发现它是从左下角往右上角去进行渐变的，为什么呢？
+
+我们小时候肯定都用过量角器
+
+![image-20220802132909345](imgs/7904f8112e20d1376c3ea05c979a8150677f9784.png)
+
+是不是恍然大悟，我们以原点作为起始点，有角度的那条边去做渐变，再把四象限的概念和矩形内部的四个角对应起来
+
+**总结**：线性渐变的边上的某一点为起点，以一定角度渐变的；渐变方向的颜色是线性变化的，而其垂线方向的颜色是一致的
+
+然后看下圈数的表示方法
+
+```css
+background-image: linear-gradient(0.4turn, red, yellow);
+```
+
+因为圈数和角度之间可以相互转换，所以这里就不再进行赘述了
+
+另外，渐变可以同时指定多个颜色，多个颜色默认情况下平均分布，也可以手动指定渐变的分布情况
+
+`repeating-linear-gradient()` 可以平铺的线性渐变
+
+```css
+background-image: repeating-linear-gradient(red, yellow);
+```
+
+![image-20220802133030130](imgs/b24c3d4f9bb906e958f3caf0084f27addf20ec79.png)
+
+默认情况下，跟`linear-gradient(red, yellow)`效果一样，我们稍作改动
+
+```css
+background-image: repeating-linear-gradient(red 0px, yellow 50px);
+```
+
+![image-20220802133053775](imgs/a9751b16518de80618a41c2dd9db07e1b1e99fea.png)
+
+由于我们设置的`div`宽高为`200px`，所以会有4次重复的渐变效果
+
+所以默认情况下，下列几种写法是一致的，效果相同
+
+```css
+background-image: linear-gradient(red, yellow);
+background-image: repeating-linear-gradient(red, yellow);
+/* 因为我们设置的div盒子的宽高为200px，所以这里[height]=200px */
+background-image: repeating-linear-gradient(red 0, yellow [height]);
+```
+
+### 2.2 径向渐变
+
+`radial-gradient()` 径向渐变（放射性的效果）
+
+```css
+background-image: radial-gradient(red, yellow);
+```
+
+默认情况下，径向渐变的形状根据元素的形状来计算的
+
+-  正方形 --> 圆形
+-  ![image-20220802133209635](imgs/3c96b1a60b12672e4c21aa43e1849d78c43ed7ff.png)
+-  长方形 --> 椭圆形
+   ![image-20220802133236725](imgs/8d6c606310e3119322ae1c4f02422eda12092389.png)
+
+默认情况下，`circle`和`ellipse`是自动适配盒子的，我们也可以手动指定径向渐变的形状
+
+**形状**
+
+- `circle` 圆形
+
+- `ellipse`椭圆
+
+```css
+background-image: radial-gradient(circle, red, yellow);
+```
+
+![image-20220802133311906](imgs/cd5c0bde85bb05f2ff27a4b0dbed24d6c3d184e7.png)
+
+也可以指定渐变的位置
+
+**位置**
+
+- `top`
+
+- `right`
+
+- `left`
+
+- `center`
+
+- `bottom`
+
+```css
+background-image: radial-gradient(at left, red, yellow);
+```
+
+![image-20220802133341945](imgs/ba046b3eb6a0901e770bf8c33902bc7f80bbcfac.png)
+
+当然，除了上述值，还可以指定像素
+
+**大小**
+
+- `closest-side` 近边
+
+- `farthest-side` 远边
+
+- `closest-corner` 近角
+
+- `farthest-corner` 远角
+
+```css
+background-image: radial-gradient(100px 60px, red, yellow);
+```
+
+![image-20220802133420787](imgs/9bb193441c218d7691529d682d4d2c98421dc57b.png)
+
+同时对其形状/大小和位置进行指定
+
+`radial-gradient(形状/大小 at 位置, 颜色 位置, 颜色 位置, 颜色 位置)`
+
+```css
+background-image: radial-gradient(circle at 50px 100px, red 50px, yellow 100px);
+```
+
+![image-20220802133504204](imgs/0663e389d0e95b2ffa6817763a699c3877fcf44d.png)
+
+总结一下
+
+**形状**
+
+- `circle` 圆形
+
+- `ellipse`椭圆
+
+**大小**
+
+- `closest-side` 近边
+
+- `farthest-side` 远边
+
+- `closest-corner` 近角
+
+- `farthest-corner` 远角
+
+**位置**
+
+- `top`
+
+- `right`
+
+- `left`
+
+- `center`
+
+- `bottom`
+
+类似于线性渐变，径向渐变也有对应的`repeat`属性
+
+```css
+background-image: repeating-radial-gradient(circle at 50px 100px, red 50px, yellow 100px);
+```
+
+![image-20220802133535705](imgs/63a479167f0b9d399e9a0987b8e916ff3836be44.png)
+
+**总结**：径向渐变的渐变方向以圆心为起点，往四周扩散的；同一半径上的颜色是渐变的，同一圆周上的颜色是一致的
