@@ -9541,3 +9541,6562 @@ background-image: repeating-radial-gradient(circle at 50px 100px, red 50px, yell
 ![image-20220802133535705](imgs/63a479167f0b9d399e9a0987b8e916ff3836be44.png)
 
 **总结**：径向渐变的渐变方向以圆心为起点，往四周扩散的；同一半径上的颜色是渐变的，同一圆周上的颜色是一致的
+
+
+
+# ⭕16 【过渡 动画】
+
+## 1.过渡
+
+### 1.1 概述
+
+
+  在CSS中用于设置过渡特效的属性是 **transition**，该属性允许CSS的属性值在一定的时间区间内平滑地过渡。这种效果可以在鼠标悬浮`（:hover）`、鼠标单击`（:active）`、表单元素获得焦点`（:focus）`或对元素任何改变以及在JavaScript中某些事件执行后触发，并圆滑（若不对时间曲线进行特殊设置）地以动画效果改变CSS的属性值。
+
+**该属性能够对CSS中绝大部分属性的变化生效，但不能对CSS属性值不为“数值”的属性生效，即只有当属性的值为一个数值的时候，该属性才能生效。**数值包含“纯数字”、“像素数值”、“百分比数值”、“十六进制数值”等CSS属性的值为数值的元素生效。如：当元素的宽度为`“width:100px”`变化为`“width:200px”`的时候过渡效果能够生效，但当元素的宽度为`“width:100px”`变化为`“width:auto”`的时候，就不会产生过渡效果了。当一个元素的字体颜色为`“#f31e1d”`，变化为`“#2396fd”`的时候过渡有效，但当它的字体颜色由`“#f31e1d”`变为`“transparent”`的时候过渡就不会产生效果了。这一点在使用中需要留意。
+
+该属性包含多个分支属性，主要有：“过渡CSS属性名称”、“过渡执行时间”、“过渡时间速率曲线”和“过渡的延时执行”四个主要内容，接下来我们对它的各分支属性进行详细的学习。
+
+### 1.2 transition-property
+
+语法：
+
+```css
+ transition-property ： none | all | [ <IDENT> ] [ ',' <IDENT> ]*
+```
+
+过渡属性，该属性是用来指定当元素其中一个属性改变时执行的过渡动画效果，该属性有三种类型的值：
+
+`none`：将过渡效果设置为“无过渡效果”，或停止当前过渡效果。
+`all`：（默认）为所支持的所有CSS属性在值变化时执行动画过渡效果。
+`[property name]`：指定一个或多个属性名称列表，以逗号“,”进行分隔，当指定的属性产生变化时，为其执行指定属性的动画过渡效果。
+
+这个属性用于指定要执行过渡的属性，一般来说大部分css属性都支持过渡效果，使用该属性时需要注意三点：
+ **（1）过渡时必须是从一个有效数值向另外一个有效数值进行过渡**（很重要的原则，需要记住）
+ （2）多个属性间使用,隔开
+ （3）如果所有属性都需要过渡，则使用all关键字
+
+> 具体什么css属性可以实现transition效果，在W3C官网中列出了所有可以实现transition效果的CSS属性值以及值的类型。这里需要提醒一点是，并不是什么属性改变都为触发transition动作效果，比如页面的自适应宽度，当浏览器改变宽度时，并不会触发transition的效果。但上述表格所示的属性类型改变都会触发一个transition动作效果。
+
+### 1.3 transition-duration
+
+语法：
+
+```css
+ transition-duration ： <time> [, <time>]* 
+```
+
+过渡持续时间，该属性是用于设定一个属性的值过渡被触发开始时到结束时所需要经历的时间，取值：`<time>`为数值，单位为`s`（秒）或者`ms`(毫秒),可以作用于所有元素，包括:before和:after伪元素。其默认值是0，也就是变换时是即时的
+
+### 1.4 transition-timing-function
+
+语法:
+
+```css
+ transition-timing-function ： ease | linear | ease-in | ease-out | ease-in-out | cubic-bezier(<number>, <number>, <number>, <number>) [, ease | linear | ease-in | ease-out | ease-in-out | cubic-bezier(<number>, <number>, <number>, <number>)]* 
+```
+
+`transition-timing-function`的值允许你根据时间的推进去改变属性值的变换速率，有器七个可能的值。
+
+- `linear`匀速运动
+
+- `ease` 默认值，慢速开始，先加速后减速
+
+- `ease-in` 加速运动
+
+- `ease-out` 减速运动
+
+- `ease-in-out` 先加速后减速
+
+- `cubic-bezier()`来指定时序函数  https://cubic-bezier.com
+
+- `steps()`分步执行过渡效果，可以设置第二个值： 
+
+- - `end`，在时间结束时执行过渡（默认值）
+
+- - `start`，在时间开始时执行过渡
+
+![image-20220803115827732](imgs/48d12cda8fb3346a2603f6bba66ad14a72b645c3.png)
+
+`steps()`**分步执行过渡效果**
+
+```css
+/* transition-timing-function: steps(2, end); */
+transition-timing-function: steps(2);
+```
+
+![image-20220803115827732](imgs/4572adc958d8d78c03b705245af0e5d7f77498ce.gif)
+
+```css
+transition-timing-function: steps(2, start);
+```
+
+![image-20220803115827732](imgs/5fa4e259d78c2305842a84896d8d6f1e31002fec.gif)
+
+### 1.5 transition-delay
+
+语法：
+
+```css
+  transition-delay ： <time> [, <time>]*
+```
+
+`transition-delay`是用来指定一个动画开始执行的时间，也就是说当改变元素属性值后多长时间开始执行transition效果，其取值：`<time>`为数值，单位为`s`（秒）或者`ms`(毫秒)，其使用和transition-duration极其相似，也可以作用于所有元素，包括:before和:after伪元素。 默认大小是"0"，也就是变换立即执行，没有延迟。
+
+有时我们不只改变一个css效果的属性,而是想改变两个或者多个css属性的transition效果，那么我们只要把几个transition的声明串在一起，用逗号（“，”）隔开，然后各自可以有各自不同的延续时间和其时间的速率变换方式。
+
+但需要值得注意的一点：`transition-delay`与`transition-duration`的值都是时间，所以要区分它们在连写中的位置，一般浏览器会根据先后顺序决定，第一个可以解析的为transition-duration 第二个为transition-delay。如：
+
+```css
+a {
+    -moz-transition: background 0.5s ease-in,color 0.3s ease-out;
+    -webkit-transition: background 0.5s ease-in,color 0.3s ease-out;
+    -o-transition: background 0.5s ease-in,color 0.3s ease-out;
+    transition: background 0.5s ease-in,color 0.3s ease-out;
+  }
+```
+
+如果你想给元素执行所有transition效果的属性，那么我们还可以利用all属性值来操作，此时他们共享同样的延续时间以及速率变换方式，如：
+
+```css
+a {
+    -moz-transition: all 0.5s ease-in;
+    -webkit-transition: all 0.5s ease-in;
+    -o-transition: all 0.5s ease-in;
+    transition: all 0.5s ease-in;
+  }
+```
+
+### 1.6 简写
+
+综合上述我们可以给transition一个速记法：transition:` <property> <duration> <animation type> <delay>`如下图所示
+
+![image-20220803120826488](imgs/31668246baa4112457975c82ff0d767a13f5bc3d.png)
+
+只有一个要求，如果要写延迟，则两个时间中第一个是持续时间，第二个是延迟时间
+
+## 2.动画
+
+动画（animation）是 CSS3 中具有颠覆性的特征之一，可通过**设置多个节点来精确控制一个或一组动画**，常用来实现复杂的动画效果。
+
+**相比较过渡，动画可以实现更多变化，更多控制，连续自动播放等效果。**
+
+动画和过渡类似，都是可以实现一些动态的效果，不同的是
+
+- 过渡需要在某个属性发生变化时才会触发
+
+- 动画可以自动触发动态效果
+
+### 2.1 动画的基本使用
+
+制作动画分为两步：
+
+1. 先定义动画
+2. 再使用（调用）动画
+
+#### 2.1.1 用 keyframes 定义动画（类似定义类选择器）
+
+设置动画效果，必须先要设置一个**关键帧**，关键帧设置了动画执行每一个步骤
+
+```css
+@keyframes 动画名称 {
+   0% {
+        width: 100px;
+   }  
+   100% {
+        width: 200px;
+   }
+}
+```
+
+**动画序列**
+
+- `0%` 是动画的开始，`100%` 是动画的完成。这样的规则就是动画序列
+- 在` @keyframes` 中规定某项` CSS` 样式，就能创建由当前样式逐渐改为新样式的动画效果
+- 动画是使元素从一种样式逐渐变化为另一种样式的效果。您可以改变任意多的样式任意多的次数
+- 请用百分比来规定变化发生的时间，或用关键词 "from" 和 "to"，等同于 0% 和 100%
+
+#### 2.1.2 元素使用动画
+
+```css
+div {
+	width: 200px;
+	height: 200px;
+	background-color: aqua;
+	margin: 100px auto;
+	/* 调用动画 */
+	animation-name: 动画名称;
+	/* 持续时间 */
+	animation-duration: 持续时间;
+}
+```
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CSS3动画的基本使用</title>
+    <style>
+        /* 我们想页面一打开，一个盒子就从左边走到右边 */
+        /* 1. 定义动画 */
+        @keyframes move {
+            /* 开始状态 */
+            0% {
+                transform: translateX(0px);
+            }
+            /* 结束状态 */
+            100% {
+                transform: translateX(1000px);
+            }
+        }
+
+        div {
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            /* 2. 调用动画 */
+            /* 动画名称 */
+            animation-name: move;
+            /* 持续时间 */
+            animation-duration: 2s;
+        }
+    </style>
+</head>
+
+<body>
+<div></div>
+</body>
+
+</html>
+```
+
+![](imgs/10345d339a0d3a7a4af357adb86ae937c642fae4.gif)
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>动画序列</title>
+    <style>
+        /* from to 等价于 0% 和 100% */
+        /*
+        @keyframes move {
+            from {
+                transform: translate(0, 0);
+            }
+            to {
+                transform: translate(1000px, 0);
+            }
+        }
+        */
+
+        /* 动画序列 */
+        /* 1. 可以做多个状态的变化 keyframe 关键帧 */
+        /* 2. 里面的百分比要是整数 */
+        /* 3. 里面的百分比就是 总的时间（我们这个案例 10s）的划分 25% * 10 = 2.5s */
+
+        @keyframes move {
+            0% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(1000px, 0)
+            }
+            50% {
+                transform: translate(1000px, 500px);
+            }
+            75% {
+                transform: translate(0, 500px);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+
+        div {
+            width: 100px;
+            height: 100px;
+            background-color: pink;
+            animation-name: move;
+            animation-duration: 10s;
+        }
+    </style>
+</head>
+
+<body>
+<div>
+
+</div>
+</body>
+
+</html>
+```
+
+![](imgs/e9cf4ed204af82fbdbb45ca4f188c5c8dfab6657.gif)
+
+### 2.2 动画常用属性
+
+`animation-name` 指定动画的关键帧名称
+
+`animation-duration`：  规定动画完成一个周期所花费的秒或毫秒，默认是 0（必须的）
+
+`animation-delay`：动画效果的延迟，等待一段时间后在执行动画
+
+`animation-timing-function`：动画的时序函数
+
+`animation-iteration-count` 动画执行的次数
+
+- `1` 一次
+
+- `infinite` 无限执行
+
+`animation-direction` 指定动画运行的方向
+
+- `normal` 从`from`向`to`运行，每次都是这样，默认值
+
+- `reverse` 从`to`向`from`运行，每次都是这样
+
+- `alternate` 从`from`向`to`运行，重复执行动画时反向执行
+
+- `alternate-reverse` 从`to`向`from`运行，重复执行动画时反向执行
+
+`animation-play-state` 设置动画的执行状态
+
+- `running` 动画执行，默认值
+
+- `paused` 动画暂停
+
+`animation-fill-mode` 动画的填充模式
+
+- `none` 动画执行完毕，元素回到原来位置，默认值
+
+- `forwards` 动画执行完毕，元素会停止在动画结束的位置
+
+- `backwards` 动画延时等待时，元素就会处于开始位置
+
+- `both` 结合了`forwards`和`backwards`
+
+`animation`   所有动画属性的简写属性，除了animation-play-state 属性
+
+### 2.3 动画简写属性
+
+animation：动画名称 持续时间 运动曲线 何时开始 播放次数 是否反方向 动画起始或者结束的状态。
+
+```css
+animation: myfirst 5s linear 2s infinite alternate;
+```
+
+- 简写属性里面不包含 animation-play-state
+- 暂停动画：animation-play-state: puased; 经常和鼠标经过等其他配合使用
+- 想要动画走回来，而不是直接跳回来：animation-direction: alternate
+- 盒子动画结束后，停在结束位置：animation-fill-mode: forwards 
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>动画属性</title>
+    <style>
+        @keyframes move {
+            0% {
+                transform: translate(0, 0);
+            }
+            100% {
+                transform: translate(1000px, 0);
+            }
+        }
+
+        div {
+            width: 100px;
+            height: 100px;
+            background-color: pink;
+            /* 动画名称 */
+            animation-name: move;
+            /* 持续时间 */
+            /* animation-duration: 2s; */
+            /* 运动曲线 */
+            /* animation-timing-function: ease; */
+            /* 何时开始 */
+            animation-delay: 1s;
+            /* 重复次数 iteration 重复的 conut 次数 infinite 无限 */
+            /* animation-iteration-count: infinite; */
+            /* 是否反方向播放 默认的是 normal 如果想要反方向 就写 alternate */
+            /* animation-direction: alternate; */
+            /* 动画结束后的状态 默认的是 backwards 回到起始状态 我们可以让他停留在结束状态 forwards */
+            /* animation-fill-mode: forwards; */
+            /* animation: name duration timing-function delay iteration-count direction fill-mode; */
+            /* animation: move 2s linear 0s 1 alternate forwards; */
+            /* 前面 2 个属性 name duration 一定要写 */
+            /* animation: move 2s linear alternate forwards; */
+        }
+
+        div:hover {
+            /* 鼠标经过 div 让这个 div 停止动画，鼠标离开就继续动画 */
+            animation-play-state: paused;
+        }
+    </style>
+</head>
+
+<body>
+<div>
+
+</div>
+</body>
+
+</html>
+```
+
+### 2.4 速度曲线细节
+
+`animation-timing-function`：规定动画的速度曲线，默认是 "ease"。
+
+| **值**      | **描述**                                     |
+| ----------- | -------------------------------------------- |
+| linear      | 动画从头到尾的速度是相同的（匀速）           |
+| ease        | 默认。动画以低速开始，然后加快，在结束前变慢 |
+| ease-in     | 动画以低速开始                               |
+| ease-out    | 动画以低速结束                               |
+| ease-in-out | 动画以低速开始和结束                         |
+| steps()     | 指定了时间函数中的间隔数量（步长）           |
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>速度曲线步长</title>
+    <style>
+        div {
+            overflow: hidden;
+            font-size: 20px;
+            width: 0;
+            height: 30px;
+            background-color: pink;
+            /* 让我们的文字强制一行内显示 */
+            white-space: nowrap;
+            /* steps 就是分几步来完成我们的动画 有了 steps 就不要在写 ease 或者 linear 了 */
+            animation: w 4s steps(10) forwards;
+        }
+
+        @keyframes w {
+            0% {
+                width: 0;
+            }
+            100% {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div>世纪佳缘我在这里等你</div>
+</body>
+
+</html>
+```
+
+![](imgs/5526a5d86bbe803e0819e5adfeb83550d7236097.gif)
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>奔跑的熊大案例</title>
+    <style>
+        body {
+            background-color: #ccc;
+        }
+
+        div {
+            position: absolute;
+            width: 200px;
+            height: 100px;
+            background: url(media/bear.png) no-repeat;
+            /* 我们元素可以添加多个动画，用逗号分隔 */
+            animation: bear .4s steps(8) infinite, move 3s forwards;
+        }
+
+        @keyframes bear {
+            0% {
+                background-position: 0 0;
+            }
+            100% {
+                background-position: -1600px 0;
+            }
+        }
+
+        @keyframes move {
+            0% {
+                left: 0;
+            }
+            100% {
+                left: 50%;
+                /* margin-left: -100px; */
+                transform: translateX(-50%);
+            }
+        }
+    </style>
+</head>
+
+<body>
+<div></div>
+</body>
+
+</html>
+```
+
+![](imgs/bf194a52d90139c0cb25ed8994089dab48aa462f.png)
+
+![](imgs/0aea882d6d3b1f1868f51fae2f1aeb9ced55e1a7.gif)
+
+# ⭕17 【2D转换 3D转换 浏览器私有前缀】
+
+## 1.2D转换
+
+转换（transform）是 CSS3 中具有颠覆性的特征之一。可以实现元素的位移、旋转、缩放等效果。
+
+转换（transform）你可以简单理解为变形。变形就是指通过css来改变元素的形状或位置，变形不会影响到页面的布局,`transform`用来设置元素的变形效果。
+
+- 移动：translate
+- 旋转：rotate
+- 缩放：scale
+
+### 1.1 二维坐标系
+
+2D 转换是改变标签在二维平面上的位置和形状的一种技术，先来学习二维坐标系。
+
+<img src="imgs/1ae56a03bd61982daf24867a74ec762da3d3409e.png" style="zoom: 50%;" />
+
+### 1.2 2D转换之移动 translate
+
+2D 移动是 2D 转换里面的一种功能，可以改变元素在页面中的位置，类似定位。
+
+![](imgs/05f250f1e1e556f9420b23508965027dbd4d75b9.png)
+
+语法：
+
+```css
+transform: translate(x, y); 
+/* 或者分开写 */
+transform: translateX(n);
+transform: translateY(n);
+```
+
+重点：
+
+- 定义 2D 转换中的移动，沿着 X 和 Y 轴移动元素
+- translate 最大的优点：**不会影响到任何其他元素的位置**（优于定位的地方）
+- translate 中的百分比单位是**相对于自身**元素的 translate: (50%, 50%);
+- **对行内元素没有效果**
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>2D转换之移动translate</title>
+    <style>
+        /* 移动盒子的位置：定位、盒子的外边距、2D转换移动 */
+
+        div {
+            width: 200px;
+            height: 200px;
+            background-color: hotpink;
+            /* x就是x轴上移动位置，y就是y轴上移动位置，中间用逗号分隔 */
+            /* transform: translate(x, y); */
+            /* transform: translate(100px, 100px); */
+            /* 1. 只移动x坐标 */
+            /* transform: translate(100px, 0); */
+            /* transform: translateX(100px); */
+            /* 2. 只移动y坐标 */
+            /* transform: translate(0, 100px); */
+            /* transform: translateY(100px); */
+        }
+
+        div:first-child {
+            transform: translate(30px, 30px);
+        }
+
+        div:last-child {
+            background-color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div></div>
+    <div></div>
+</body>
+
+</html>
+```
+
+<img src="imgs/1a3fa74fcc8021d352ca5b3c80fe8e4d0898d821.png" style="zoom: 80%;" />
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>让一个盒子水平居中</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        
+        div {
+            position: relative;
+            width: 500px;
+            height: 500px;
+            background-color: hotpink;
+            /* 1. 我们 tranlate 里面的参数是可以用 % */
+            /* 2. 如果里面的参数是 % 那么移动的距离是以盒子自身的宽度或者高度来对比的 */
+            /* 这里的 50% 就是 250px 因为盒子的宽度是 500px */
+            /* transform: translateX(50%); */
+        }
+
+        p {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background-color: black;
+            /*
+            在前面的定位中使用直接减去自身宽度与高度的一半，此种方式的缺点在于不能随盒子大小的变化而变化
+            margin-top: -100px;
+            margin-left: -100px;
+            */
+            transform: translate(-50%, -50%);
+        }
+
+        span {
+            /* translate 对于行内元素是无效的 */
+            transform: translate(300px, 300px);
+        }
+    </style>
+</head>
+
+<body>
+<div>
+    <p></p>
+</div>
+<span>123</span>
+</body>
+
+</html>
+```
+
+<img src="imgs/db3136a82349d665a715d24c690fc6452a1a08b7.png" style="zoom:50%;" />
+
+### 1.3 2D转换之旋转 rotate
+
+2D 旋转指的是让元素在 2 维平面内顺时针旋转或者逆时针旋转。
+
+<img src="imgs/6d0e5184325f6825c3114b1bb476d2acc376fea5.png" style="zoom:50%;" />
+
+语法：
+
+```css
+transform: rotate(度数)
+```
+
+重点：
+
+- rotate 里面跟度数，单位是 deg，比如 rotate(45deg)
+- 角度为正时，顺时针；负时，逆时针
+- 默认旋转的中心点是元素的中心点
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>2D转换之旋转rotate</title>
+    <style>
+        img {
+            width: 150px;
+            /* 顺时针旋转45度 */
+            /* transform: rotate(45deg); */
+            border-radius: 50%;
+            border: 5px solid pink;
+            /* 过渡写到本身上，谁做动画给谁加 */
+            transition: all 0.5s;
+        }
+
+        img:hover {
+            transform: rotate(360deg);
+        }
+    </style>
+</head>
+
+<body>
+<img src="media/pic.jpg" alt="">
+</body>
+
+</html>
+```
+
+![](imgs/3df67a59b73c24e4b609d18c7f078bbe7a7ee333.gif)
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>旋转三角</title>
+    <style>
+        div {
+            position: relative;
+            width: 249px;
+            height: 35px;
+            border: 1px solid #000;
+        }
+
+        /* 三角可以通过盒子来制作，不一定非得字体图标 */
+        /* 让一个旋转45度的正方形（菱形）的两个边框显示出来 */
+        div::after {
+            content: "";
+            position: absolute;
+            top: 8px;
+            right: 15px;
+            width: 10px;
+            height: 10px;
+            border-right: 1px solid #000;
+            border-bottom: 1px solid #000;
+            transform: rotate(45deg);
+            transition: all 0.2s;
+        }
+
+        /* 鼠标经过 div 里面的三角旋转 */
+        div:hover::after {
+            transform: rotate(225deg);
+        }
+    </style>
+</head>
+
+<body>
+<div></div>
+</body>
+
+</html>
+```
+
+![](imgs/6f5094cd10fea96433894257a159069b6a60f722.gif)
+
+### 1.4 转换中心点 transform-origin
+
+我们可以设置元素转换的中心点。
+
+语法：
+
+```css
+transform-origin: x y;
+```
+
+重点：
+
+- 注意后面的参数 x 和 y 用空格隔开
+- x y 默认转换的中心点是元素的中心点（50% 50%）
+- 还可以给 x y 设置 像素 或者 方位名词（top  bottom  left  right  center）
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>transform-origin</title>
+    <style>
+        div {
+            width: 100px;
+            height: 100px;
+            background-color: pink;
+            margin: 100px auto;
+            transition: all 1s;
+            /* 1.可以跟方位名词 */
+            /* transform-origin: left bottom; */
+            /* 2. 默认的是 50% 50% 等价于 center center */
+            /* 3. 可以是 px 像素 */
+            transform-origin: 25px 25px;
+        }
+
+        div:hover {
+            transform: rotate(360deg);
+        }
+    </style>
+</head>
+
+<body>
+<div></div>
+</body>
+
+</html>
+```
+
+<img src="imgs/c96321365bc3c3866c28cfbfb9f1c93cc7801f5a.gif" style="zoom: 33%;" />
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>旋转中心点</title>
+    <style>
+        div {
+            /* 溢出隐藏 */
+            overflow: hidden;
+            width: 200px;
+            height: 200px;
+            border: 1px solid pink;
+            margin: 10px;
+            float: left;
+        }
+
+        div::before {
+            content: "黑马";
+            display: block;
+            width: 100%;
+            height: 100%;
+            background-color: hotpink;
+            transform: rotate(180deg);
+            transform-origin: left bottom;
+            transition: all 0.4s;
+        }
+
+        /* 鼠标经过 div 里面的 before 复原 */
+        div:hover::before {
+            transform: rotate(0deg);
+        }
+    </style>
+</head>
+
+<body>
+<div></div>
+<div></div>
+<div></div>
+</body>
+
+</html>
+```
+
+![](imgs/f34fe6847075e199778869fd1b8f2a3b9ef78e3a.gif)
+
+### 1.5 2D 转换之缩放 scale
+
+缩放，顾名思义，可以放大和缩小。只要给元素添加上了这个属性就能控制它放大还是缩小。
+
+语法：
+
+```css
+transform: scale(x, y);
+```
+
+注意：
+
+- 注意其中的 x 和 y 用逗号分隔
+- transform: scale(1, 1) ：宽和高都放大一倍，相当于没有放大
+- transform: scale(2, 2) ：宽和高都放大了 2 倍
+- transform: scale(2) ：只写一个参数，第二个参数默认等于第一个参数，相当于 scale(2, 2)
+- transform: scale(0.5, 0.5) ：缩小
+- scale 缩放最大的优势：可以设置缩放的基准点（默认以中心点缩放）；并且缩放不会影响其他盒子的位置（以上两个特点都是直接设置 width 和 height 都无法做到的）
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>2D转换之缩放</title>
+    <style>
+        div {
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            margin: 100px auto;
+            /* 可以设置缩放的中心点 */
+            /* transform-origin: left bottom; */
+        }
+        
+        div:hover {
+            /* 1. 里面写的数字不跟单位 就是倍数的意思， 1 就是 1 倍；2 就是 2 倍 */
+            /* transform: scale(x, y); */
+            /* transform: scale(2, 2); */
+            /* 2. 修改了宽度为原来的 2 倍，高度不变 */
+            /* transform: scale(2, 1); */
+            /* 3. 等比例缩放 同时修改宽度和高度，我们有简单的写法以下是宽度修改了 2 倍，高度默认和第一个参数一样 */
+            /* transform: scale(2); */
+            /* 4. 我们可以进行缩小，小于 1就是缩小 */
+            /* transform: scale(0.5, 0.5); */
+            /* transform: scale(0.5); */
+            /* 5. scale 的优势之处：不会影响其他的盒子，而且可以设置缩放的中心点 */
+            /*
+            直接设置宽高时无法做到以上优点的！
+            width: 300px;
+            height: 300px;
+            */
+            transform: scale(2);
+        }
+    </style>
+</head>
+
+<body>
+    <div></div>
+</body>
+
+</html>
+```
+
+<img src="imgs/7b7c5fd4c2a157845d01400156c57c99862ee168.gif" style="zoom:50%;" />
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>图片放大案例</title>
+    <style>
+        div {
+            width: 225px;
+            height: 137px;
+            overflow: hidden;
+            float: left;
+            margin: 10px;
+        }
+
+        div img {
+            transition: all .4s;
+        }
+
+        div img:hover {
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+
+<body>
+<div>
+    <a href="#"><img src="media/scale.jpg" alt=""></a>
+</div>
+<div>
+    <a href="#"><img src="media/scale.jpg" alt=""></a>
+</div>
+<div>
+    <a href="#"><img src="media/scale.jpg" alt=""></a>
+</div>
+</body>
+ 
+</html>
+```
+
+![](imgs/566216e50089039e4b65b9ec1a3fd7a0e22014cb.gif)
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        li {
+            float: left;
+            width: 30px;
+            height: 30px;
+            border: 1px solid hotpink;
+            margin: 10px;
+            text-align: center;
+            line-height: 30px;
+            list-style: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all .4s;
+        }
+
+        li:hover {
+            transform: scale(1.2);
+        }
+    </style>
+</head>
+
+<body>
+<ul>
+    <li>1</li>
+    <li>2</li>
+    <li>3</li>
+    <li>4</li>
+    <li>5</li>
+    <li>6</li>
+    <li>7</li>
+</ul>
+</body>
+
+</html>
+```
+
+![](imgs/701daeb5a49f832418f7c18e8c3bbbcb71f9c8e1.gif)
+
+### 1.6 2D 转换综合写法
+
+注意：
+
+1. 同时使用多个转换，其格式为：`transform: translate() rotate() scale()` ...等
+2. 其顺序会影转换的效果。（先旋转会改变坐标轴方向）
+3. 当我们同时有位移和其他属性的时候，记得要将**位移放到最前**
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        div {
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            transition: all 1s;
+        }
+
+        div:hover {
+            /* transform: rotate(180deg) translate(150px, 50px); */
+            /* 我们同时有位移和其他属性，我们需要把位移放到最前面 */
+            transform: translate(150px, 50px) rotate(180deg) scale(1.2);
+        }
+    </style>
+</head>
+
+<body>
+<div></div>
+</body>
+
+</html>
+```
+
+<img src="imgs/d76e44b93ebda1d98d1145418ca1469fad50221d.gif" style="zoom:50%;" />
+
+### 1.7 2D 转换总结
+
+- 转换 transform 我们简单理解就是变形，有 2D 和 3D 之分
+- 我们暂且学了三个，分别是：位移、旋转 和 缩放
+- 2D 移动 translate(x, y) 最大的优势是不影响其他盒子，里面参数用 %，是相对于自身宽度和高度来计算的
+- 可以分开写比如 translateX(x)  和 translateY(y)
+- 2D 旋转 rotate(度数) 可以实现旋转元素，度数的单位是 deg
+- 2D 缩放 sacle(x, y) 里面参数是数字，不跟单位，可以是小数。最大的优势在于不影响其他盒子
+- 设置转换中心点 transform-origin : x y; 参数可以百分比、像素或者是方位名词
+- 当我们进行综合写法，同时有位移和其他属性的时候，记得要将位移放到最前
+
+## 2.3D转换
+
+我们生活的环境是 3D 的，照片就是 3D 物体在 2D 平面呈现的例子。
+
+**有什么特点**
+
+- 近大远小
+- 物体后面遮挡不可见
+
+当我们在网页上构建 3D 效果的时候参考这些特点就能产出 3D 效果。
+
+### 2.1 三维坐标系
+
+三维坐标系其实就是指立体空间，立体空间是由3个轴共同组成的。
+
+<img src="imgs/7529546aa6911a7bea789f59e44e253752c5ba11.png" style="zoom: 33%;" />
+
+- x 轴：水平向右（注意：x 右边是正值，左边是负值）
+- y 轴：垂直向下（注意：y 下面是正值，上面是负值）
+- z 轴：垂直屏幕（注意：往外面是正值，往里面是负值）
+
+**3D 转换我们主要学习工作中最常用的 3D 位移 和 3D 旋转。**
+
+**主要知识点**
+
+- 3D 位移：translate3d(x, y, z)
+- 3D 旋转：rotate3d(x, y, z)
+- 透视：perspective
+- 3D 呈现：transfrom-style
+
+### 2.2 3D移动 translate3d
+
+3D 移动在 2D 移动的基础上多加了一个可以移动的方向，就是 z 轴方向。
+
+- transform:translateX(100px)：仅仅是在 X 轴上移动
+- transform:translateY(100px)：仅仅是在 Y 轴上移动
+- transform:translateZ(100px)：仅仅是在 Z 轴上移动（注意：translateZ 一般用 px 单位）
+- transform:translate3d(x, y, z)：其中 x、y、z 分别指要移动的轴的方向的距离
+
+因为 z 轴是垂直屏幕，由里指向外面，所以默认是看不到元素在 z 轴的方向上移动（要借助透视）。
+
+### 2.3 透视 perspective
+
+<img src="imgs/5f9f4b4038274b3902564f2720fae466ed198040.png" style="zoom: 25%;" />
+
+<img src="imgs/4850dbe3e2352f084cd822cafac04c8234470d8c.png" style="zoom:25%;" />
+
+在 2D 平面产生近大远小视觉立体，但是效果只是二维的。
+
+- 如果想要在网页产生 3D 效果需要透视（理解成 3D 物体投影在 2D 平面内）
+- 模拟人类的视觉位置，可认为安排一只眼睛去看
+- 透视我们也称为视距：视距就是人的眼睛到屏幕的距离
+- 距离视觉点越近的，在电脑平面成像越大，越远成像越小
+- 透视的单位是像素
+
+**透视写在被观察元素的父盒子上面。**
+
+d：就是视距，视距就是一个距离人的眼睛到屏幕的距离。
+
+z：就是 z 轴，物体距离屏幕的距离，z 轴越大（正值）我们看到的物体就越大。
+
+
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>3D移动translate3d</title>
+    <style>
+        body {
+            /* 透视写到被观察元素的父盒子上面 */
+            perspective: 200px;
+        }
+
+        div {
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            /* transform: translateX(100px) translateY(100px) translateZ(100px); */
+            /* 1. translateZ 沿着 Z 轴移动 */
+            /* 2. translateZ 后面的单位我们一般跟 px */
+            /* 3. translateZ(100px) 向外移动 100px（向我们的眼睛来移动的） */
+            /* 4. 3D 移动有简写的方法 */
+            /* transform: translate3d(x, y, z); */
+            /* transform: translate3d(100px, 100px, 100px); */
+            /* 5. xyz 是不能省略的，如果没有就写 0 */
+            transform: translate3d(400px, 100px, 100px);
+        }
+    </style>
+</head>
+
+<body>
+<div></div>
+</body>
+
+</html>
+```
+
+![](imgs/dd8c606aeeb066ddb31564dec7d1f7a44bab6359.png)
+
+### 2.4 translateZ
+
+translform:translateZ(100px)：仅仅是在 Z 轴上移动。有了透视，就能看到 translateZ 引起的变化了。
+
+- translateZ：近大远小
+- translateZ：往外是正值
+- translateZ：往里是负值
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>translateZ</title>
+    <style>
+        body {
+            perspective: 500px;
+        }
+
+        div {
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            margin: 100px auto;
+            transform: translateZ(0);
+        }
+    </style>
+</head>
+
+<body>
+<div></div>
+<div></div>
+<div></div>
+</body>
+
+</html>
+```
+
+<img src="imgs/1349168ad5d9cd0827789d27abdb8f2ded2f672f.png" style="zoom:50%;" />
+
+### 2.5 3D旋转 rotate3d
+
+3D旋转指可以让元素在三维平面内沿着 x轴，y轴，z轴或者自定义轴进行旋转。
+
+**语法**
+
+- transform: rotateX(45deg)：沿着 x 轴正方向旋转 45 度
+- transform: rotateY(45deg)：沿着 y 轴正方向旋转 45deg
+- transform: rotateZ(45deg)：沿着 z 轴正方向旋转 45deg
+- transform: rotate3d(x, y, z, deg)：沿着自定义轴旋转 deg 为角度（了解即可）
+
+![](imgs/b46aa4ca8dbb023a2fb4f10053695e05cc57ee25.gif)
+
+对于元素旋转的方向的判断，我们需要先学习一个左手准则。
+
+**左手准则**
+
+- 左手的手拇指指向 x 轴的正方向
+- 其余手指的弯曲方向就是该元素沿着 x 轴旋转的方向
+
+<img src="imgs/e3aec44aa1c0134bae8eaeb2863d7a2a76d85fe9.png" style="zoom:50%;" />
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>rotateX</title>
+    <style>
+        body {
+            /* 利用透视产生近大远小效果 */
+            perspective: 300px;
+        }
+
+        img {
+            display: block;
+            margin: 100px auto;
+            transition: all 1s;
+        }
+
+        img:hover {
+            transform: rotateX(45deg);
+        }
+    </style>
+</head>
+
+<body>
+<img src="media/pig.jpg" alt="">
+</body>
+
+</html>
+```
+
+<img src="imgs/d4e676b6d0d9aedf0d6dda3bb5afbcdb452342d1.gif" style="zoom:50%;" />
+
+---
+
+- 左手的手拇指指向 y 轴的正方向
+- 其余手指的弯曲方向就是该元素沿着 y 轴旋转的方向（正值）
+
+<img src="imgs/80c67f7edd51b5f4a19d8f43cad806a84643a439.png" style="zoom:33%;" />
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>rotateY</title>
+    <style>
+        body {
+            perspective: 500px;
+        }
+
+        img {
+            display: block;
+            margin: 100px auto;
+            transition: all 1s;
+        }
+
+        img:hover {
+            transform: rotateY(45deg);
+        }
+    </style>
+</head>
+
+<body>
+<img src="media/pig.jpg" alt="">
+</body>
+</html>
+```
+
+![20210425121401130](imgs/25f7fc6db557bd60c7b3eada54eee51842001182.gif)
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>rotateZ</title>
+    <style>
+        body {
+            perspective: 500px;
+        }
+
+        img {
+            display: block;
+            margin: 100px auto;
+            transition: all 1s;
+        }
+
+        img:hover {
+            transform: rotateZ(180deg);
+        }
+    </style>
+</head>
+
+<body>
+<img src="media/pig.jpg" alt="">
+</body>
+
+</html>
+```
+
+<img src="imgs/08c8d6984a33803b57c733360bc0fd7b892bfcc6.gif" style="zoom:50%;" />
+
+transform: rotate3d(x, y, z, deg)：沿着自定义轴旋转 deg 为角度（了解即可）。
+
+xyz 是表示旋转轴的矢量，表示你是否希望沿着该轴旋转，最后一个表示旋转的角度。
+
+- transform: rotate3d(1, 0, 0, 45deg)：就是沿着 x 轴旋转 45deg
+- transform: rotate3d(0, 1, 0, 45deg)：就是沿着 y 轴旋转 45deg
+- transform: rotate3d(0, 0, 1, 45deg)：就是沿着 z 轴旋转 45deg
+- transform: rotate3d(1, 1, 0, 45deg)：就是沿着对角线（矢量计算）旋转 45deg
+
+<img src="imgs/bfc8681de5016d7885970f072fb20e27418cd70f.png" style="zoom: 33%;" />
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>rotate3d</title>
+    <style>
+        body {
+            perspective: 500px;
+        }
+
+        img {
+            display: block;
+            margin: 100px auto;
+            transition: all 1s;
+        }
+
+        img:hover {
+            /* transform: rotate3d(x,y,z,deg); */
+            /* transform: rotate3d(1, 0, 0, 45deg); */
+            /* transform: rotate3d(0, 1, 0, 45deg); */
+            transform: rotate3d(1, 1, 0, 45deg);
+        }
+    </style>
+</head>
+
+<body>
+<img src="media/pig.jpg" alt="">
+</body>
+
+</html>
+```
+
+<img src="imgs/eacc33670249c77af094a74528a20bba29af5f0b.gif" style="zoom:50%;" />
+
+### 2.6 3D呈现 transfrom-style
+
+- 控制子元素是否开启三维立体环境
+- transform-style: flat 子元素不开启 3d 立体空间（默认的）
+- transform-style: preserve-3d; 子元素开启立体空间
+- 代码写给父级，但是影响的是子盒子
+- 这个属性很重要，后面必用
+
+![](imgs/df5332f968d4f1ebaea34ddede4c660a3ce1329b.png)
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>transform-style</title>
+    <style>
+        body {
+            perspective: 500px;
+        }
+
+        .box {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 100px auto;
+            transition: all 2s;
+            /* 让子元素保持3d立体空间环境 */
+            transform-style: preserve-3d;
+        }
+
+        .box:hover {
+            transform: rotateY(60deg);
+        }
+
+        .box div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: pink;
+        }
+
+        .box div:last-child {
+            background-color: purple;
+            transform: rotateX(60deg);
+        }
+    </style>
+</head>
+
+<body>
+<div class="box">
+    <div></div>
+    <div></div>
+</div>
+</body>
+
+</html>
+```
+
+<img src="imgs/cd918f0ddf72f59880e75f69f262c96de4aef299.gif" style="zoom:50%;" />
+
+【案例：两面翻转的盒子】
+
+<img src="imgs/39473c6ee27a4688b8062e69db78007c82480a80.gif" style="zoom:50%;" />
+
+实现步骤：
+
+1. 搭建 HTML 结构
+
+```html
+<div class="box">
+	<div class="front">黑马程序员</div>
+    <div class="back">pink老师等你</div>
+</div>
+```
+
+- box 父盒子里面包含前后两个子盒子
+- box 是翻转的盒子 front 是前面盒子 back 是后面盒子
+
+2. CSS 样式
+
+- box 指定大小，切记要添加 3d 呈现
+- back 盒子要沿着 Y 轴翻转 180 度
+- 最后鼠标经过 box 沿着 Y 旋转 180deg
+
+代码：
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>两面翻转的盒子</title>
+    <style>
+        body {
+            perspective: 400px;
+        }
+
+        .box {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin: 100px auto;
+            transition: all .4s;
+            /* 让背面的紫色盒子保留立体空间 给父级添加的 */
+            transform-style: preserve-3d;
+        }
+
+        .box:hover {
+            transform: rotateY(180deg);
+        }
+
+        .front,
+        .back {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            font-size: 30px;
+            color: #fff;
+            text-align: center;
+            line-height: 300px;
+        }
+
+        .front {
+            background-color: pink;
+            z-index: 1;
+        }
+
+        .back {
+            background-color: purple;
+            /* 像手机一样 背靠背 旋转 */
+            transform: rotateY(180deg);
+        }
+    </style>
+</head>
+
+<body>
+<div class="box">
+    <div class="front">黑马程序员</div>
+    <div class="back">pink老师这里等你</div>
+</div>
+</body>
+
+</html>
+```
+
+---
+
+【案例：3D 导航栏】
+
+![](imgs/cad13e1072a1a8645cac57c9a504b1864b31ff90.gif)
+
+实现步骤：
+
+1. 搭建 HTML 结构
+
+```html
+<ul>
+    <li>
+        <div class="box">
+            <div class="front">黑马程序员</div>
+            <div class="bottom">pink老师等你</div>
+         </div>
+    </li>
+</ul>
+```
+
+- li 做导航栏
+- .box 是翻转的盒子 front 是前面盒子 bottom 是底下盒子
+
+2. CSS 样式
+
+- li 设置大小，加透视和 3d 呈现
+- front 需要前移 17.5 像素
+- bottom 需要下移 17.5 像素并且要沿着 x 轴翻转 负 90 度
+- 鼠标放到 box 让盒子旋转 90 度
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>3D导航栏案例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul {
+            margin: 100px;
+        }
+
+        ul li {
+            float: left;
+            margin: 0 5px;
+            width: 120px;
+            height: 35px;
+            list-style: none;
+            /* 一会我们需要给 box 旋转 也需要透视 干脆给 li 加 里面的子盒子都有透视效果 */
+            perspective: 500px;
+        }
+
+        .box {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: all .4s;
+        }
+
+        .box:hover {
+            transform: rotateX(90deg);
+        }
+
+        .front,
+        .bottom {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .front {
+            background-color: pink;
+            z-index: 1;
+            transform: translateZ(17.5px);
+        }
+
+        .bottom {
+            background-color: purple;
+            /* 这个x轴一定是负值 */
+            /* 我们如果有移动 或者其他样式，必须先写我们的移动 */
+            transform: translateY(17.5px) rotateX(-90deg);
+        }
+    </style>
+</head>
+
+<body>
+<ul>
+    <li>
+        <div class="box">
+            <div class="front">黑马程序员</div>
+            <div class="bottom">pink老师等你</div>
+        </div>
+    </li>
+    <li>
+        <div class="box">
+            <div class="front">黑马程序员</div>
+            <div class="bottom">pink老师等你</div>
+        </div>
+    </li>
+    <li>
+        <div class="box">
+            <div class="front">黑马程序员</div>
+            <div class="bottom">pink老师等你</div>
+        </div>
+    </li>
+    <li>
+        <div class="box">
+            <div class="front">黑马程序员</div>
+            <div class="bottom">pink老师等你</div>
+        </div>
+    </li>
+    <li>
+        <div class="box">
+            <div class="front">黑马程序员</div>
+            <div class="bottom">pink老师等你</div>
+        </div>
+    </li>
+    <li>
+        <div class="box">
+            <div class="front">黑马程序员</div>
+            <div class="bottom">pink老师等你</div>
+        </div>
+    </li>
+</ul>
+</body>
+
+</html>
+```
+
+---
+
+【综合案例：旋转木马】
+
+![](imgs/1acbdd61c98bab3bbcd87589664d921af53af014.gif)
+
+1. 搭建 HTML 结构
+
+```html
+<section>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+</section>
+```
+
+- 里面的 6 个 div 分别是 6 个狗狗图片
+- 注意最终旋转是 section 标签旋转
+
+2. CSS 样式
+
+- 给 body 添加 透视效果 perspective: 1000px;
+- 给 section 添加大小，一定不要忘记添加 3d 呈现效果控制里面的 6 个 div
+  -  别忘记子绝父相，section 要加相对定位
+- 里面 6 个 div 全部绝对定位叠到一起，然后移动不同角度旋转和距离
+  - 注意：旋转角度用 rotateY 距离肯定用 translateZ 来控制
+- 给 section 添加动画 animation，让它可以自动旋转即可
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>综合案例：旋转木马</title>
+    <style>
+        body {
+            perspective: 1000px;
+        }
+
+        section {
+            position: relative;
+            width: 300px;
+            height: 200px;
+            margin: 150px auto;
+            transform-style: preserve-3d;
+            /* 添加动画效果 */
+            animation: rotate 10s linear infinite;
+            background: url(media/pig.jpg) no-repeat;
+        }
+
+        section:hover {
+            /* 鼠标放入 section 停止动画 */
+            animation-play-state: paused;
+        }
+
+        @keyframes rotate {
+            0% {
+                transform: rotateY(0);
+            }
+            100% {
+                transform: rotateY(360deg);
+            }
+        }
+
+        section div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url(media/dog.jpg) no-repeat;
+        }
+
+        section div:nth-child(1) {
+            transform: rotateY(0) translateZ(300px);
+        }
+
+        section div:nth-child(2) {
+            /* 先旋转好了再 移动距离 */
+            transform: rotateY(60deg) translateZ(300px);
+        }
+
+        section div:nth-child(3) {
+            /* 先旋转好了再 移动距离 */
+            transform: rotateY(120deg) translateZ(300px);
+        }
+
+        section div:nth-child(4) {
+            /* 先旋转好了再 移动距离 */
+            transform: rotateY(180deg) translateZ(300px);
+        }
+
+        section div:nth-child(5) {
+            /* 先旋转好了再 移动距离 */
+            transform: rotateY(240deg) translateZ(300px);
+        }
+
+        section div:nth-child(6) {
+            /* 先旋转好了再 移动距离 */
+            transform: rotateY(300deg) translateZ(300px);
+        }
+    </style>
+</head>
+
+<body>
+<section>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+    <div></div>
+</section>
+</body>
+
+</html>
+```
+
+## 3.浏览器私有前缀
+
+浏览器私有前缀是为了**兼容老版本**的写法，**比较新版本的浏览器无须添加**。
+
+### 3.1 私有前缀
+
+- -moz-：代表 firefox 浏览器私有属性
+- -ms-：代表 ie 浏览器私有属性
+- -webkit-：代表 safari、chrome 私有属性
+- -o-：代表 Opera 私有属性
+
+### 3.2 提倡的写法
+
+```css
+-moz-border-radius: 10px; 
+-webkit-border-radius: 10px; 
+-o-border-radius: 10px; 
+border-radius: 10px;
+```
+
+> 以后通过构建工具来自动加这些属性
+
+# ⭕18 【移动Web开发之流式布局】
+
+## 1.移动端基础
+
+### 1.1 浏览器现状
+
+由于移动端浏览器的发展比较晚，所以主流移动端浏览器的内核都是基于 `Webkit` 内核打造的。
+
+我们在进行移动端的页面开发时，兼容性主要考虑 `Webkit` 内核。
+
+### 1.2 手机屏幕现状
+
+目前无论是 安卓 还是 IOS，移动端设备的屏幕尺寸非常多，碎片化非常严重。
+
+但是，前端页面开发者无需关注这些分辨率，因为我们常用的尺寸单位是 `px`。
+
+### 1.3 常见移动端屏幕尺寸
+
+目前移动端的屏幕尺寸非常多，并且随着发展还会越来越多。
+
+但是，对于移动端的 Web 开发来说，我们不用考虑太多。
+
+对于专门的 安卓 和 IOS 开发，才需要特别关注 `dp`、`dpi`、`pt`、`ppi` 等单位。
+
+### 1.4 移动端调试方法
+
+- Chrome DevTools（谷歌浏览器）的模拟手机调试
+- 搭建本地 Web 服务器，手机和服务器一个局域网内，通过手机访问服务器
+- 使用外网服务器，直接 IP 或 域名 访问
+
+### 1.5 像素
+
+- 屏幕是由一个一个发光的小点构成，这一个个的小点就是像素
+- 分辨率：1920 x 1080 说的就是屏幕中小点的数量，横向1920个像素点，纵向1080个像素点
+
+![image-20220816224839230](imgs/2c4d7ae5b0a71b19ec231564e7cc5edcc54d46dd.png)
+
+- 在前端开发中像素要分成两种情况讨论：**CSS像素** 和 **物理像素**
+- 物理像素，显示器的小点点就属于物理像素
+- CSS像素，编写网页时，我们所用像素都是CSS像素
+  - 浏览器在显示网页时，需要**将CSS像素转换为物理像素然后再呈现**
+  - 一个css像素**最终由几个物理像素显示，由浏览器决定**：
+    **`默认`\**情况下在\**pc端**，一个**css像素** = **一个物理像素** `1:1`
+
+### 1.6 总结
+
+- 移动端浏览器我们主要对 Webkit 内核进行兼容
+- 我们现在开发的移动端主要针对手机端开发
+- 现在移动端碎片化比较严重，分辨率和屏幕尺寸大小不一
+- 学会用谷歌浏览器模拟手机界面以及调试
+
+## 2.视口
+
+视口（viewport）：浏览器显示页面内容的**屏幕区域**。
+
+![image-20220816225052942](imgs/bcd9d7875e021ca8a1d96df4db19ff6cff6db9cd.png)
+
+视口的分类：布局视口、视觉视口、理想视口。
+
+### 2.1 布局视口
+
+- 为了解决早期 PC 端网页在手机上显示的问题，移动端浏览器都默认设置了一个布局视口。
+- IOS、Android 基本都将布局视口分辨率设置为 980px，所以 PC 上的网页大多也能在手机上呈现，但是网页元素看上去会非常小，一般可以通过手动缩放网页。
+
+<img src="imgs/dc321c007dd3d97ed1f1b66ea010e47aeeb04adf.png" style="zoom:50%;" />
+
+### 2.2 视觉视口
+
+- 字面意思，它是用户正在看到的网站的区域。注意：是网站的区域。
+- 我们可以通过缩放去操作视觉视口，但不会影响布局视口，布局视口仍保持原来的宽度。
+
+<img src="imgs/fc798a195dd05cadf48ba15c891a09e734a74dfe.png" style="zoom:50%;" />
+
+### 2.3 理想视口
+
+> 发明者：史蒂夫·乔布斯
+
+- 为了使网站在移动端有最理想的浏览和阅读宽度而设定
+- 理想视口，对设备来讲，是最理想的视口尺寸
+- 需要手动添写 `meta` 视口标签通知浏览器操作
+- `meta` 视口标签的主要目的：**布局视口的宽度应该与理想视口的宽度一致，简单理解就是设备有多宽，我们布局的视口就有多宽。**
+
+> 移动端 web 开发就是开发理想视口！
+
+### 2.4 视口总结
+
+- 视口就是浏览器显示页面内容的屏幕区域
+- 视口分为布局视口、视觉视口和理想视口
+- **我们移动端布局想要的是理想视口就是手机屏幕有多宽，我们的布局视口就有多宽**
+- **想要理想视口，我们需要给我们的移动端页面添加 `meta` 视口标签**
+
+### 2.5 meta视口标签
+
+```html
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
+```
+
+name="视口"
+
+content="内容中包含若干个属性，用逗号隔开"
+
+| 属性            | 解释说明                                                     |
+| --------------- | ------------------------------------------------------------ |
+| `width`         | 宽度设置的是 viewport 宽度，我们设置为 `device-width` “设备宽度” 特殊值 |
+| `initial-scale` | 初始缩放比，大于 0 的数字，一般来说是设置为 1:1 即：`1.0`    |
+| `maximum-scale` | 最大缩放比，大于 0 的数字                                    |
+| `minimum-scale` | 最小缩放比，大于 0 的数字                                    |
+| `user-scalable` | 用户是否可以缩放，yes 或 no（1或0），一般来说是 no           |
+
+### 2.6 标准的viewport设置
+
+- 视口宽度和设备保存一致 `device-width`
+- 视口默认缩放比例 `1.0`
+- 不允许用户自行缩放 `no`
+- 最大允许的缩放比例 `1.0`
+- 最小允许的缩放比例 `1.0`
+
+### 2.7 移动端完美视口
+
+不同屏幕，单位像素的多少是不同的，单位像素越多屏幕会越清晰，
+
+![image-20220816225739586](imgs/e1067f6e2661482d9f864f9ab6df02d6cdbf4895.png)
+
+`默认`情况下，移动端的网页都会将视口设置为 `980像素`（css像素）。 以确保pc端网页可以在移动端正常访问，但是如果网页的宽度超过了980，移动端的浏览器会 `自动对网页缩放`以完整显示网页。
+
+![image-20220816225811073](imgs/6a89919dde6cdb57fbf47310b0b06b8651c56f1a.png)
+
+所以基本大部分的pc端网站都可以在移动端中正常浏览，但是往往都不会有一个好的体验， 为了解决这个问题，大部分网站都会 `专门为移动端设计网页`
+
+移动端默认情况下像素比是 `980/移动端宽度`，即视口宽度（css像素）/移动端物理屏幕宽度
+
+我的手机是小米6，默认情况下像素比是980/1080=0.907
+
+如果我们直接在网页中编写移动端代码，这样在980的视口下，像素比是非常不好，导致网页中的内容非常小
+
+编写移动页面时，必须要确保有一个比较合理的 `像素比`：
+1css像素 对应 2个物理像素
+1css像素 对应 3个物理像素
+
+可以通过meta标签来设置视口宽度，控制像素比，如果这样固定视口宽度会导致再不同机型下显示效果不同。
+
+所以 `不能将视口宽度写死`
+
+```html
+<meta name="viewport" content="width=100px">
+```
+
+> 每一款移动设备设计时，都会有一个最佳的像素比，所以设备不同，像素比不同
+> **一般我们只需要将像素比设置为该值即可得到一个最佳效果**
+> 将像素比设置为最佳像素比的视口大小我们称其为完美视口
+
+```html
+<meta name="viewport" content="width=device-width">
+```
+
+**完美视口问题**
+
+> 不同手机完美视口的大小是不同的。
+>
+> iphonex 375px
+>
+> iphone6 414px
+>
+> ![image-20220816230058022](imgs/54be28fc63f38c6ad09ab78593ab37a2cf6377dd.png)
+
+如果设置一个元素宽度为375px，再iphonex里显示正常，再iphone6中就不能占满宽度。
+
+由于不同设备视口和像素比不同，所以同样的375个像素在不同的设备下意义是不一样，
+
+**为什么不用100%呢？**
+
+在多层元素嵌套下，百分比的参照物不同，所以不能用百分比进行布局。
+
+## 3.二倍图
+
+### 3.1 物理像素&物理像素比
+
+- 物理像素点指的是屏幕显示的最小颗粒，是物理真实存在的
+- 在 PC 端页面，1px 等于 1 个物理像素，但是移动端就不尽相同
+- 移动端 1px 能实际显示的物理像素点的个数就称为物理像素比或屏幕像素比
+
+`物理像素比 = 物理像素（分辨率） / 独立像素（CSS像素）`
+
+例如：iPhone X 的物理像素比为 3
+
+| 屏幕尺寸 | 独立像素（CSS像素） | 物理像素（分辨率） | ppi/dpi（像素密度） | dpr（倍图） |
+| -------- | ------------------- | ------------------ | ------------------- | ----------- |
+| 5.8英寸  | 812×375             | 2436×1125          | 458                 | 3           |
+
+浏览器放大两倍的情况：
+
+视口宽度 960px（CSS像素）
+1920px（物理像素）
+
+![image-20220816225350743](imgs/21a90f1f7b6c773e86f5aed212c3d02a33741ffe.png)
+
+> **此时，css像素和物理像素的比是1:2**即一个浏览器显示一个css像素宽度，物理像素用了两个像素显示（此处忽略高度），`也就是100个css像素经过缩放200%后显示器显示200个像素`。
+
+我们可以通过改变视口的大小，来改变CSS像素和物理像素的比值
+
+> 影响视口宽度的因素有 `浏览器缩放百分比`，`系统缩放`,`拖动浏览器窗口`
+
+物理像素比提出的原因：
+
+- 在早期，PC及移动端都是：1CSS像素 = 1物理像素
+- 随着 Retina（视网膜屏幕）显示技术的普及，可以将更多的物理像素点压缩至一块屏幕里，从而达到更高的分辨率，并提高屏幕显示的细腻程度。
+
+![](imgs/5c7342df1bb4eda7363ec3db747fc0156f35cae6.png)
+
+常见 iPhone 设备屏幕参数：
+
+| 设备                         | 物理分辨率  | 开发分辨率 | 物理像素比（dpr） |
+| ---------------------------- | ----------- | ---------- | ----------------- |
+| iPhone13 Pro Max、12 Pro Max | 1284 * 2778 | 428 * 926  | 3                 |
+| iPhone 13\13 Pro、12\12 Pro  | 1170 * 2532 | 390 * 844  | 3                 |
+| iPhone 13 mini、12 mini      | 1080 * 2340 | 375 * 812  | 2.88（3）         |
+| iPhone 11 Pro Max、XS Max    | 1242 * 2688 | 414 * 896  | 3                 |
+| iPhone X、XS、11 Pro         | 1125 * 2436 | 375 * 812  | 3                 |
+| iPhone XR、11                | 828 * 1792  | 414 * 896  | 2                 |
+| iPhone 8 Plus                | 1080 * 1920 | 414 * 736  | 2.6（3）          |
+| iPhone 8、SE                 | 750 * 1334  | 375 * 667  | 2                 |
+
+常见 iPad 设备屏幕参数：
+
+| 设备          | 物理分辨率  | 开发分辨率  | 物理像素比（dpr） |
+| ------------- | ----------- | ----------- | ----------------- |
+| iPad Pro 12.9 | 2048 * 2732 | 1024 * 1366 | 2                 |
+| iPad Pro 11   | 1668 * 2388 | 834 * 1194  | 2                 |
+| iPad mini 8.3 | 1488 * 2266 | 744 * 1133  | 2                 |
+
+> 随着移动智能设备屏幕素质的不断提高，目前手机一般都统一使用 3 倍图，平板电脑使用 2 倍图。
+
+> **电脑-显示器多倍图说明**
+>
+> 目前由于电脑显示器的素质也越来越高（尤其是笔记本电脑），2K屏、3K屏、4K屏、5K屏、6K屏 已经在不断普及，所以其实电脑端的也已经存在多倍图的应用了。
+>
+> 比如 Macbook Pro 16 M1 Pro/Max：物理分辨率（3456 * 2234）开发分辨率（1728 * 1117）2倍图
+>
+> 当然电脑端用户都能够方便的设置屏幕显示的缩放比，当缩放比为100%时就为1倍图，但目前的电脑端显示器大多已经默认为 125%、150%、175%、200% 缩放比。
+>
+> 故，在未来多倍图的运用将会越来越必要！
+>
+> > 认识了缩放，就能合理的解释：为什么在电脑上设置了一个 100 * 100 的 div 盒子，而在浏览器上用测量工具测量像素长度时，却为 150 * 150，因为此时电脑显示器为 150% 的缩放比，只要我们将其改为 100%，就能得到我们想要的效果了。
+
+### 3.2 多倍图
+
+- 对于一张 `50px * 50px` 的图片，在手机 Retina 屏中打开，按照刚才的物理像素比会放大倍数，这样会造成图片模糊（比如：3倍图手机中，50 * 50 实际上是 150 * 150 个像素在显示）
+- 在标准的 viewport 设置中，使用多倍图来提高图片质量，解决在高清设备中的模糊问题
+- 通常使用二倍体，是因为 iPhone 6\7\8 的影响，但是现在 3倍图 4倍图 也逐渐普及了，这个要看实际开发需求
+- 背景图片也同样要注意缩放问题
+- 字体不用考虑缩放问题，因为字体是矢量的，不会失真
+
+```css
+  /* 在 iphone8 下面 */
+  img {
+      /* 原始图片100*100px */
+      width: 50px;
+      height: 50px;
+  }
+
+  .box {
+      /* 原始背景图片100*100px */
+      background-size: 50px 50px;
+  }
+```
+
+案例：
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>03-二倍图做法</title>
+    <style>
+        /* 我们需要一个50*50像素（css像素）的图片，直接放到我们的iphone8里面会放大2倍100*100就会模糊 */
+        /* 我们采取的是放一个100*100图片，然后手动的把这个图片缩小为50*50（css像素）*/
+        /* 我们准备的图片比我们实际需要的大小大2倍，这就方式就是2倍图 */
+        img:nth-child(2) {
+            width: 50px;
+            height: 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 模糊的 -->
+    <img src="images/apple50.jpg" alt="">
+    <!-- 我们采取2倍图 -->
+    <img src="images/apple100.jpg" alt="">
+</body>
+
+</html>
+```
+
+手机模拟效果：
+
+<img src="imgs/01abc0ce134f1b295eab3b39a0b1d7bdbabb08ae.jpg" style="zoom: 25%;" />
+
+【附：二倍精灵图做法】
+
+- 在 PS 中将精灵图等比例缩放为原来的一半
+- 之后根据大小测量坐标
+- 注意代码里面 background-size 也要写：精灵图原来宽度的一半
+
+### 3.3 背景缩放
+
+`background-size` 属性规定**背景图像**的尺寸
+
+```css
+background-size: 背景图片宽度 背景图片高度;
+```
+
+- 单位：长度 | 百分比 | cover | contain
+- cover 把背景图像扩展至足够大，以使背景图像完全覆盖背景区域
+- contain 把图像扩展至最大尺寸，以使其宽度和高度完全适应内容区域
+
+注意：
+
+1. 以长度为单位时，只写其中一个参数，另一个参数会自动适配
+2. 以百分比为单位时，其参照对象为父盒子，只写其中一个参数，另一个参数会自动适配
+
+【cover & contain 案例】
+
+![](imgs/3ac833b534a84ede3fe53048999b41f366c0d577.png)
+
+cover 案例：
+
+```css
+background-size: cover;
+```
+
+![image-20220812122639239](imgs/830484a92f8f798651cd4c3e558dcb6656653691.png)
+
+contain 案例：
+
+```css
+background-size: contain;
+```
+
+![](imgs/f2e346481738468807f51197b6acac4b7d4ddf0d.png)
+
+当图片是竖直放置时：
+
+![](imgs/f7d3f519e548e7204dbb1fcc0cd8febc909071b2.png)
+
+【背景缩放案例】
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>05-背景图片2倍图</title>
+
+    <style>
+        /* 1. 我们有一个50*50的盒子需要一个背景图片，但是根据分析这个图片还是要准备2倍，100*100 */
+        /* 2. 我们需要把这个图片缩放一半，也就是 50*50 background-size*/
+        div {
+            width: 50px;
+            height: 50px;
+            border: 1px solid red;
+            background: url(images/apple100.jpg) no-repeat;
+            background-size: 50px 50px;
+        }
+    </style>
+</head>
+
+<body>
+    <div></div>
+</body>
+
+</html>
+```
+
+### 3.4 多倍图切工具 cutterman
+
+![](imgs/da52b636105866f147d06af8f58f297dbfdd0772.png)
+
+一次性导出多种倍数的图片。
+
+## 4.移动端开发选择
+
+### 4.1 移动端主流方案
+
+（1）单独制作移动端页面【主流】
+
+- 京东 https://m.jd.com/
+- 淘宝 https://m.taobao.com/
+- 苏宁 https://m.suning.com/
+- ……
+
+（2）响应式页面兼容移动端【其次】
+
+- https://www.samsungeshop.com.cn/
+- ……
+
+### 4.2 单独移动端页面（主流）
+
+通常情况下，网址域名前面加 `m(mobile)` 可以打开移动端。通过判断设备，如果是移动设备打开，则跳到移动端页面。
+
+### 4.3 响应式兼容移动端（其次）
+
+通过判断浏览器窗口宽度来改变样式，以适应不同终端。
+
+缺点：制作麻烦，需要花很大精力去调兼容性问题。
+
+### 4.4 总结
+
+现在市场常见的移动端开发有单独制作移动端页面和相应式页面两种方案。
+
+现在市场主流的选择还是单独制作移动端页面。
+
+## 5.移动端技术解决方案
+
+### 5.1 移动端浏览器
+
+- 移动端浏览器基本以 `webkit` 内核为主，因此我们就考虑 `webkit` 兼容性问题
+- 我们可以放心使用 H5标签 和 CSS3样式
+- 同时我们浏览器的私有前缀我们只要考虑添加 `webkit` 即可
+
+### 5.2 CSS初始化 normalize.css
+
+移动端 CSS 初始化推荐使用 `normalize.css/`
+
+- Normalize.css：保护了有价值的默认值
+- Normalize.css：修复了浏览器的漏洞
+- Normalize.css：是模块化的
+- Normalize.css：拥有详细的文档
+
+官网地址：http://necolas.github.io/normalize.css/
+
+### 	33.5.3 CSS3盒子模型 box-sizing
+
+- 传统模式宽度计算：盒子的宽度 = CSS中设置的 width + border + padding
+- CSS3盒子模型：盒子的宽度 = CSS中设置的宽度 width，里面包含了 border 和 padding
+
+也就是说，我们的 CSS3 中的盒子模型，padding 和 border 不会撑大盒子了
+
+```css
+/* CSS3盒子模型 */
+box-sizing: border-box;
+/* 传统盒子模型 */
+box-sizing: content-box;
+```
+
+传统 or CSS3盒子模型？
+
+- 移动端可以全部使用 CSS3 盒子模型
+- PC 端如果完全需要兼容，我们就用传统模式，如果不考虑兼容性，我们就选择 CSS3 盒子模型
+
+案例：
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>06-CSS3盒子模型</title>
+    <style>
+        div:nth-child(1) {
+            /* 传统盒子模型= width + border + padding */
+            width: 200px;
+            height: 200px;
+            background-color: pink;
+            padding: 10px;
+            border: 10px solid red;
+            box-sizing: content-box;
+        }
+
+        div:nth-child(2) {
+            /* 有了这句话就让盒子变成CSS3盒子模型 */
+            /* padding 和 border 不会再撑大盒子了 */
+            box-sizing: border-box;
+            width: 200px;
+            height: 200px;
+            background-color: purple;
+            padding: 10px;
+            border: 10px solid blue;
+        }
+    </style>
+</head>
+
+<body>
+    <div></div>
+    <div></div>
+</body>
+
+</html>
+```
+
+![](imgs/6e6834449c0d84415567a84abcc362eb635fe2c7.png)
+
+![](imgs/d58b84c7f4963064eb2ffa7c8c77254a4c37da75.png)
+
+### 5.4 移动端特殊样式
+
+```css
+/* CSS3盒子模型 */
+box-sizing: border-box;
+-webkit-box-sizing: border-box;	/* 浏览器前缀兼容老版本浏览器 */
+
+/* 移动端中某些地方点击会高亮，我们一般需要清除，设置 transparent 完成透明 */
+/* 说明：比如 a链接 在移动端默认点击时会有一个背景颜色高亮 */
+-webkit-tap-highlight-color: transparent;
+/* 比如可以这样： */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 移动端浏览器默认的外观在 iOS 上加上这个属性才能给按钮和输入框自定义样式 */
+-webkit-appearance: none;
+/* 比如可以这样： */
+input  {
+    -webkit-appearance: none;
+}
+
+/* 禁用长按页面时的弹出菜单 */
+-webkit-touch-callout: none;
+/* 此处以 img 及 a 为例子 */
+img, a { -webkit-touch-callout: none; }
+```
+
+## 6.移动端常见布局
+
+【移动端技术选型】
+
+移动端布局和以前我们学习的PC端有所区别：
+
+（1）单独制作移动端页面【主流】
+
+- 流式布局（百分比布局）
+- flex 弹性布局（强烈推荐）
+- less + rem + 媒体查询布局
+- 混合布局
+
+（2）响应式页面兼容移动端【其次】
+
+- 媒体查询
+- bootstrap
+
+### 6.1 流式布局（百分比布局）
+
+- 流式布局，就是百分比布局，也称非固定像素布局
+- 通过盒子的宽度设置成百分比来根据屏幕的宽度来进行伸缩，不受固定像素的限时，内容向两侧填充
+- 流式布局方式是移动Web开发使用的比较常见的布局方式
+- `max-width` 最大宽度（`max-height` 最大高度）
+- `min-width` 最小宽度（`min-height` 最小高度）
+
+案例：
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>08-流式布局</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        section {
+            width: 100%;
+            max-width: 980px;
+            min-width: 320px;
+            margin: 0 auto;
+        }
+
+        section div {
+            float: left;
+            width: 50%;
+            height: 400px;
+        }
+
+        section div:nth-child(1) {
+            background-color: pink;
+        }
+
+        section div:nth-child(2) {
+            background-color: rgb(0, 0, 0);
+        }
+    </style>
+</head>
+
+<body>
+    <section>
+        <div></div>
+        <div></div>
+    </section>
+</body>
+
+</html>
+```
+
+![](imgs/2cd69d363ca2a48220d11ecef48907b4a1241d7e.gif)
+
+### 6.2 搜索框
+
+![](imgs/c9225992a1166a3a607acc84b4c10c898c5c6e75.png)
+
+![ssk](imgs/623ff6a3bdcb4402866dec9a8f385fa7dccd7a2b.gif)
+
+可以看到，当页面宽度变化时，搜索框会同步变宽，但是左右两边的按钮是不会变化的，实现这个功能的原理是：
+
+![](imgs/a2f5d90be158d2a7b37068605d883d2d309dd98f.png)
+
+代码：
+
+```html
+ <div class="search-wrap">
+        <div class="search-btn"></div>
+        <div class="search">
+            <div class="jd-icon"></div>
+            <div class="sou"></div>
+        </div>
+        <div class="search-login">登陆</div>
+ </div>
+```
+
+```css
+.search-wrap {
+  position: fixed;
+  overflow: hidden;
+  width: 100%;
+  height: 44px;
+  min-width: 320px;
+  max-width: 640px;
+}
+
+.search-btn {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40px;
+  height: 44px;
+}
+
+.search-btn::before {
+  content: "";
+  display: block;
+  width: 20px;
+  height: 18px;
+  background: url(../images/s-btn.png) no-repeat;
+  background-size: 20px 18px;
+  margin: 14px 0 0 15px;
+}
+
+.search-login {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 40px;
+  height: 44px;
+  color: #fff;
+  line-height: 44px;
+}
+
+.search {
+  position: relative;
+  height: 30px;
+  background-color: #fff;
+  margin: 0 50px;
+  border-radius: 15px;
+  margin-top: 7px;
+}
+
+.jd-icon {
+  width: 20px;
+  height: 15px;
+  position: absolute;
+  top: 8px;
+  left: 13px;
+  background: url(../images/jd.png) no-repeat;
+  background-size: 20px 15px;
+}
+
+.jd-icon::after {
+  content: "";
+  position: absolute;
+  right: -8px;
+  top: 0;
+  display: block;
+  width: 1px;
+  height: 15px;
+  background-color: #ccc;
+}
+
+.sou {
+  position: absolute;
+  top: 8px;
+  left: 50px;
+  width: 18px;
+  height: 15px;
+  background: url(../images/jd-sprites.png) no-repeat -81px 0;
+  background-size: 200px auto;
+}
+```
+
+### 6.3 图片底部空白
+
+<img src="imgs/58f800ac457d5458dcf7822041c1ef4f616f8bd5.jpg" style="zoom: 33%;" />
+
+图片底部默认会带有一个空白，所以通常在开发中会设置：
+
+```css
+img {
+    vertical-align: top;	/* 去掉图片底部空白 */
+}
+```
+
+### 6.4 二倍精灵图做法
+
+- 在 `firework` 里面把精灵图等比例缩放为原来的一半
+- 之后根据大小测量坐标
+- 注意代码里面 background-size 也要写：精灵图原来宽度的一半
+
+### 6.5 竖线的选型
+
+**情况一**
+
+![](imgs/07a573aaa09b2c76b390de9681eec94f439a936f.png)
+
+这里 JD 与 搜索按钮之间有一个 `|`，之前我们使用盒子模型的右边框来实现，但是这里使用边框并不是一个好的选择，原因有二：
+
+1. 边框的长度不能控制
+2. 内容与边框的距离不好控制，需要额外设置边距（打破了结构的科学性）
+
+解决方法：利用伪元素法
+
+```css
+.jd-icon::after {
+	content: "";
+	position: absolute;
+	right: -8px;
+	top: 0;
+	display: block;
+	width: 1px;
+	height: 15px;
+	background-color: #ccc;
+}
+```
+
+**情况二**
+
+![](imgs/cb1c1901cf207b1b1d3bfb6f1bba8f168f9d1041.jpg)
+
+这里的一排盒子用百分比布局，所以如果我们利用伪元素法加竖线的话，整体的大小加起来就大于 100% 了，所以最优的解法为直接给盒子加边框，但是加边框后盒子就变大了，所以正确的做法是先设置 CSS3 盒子模型，然后再设置边框就可以了。
+
+
+
+附：CSS3 盒子模型 `box-sizing: border-box;`
+
+# 19 【flex布局】
+
+## 1.flex布局体验
+
+### 1.1 传统布局与flex布局
+
+【传统布局】
+
+- 兼容性好
+- 布局繁琐
+
+- 局限性，不能在移动端很好的布局
+
+【flex布局】
+
+- 操作方便，布局极为简单，移动端应用很广泛
+- PC 端浏览器支持情况较差
+- IE11 或更低版本不支持或仅部分支持
+
+建议：
+
+1. 如果是 PC 端页面布局，我们还是建议使用传统布局
+2. 如果是移动端或者不考虑兼容性问题的 PC 端页面布局，推荐使用 flex 弹性布局
+
+### ⭕1.2 初体验
+
+**弹性盒**
+
+`flex`（弹性盒、伸缩盒）
+
+- 是`css`中的又一种布局手段，它主要用来代替浮动来完成页面的布局
+
+- `flex`可以使元素具有弹性，让元素可以跟随页面的大小的改变而改变
+
+**弹性容器**
+
+要使用弹性盒，必须先将一个元素设置为弹性容器
+
+我们通过`display` 来设置弹性容器
+
+- `display:flex` 设置为块级弹性容器
+
+- `display:inline-flex` 设置为行内的弹性容器
+
+**弹性元素**
+
+- 弹性容器的子元素是弹性元素（弹性项）
+
+- 弹性元素可以同时是弹性容器
+
+```html
+    <style>
+        div {
+            display: flex;
+            width: 80%;
+            height: 300px;
+            background-color: pink;
+        }
+
+        div span {
+            /* 弹性布局中：行内盒子的宽高可直接设置了，这也是优于百分比布局的地方之一 */
+            /* 免去了浮动的设置，以及对父盒子清除浮动的麻烦 */
+            width: 150px;
+            height: 100px;
+            background-color: black;
+            margin-right: 5px;
+        }
+    </style>
+    <div>
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+    </div>
+```
+
+![](imgs/35b96b04d3f1a95d5f84db0144a8ed972463d672.png)
+
+**等间距分布**
+
+```css
+        div {
+            width: 80%;
+            justify-content: space-around;
+        }
+```
+
+![](imgs/6d70e5725dcb049a630bd6fbe386fda63e9c53b4.gif)
+
+**平均分为三等分**
+
+```css
+        div {
+            display: flex;
+            width: 80%;
+            justify-content: space-around;
+        }
+
+        div span {
+            /* 弹性布局中：行内盒子的宽高可直接设置了 */
+            /* width: 150px; */
+            flex: 1;
+        }
+```
+
+![](imgs/d7a57c689b9692c5dccc4131f7c9e105ca63ef0f.gif)
+
+## 2.flex布局原理
+
+flex 是 flexible Box 的缩写，意为 “弹性布局”，用来为盒状模型**提供最大的灵活性**，**任何一个容器都可以指定为 flex 布局**。
+
+- 当我们为父盒子设为 flex 布局以后，子元素的 float（浮动功能）、clear（清除浮动功能）和 vertical-align（垂直居中功能）属性将失效。
+- 伸缩布局 = 弹性布局 = 伸缩盒布局 = 弹性盒布局 = flex 布局
+
+采用 flex 布局的元素，称为 flex 容器（flex container），简称 “容器”。它的所有子元素自动成为容器成员，称为 flex 项目（flex item），简称 “项目”。
+
+- 上面的体验中 div 就是 flex 父容器
+- 上面的体验中 span 就是子容器 flex 项目
+- 子容器可以横向排列也可以纵向排列
+
+【子容器横向排列时的图示】
+
+![](imgs/897c0e795aeb8f5d8b881d3dafc7ad954a5a9b97.png)
+
+【总结 flex 布局原理】
+
+**就是通过给父盒子添加 flex 属性，来控制子盒子的位置和排列方式。**
+
+## ⭕3.常见弹性容器属性
+
+以下由 6 个属性是对父元素设置的
+
+- `flex-direction`：设置主轴的方向
+- `justify-content`：设置主轴上的子元素排列方式
+- `flex-wrap`：设置子元素是否换行
+- `flex-flow`：复合属性，相当于同时设置了 flex-direction 和 flex-wrap
+- `align-content`：设置侧轴上的子元素的排列方式（多行）
+- `align-items`：设置侧轴上的子元素排列方式（单行）
+
+## ⭕4.flex-direction设置主轴的方向
+
+`flex-direction` 指定容器中弹性元素的排列方式
+
+**（1）主轴与侧轴**
+
+在 flex 布局中，是分为主轴和侧轴两个方向，同样的叫法有：行 和 列、x轴 和 y轴
+
+- 默认主轴方向就是 x轴 方向，水平向右
+- 默认侧轴方向就是 y轴 方向，水平向下
+
+![](imgs/f2d2c9fb7956df15da4cea034930fcc113048e7a.png)
+
+**（2）属性值**
+
+`flex-direction` 属性决定主轴的方向（即：项目的排列方向）
+
+注意：主轴和侧轴是会变化的，就看 flex-direction 设置谁为主轴，剩下的就是侧轴。而我们的子元素是跟着主轴来排列的。
+
+- `row`默认值，弹性元素在容器中水平排列（自左向右）
+
+- `row-reverse` 弹性元素在容器中反向水平排列（自右向左）
+
+- `column` 弹性元素纵向排列（自上向下）
+
+- `column-reverse` 弹性元素反向纵向排列（自下向上）
+
+【案例】
+
+```html
+    <style>
+        div {
+            /* 给父级添加flex属性 */
+            display: flex;
+            width: 800px;
+            height: 300px;
+            background-color: pink;
+            /* 默认的主轴是 x 轴,那么 y 轴就是侧轴喽 */
+            /* 我们的元素是跟着主轴来排列的 */
+            flex-direction: row;
+            /* 简单了解翻转即可 */
+            /* flex-direction: row-reverse; */
+            /* 我们可以把我们的主轴设置为 y 轴 那么 x 轴就成了侧轴 */
+            /* flex-direction: column; */
+        }
+
+        div span {
+            width: 150px;
+            height: 100px;
+            background-color: purple;
+        }
+    </style>
+    <div>
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+    </div>
+```
+
+![](imgs/1bff4d080d7437c8bb2dc17c6a38f35df217ca0e.png)
+
+```css
+            flex-direction: row-reverse;
+```
+
+![](imgs/e897fad7623720ddc687c091739aa2d4fee74352.png)
+
+```css
+            flex-direction: column;
+```
+
+![](imgs/8c13a430cea233f2c574e7f49ef3a08339850144.png)
+
+## ⭕5.justify-content设置主轴上的子元素排列方式
+
+`justify-content` 属性定义了项目在主轴上的对齐方式
+
+注意：使用这个属性之前一定要确定好主轴是哪个！
+
+| 属性值          | 说明                                                       |
+| --------------- | ---------------------------------------------------------- |
+| `flex-start`    | 元素沿着主轴起边排列，如果主轴是 x轴，则从左到右（默认值） |
+| `flex-end`      | 元素沿着主轴终边排列                                       |
+| `center`        | 在主轴居中对齐（如果主轴是 x轴 则 水平居中）               |
+| `space-around`  | 空白分布到元素两侧                                         |
+| `space-between` | 先两边贴边再平分剩余空间（重要）                           |
+| `space-evenly`  | 空白分布到元素的单侧                                       |
+
+【案例】
+
+ `flex-start` 元素沿着主轴起边排列
+
+```html
+    <style>
+        div {
+            display: flex;
+            width: 800px;
+            height: 300px;
+            background-color: pink;
+            /* 默认的主轴是 x轴 row */
+            flex-direction: row;
+            /* justify-content: 是设置主轴上子元素的排列方式 */
+            /* 从头部开始，如果主轴是 x轴，则从左到右（默认值） */
+            justify-content: flex-start;
+            /* 从尾部开始排列 */
+            /* justify-content: flex-end; */
+            /* 让我们子元素居中对齐 */
+            /* justify-content: center; */
+            /* 平分剩余空间 */
+            /* justify-content: space-around; */
+            /* 先两边贴边，在分配剩余的空间 */
+            /* justify-content: space-between; */
+        }
+
+        div span {
+            width: 150px;
+            height: 100px;
+            background-color: gray;
+        }
+    </style>
+    <div>
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>4</span>
+    </div>
+```
+
+![](imgs/ef3457bfc8477bc5b825bb7272ba46fdc7f7b14e.png)
+
+ `flex-end` 元素沿着主轴终边排列
+
+![](imgs/51e7f397043eef3e0b4282aecc3bafd7492ad708.png)
+
+ `center` 元素居中排列
+
+![image-20220812122252100](imgs/e5abc3d231d6dabd682c4777fc69951cf5729ed7.png) `space-around`  空白分布到元素两侧
+
+![](imgs/90eaec58b3e2f2b6a56c6314f4440cc6aec0914d.png)
+
+ `space-between` 先两边贴边再平方剩余空间
+
+![](imgs/b7dd454e231a2627f0d7a3beed2ef8b8b1227d86.png)
+
+> **补充**
+>
+> `space-evenly` 空白分布到元素的单侧
+>
+> ![image-20220812105356829](imgs/008889e323285a5a8bd055f8c9bc7e17beb6c3d3.png)
+
+> 注意：以上例子并不能根据浏览器窗口大小自动调整子项之间的间距，因为父盒子的宽度是固定死 800px 的，假如我们把父盒子宽度设为 80%，那么就可以有效果了。
+
+`div {width: 800px;}`
+
+![](imgs/4c7a2bfc919c4dc0f6113ef7838c97a02153e693.gif)
+
+`div {width: 80%;}`
+
+![](imgs/e81b12ef6c8b3c12325ba377894a17f1b3c43173.gif)
+
+`div {width: 80%;}`
+
+`div span {width: 80%;}`
+
+![](imgs/186275c836d91572211f12780a4f154ae3145d77.gif)
+
+【以上到下为主轴的案例】
+
+```css
+         /* 我们现在的主轴是 y轴 */
+         flex-direction: column;
+        /* justify-content: 是设置主轴上子元素的排列方式 */
+        /* 从头部开始，则从上到下（默认值） */
+        justify-content: flex-start;
+```
+
+![image-20220812122358520](imgs/0b6afe1d08a543f4e61c585b207e527f41d1c584.png)
+
+```css
+            /* 我们现在的主轴是 y轴 */
+            flex-direction: column;
+            /* justify-content: 是设置主轴上子元素的排列方式 */
+            /* 从下开始排列 */
+            justify-content: flex-end;
+```
+
+![](imgs/1b3ddbaf1f0d608ddb08ec78acf8116b0ceb8606.png)
+
+```css
+            /* 我们现在的主轴是 y轴 */
+            flex-direction: column;
+            /* justify-content: 是设置主轴上子元素的排列方式 */
+            /* 让我们子元素垂直居中对齐 */
+            justify-content: center;
+```
+
+盒子自动垂直居中的困扰终于解决啦！！！
+
+![](imgs/bb005e50536217371f764154f55e6e77aa39426d.png)
+
+```css
+            /* 我们现在的主轴是 y轴 */
+            flex-direction: column;
+            /* justify-content: 是设置主轴上子元素的排列方式 */
+            /* 平分剩余空间 */
+            justify-content: space-around;
+```
+
+![](imgs/d567cb6e04e12144a77be96b0b4c5c1aea15038e.png)
+
+```css
+            /* 我们现在的主轴是 y轴 */
+            flex-direction: column;
+            /* justify-content: 是设置主轴上子元素的排列方式 */
+            /* 先上下两边贴边，在分配剩余的空间 */
+            justify-content: space-between;
+```
+
+![](imgs/d2cb207e29718ed796592a033c3a65fab834161c.png)
+
+## ⭕6.flex-wrap设置子元素是否换行
+
+`flex-wrap` 设置弹性元素是否在弹性容器中自动换行
+
+| 属性值   | 说明                     |
+| -------- | ------------------------ |
+| `nowrap` | 默认值，元素不会自动换行 |
+| `wrap`   | 元素沿着辅轴方向自动换行 |
+
+【案例】
+
+```html
+    <style>
+        div {
+            display: flex;
+            width: 600px;
+            height: 400px;
+            background-color: pink;
+            /* flex布局中，默认的子元素是不换行的， 如果装不开，会缩小子元素的宽度，放到父元素里面  */
+            /* flex-wrap: nowrap; */
+            /* 自动换行 */
+            /* flex-wrap: wrap; */
+        }
+
+        div span {
+            width: 150px;
+            height: 100px;
+            background-color: gray;
+            color: #fff;
+            margin: 10px;
+        }
+    </style>
+
+    <div>
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>4</span>
+        <span>5</span>
+        <span>6</span>
+    </div>
+```
+
+<img src="imgs/d37358b55053592cf3ceb174c37e7f72c76854fd.png" alt="image-20220119004923437" style="zoom:50%;" />
+
+```css
+            flex-wrap: wrap;
+```
+
+<img src="imgs/1825de48955b6e4cf496224fa41d0b4a6ddc6969.png" style="zoom:50%;" />
+
+## ⭕7.flex-flow复合属性
+
+`flex-flow` 属性是 flex-direction 和 flex-wrap 属性的复合属性
+
+`flex-flow: row wrap;`
+
+【案例】
+
+```html
+    <style>
+        div {
+            display: flex;
+            width: 600px;
+            height: 300px;
+            background-color: pink;
+            /* flex-direction: column;
+            flex-wrap: wrap; */
+            /* 把设置主轴方向和是否换行（换列）简写 */
+            flex-flow: column wrap;
+        }
+
+        div span {
+            width: 150px;
+            height: 100px;
+            background-color: gray;
+        }
+    </style>
+    <div>
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>4</span>
+        <span>5</span>
+    </div>
+```
+
+![](imgs/df1cb1d2aeddf3d0d561d4da400d324065127d13.png)
+
+## ⭕8.align-items设置侧轴上的子元素排列方式（单行）
+
+该属性是控制子项在侧轴（默认是 y轴）上的排列方式，在子项为单项（单行）的时候使用。
+
+| 属性值       | 说明                                                       |
+| ------------ | ---------------------------------------------------------- |
+| `flex-start` | 从上到下                                                   |
+| `flex-end`   | 从下到上                                                   |
+| `center`     | 挤在一起居中                                               |
+| `stretch`    | 拉伸（默认值）注：前提是子盒子没有指定高度，否则没有效果！ |
+
+【案例】
+
+ `flex-start` 元素不会拉伸，沿着辅轴起边对齐
+
+```html
+    <style>
+        div {
+            display: flex;
+            width: 800px;
+            height: 400px;
+            background-color: pink;
+            /* 默认的主轴是 x轴 row */
+            flex-direction: row;
+            justify-content: center;
+            /* 设置侧轴：从上到下 */
+            align-items: flex-start;
+        }
+
+        div span {
+            width: 150px;
+            height: 100px;
+            background-color: gray;
+            color: #fff;
+            margin: 10px;
+        }
+    </style>
+
+    <div>
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+    </div>
+```
+
+![](imgs/2e605b349e3285d7168dd125aba27cea6b530849.png)
+
+ `flex-end` 沿着辅轴的终边对齐
+
+![](imgs/0f1b2a03959a9cc2906249c368d29c73197b6db2.png)
+
+ `center` 居中对齐
+
+![](imgs/3170da9ea015bcd564d892ef095b877b6bbe9fb8.png)
+
+```html
+    <style>
+        div {
+            display: flex;
+            width: 800px;
+            height: 400px;
+            background-color: pink;
+            /* 默认的主轴是 x轴 row */
+            flex-direction: row;
+            justify-content: center;
+            /* 设置侧轴：拉伸（默认） */
+            align-items: stretch;
+        }
+
+        div span {
+            width: 150px;
+            /* 拉伸的前提是没有指定高度 */
+            /* height: 100px; */
+            background-color: gray;
+            color: #fff;
+            margin: 10px;
+        }
+    </style>
+    <div>
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+    </div>
+```
+
+![](imgs/d6c0c1eba75c109f71322feeae31bc8e74b646f1.png)
+
+> align-items 只能统一对侧轴上的子元素排列方式，假如有多行子元素，要分别对不同的行设置不同的排列方式，那么此种方式就无法做了。
+
+## ⭕9.align-content 设置侧轴上的子元素的排列方式（多行）
+
+设置子项在侧轴上的排列方式并且只能用于子项出现 **换行** 的情况（多行），在单行下是没有效果的。
+
+| 属性值          | 说明                                   |
+| --------------- | -------------------------------------- |
+| `flex-start`    | 在侧轴的头部开始排列                   |
+| `flex-end`      | 在侧轴的尾部开始排列                   |
+| `center`        | 在侧轴中间显示                         |
+| `space-around`  | 子项在侧轴平方剩余空间                 |
+| `space-between` | 子项在侧轴先分布在两头，再平分剩余空间 |
+| `stretch`       | 行拉伸以占据剩余空间（默认值）         |
+
+【案例】
+
+```html
+    <style>
+        div {
+            display: flex;
+            width: 800px;
+            height: 400px;
+            background-color: pink;
+            /* 换行 */
+            flex-wrap: wrap;
+            /* 因为有了换行，此时我们侧轴上控制子元素的对齐方式我们用 align-content */
+            align-content: flex-start;
+            /* align-content: center; */
+            /* align-content: space-around; */
+            /* align-content: space-between; */
+            /* align-content: stretch; */
+        }
+
+        div span {
+            width: 150px;
+            height: 100px;
+            background-color: gray;
+            color: #fff;
+            margin: 10px;
+        }
+    </style>
+    <div>
+        <span>1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>4</span>
+        <span>5</span>
+        <span>6</span>
+        <span>7</span>
+        <span>8</span>
+    </div>
+```
+
+![](imgs/64a0439d75ab20ba3028cadf6a202dbfeacf12d5.png)
+
+```css
+            align-content: center;
+```
+
+![](imgs/236869854dc0b30199fbcd3bedd39a7513763483.png)
+
+```css
+            align-content: space-around;
+```
+
+![](imgs/d5ebb96dd5a524a86cf430ee8e16f0e8a80ee90b.png)
+
+```css
+            align-content: space-between;
+```
+
+![](imgs/ebf1d9360330231869e358f269165f2a198436b8.png)
+
+```html
+    <style>
+        div {
+            display: flex;
+            width: 800px;
+            height: 400px;
+            /* 换行 */
+            flex-wrap: wrap;
+            /* 因为有了换行，此时我们侧轴上控制子元素的对齐方式我们用 align-content */
+            align-content: stretch;
+        }
+
+        div span {
+            width: 150px;
+            height: 100px;
+            margin: 10px;
+        }
+    </style>
+```
+
+![](imgs/183a552be79119aaa913ae68fd3e46546ec5b873.png)
+
+**弹性居中**
+
+```css
+justify-content: center;
+align-items: center;
+```
+
+利用弹性盒对元素进行水平垂直双方向居中
+
+![image-20220812111500820](imgs/91bff2646ecca85d0a785579f731df13ac287138.png)
+
+## ⭕10.align-content和align-items区别
+
+- align-items 适用于单行情况下，只有上对齐、下对齐、居中和拉伸
+- align-content 适应于换行（多行）的情况下（单行情况下无效），可以设置上对齐、下对齐、居中、拉伸以及平均分配剩余空间等属性值
+- 总结就是单行找 align-items 多行找 align-content
+
+![](imgs/ff9d3a127b6b9fad056166008f9eb5420eddd506.png)
+
+## ⭕11.常见弹性元素属性
+
+- `flex-grow` 指定弹性元素的伸展系数，默认值为0
+- `flex-shrink` 指定弹性元素的收缩系数，默认值为1
+- `flex-basis` 指定的是元素在主轴上的基础长度
+- `flex` flex-grow、flex-shrink、flex-basis 三个属性的合集
+- `order` 决定弹性元素的排列顺序（前后顺序）
+- `align-self` 控制子项自己在侧轴的排列方式
+
+## ⭕12.伸展系数
+
+`flex-grow` 指定弹性元素的伸展系数，默认值为0
+
+- 当父元素有多余空间的时，子元素如何伸展
+
+- 父元素的剩余空间，会按照比例进行分配
+
+### 12.1 flex-grow基础
+
+flex-grow 属性定义项目的扩大系数，用于**分配容器的剩余空间**，那么什么是剩余空间呢？
+
+其实非常简单，剩余空间计算方式就是：
+
+```tex
+容器大小 - 所有项目的总大小
+```
+
+参考如下示例：
+
+![image-20220812112444197](imgs/ee070dc47a9c470bf70bd549156266726be8f07d.png)
+
+其中：
+
+```css
+1. 每个项目的宽度为50px，3个为150px。
+2. 剩余空间为 450px - 150px = 300px。
+```
+
+```css
+1. 默认为 0 ，即如果容器存在剩余空间，也不放大。
+2. flex-grow只能为>=0的数字，项目根据设置的系数进行放大。
+```
+
+那么问题就来了：
+
+```tex
+项目是如何根据设置的系数分配剩余空间呢？
+```
+
+这边涉及到**两个关键公式：**
+
+1）计算将多少剩余空间拿来分配。
+
+```css
+公式：剩余空间 * ( 所有项目的flex-grow之和 >= 1 ? 1 : 所有项目的flex-grow之和 ) 。
+```
+
+这边用了一个三元表达式，理解不难，公式的意思就是说：
+
+如果 所有项目的flex-grow之和 大于等于1，那么就是所有的剩余空间都拿来分配，否则乘以系数即为要分配的剩余空间。
+
+2）计算每个项目分配到多少剩余空间。
+
+```css
+公式：要分配的剩余空间 * ( 单个项目flex-grow / 所有项目的flex-grow之和 )
+```
+
+简单的说，就是按照 flex-grow 占比进行分配。
+
+下面我们结合例子进行说明，对这边的计算公式进行理解。
+
+**示例1**，设置项目的flex-grow为1：
+
+有一个div（容器，450px），容器内包含3个div（项目，各50px）。
+
+```css
+.item {
+	/* 	flex-basis属性定义了项目占据主轴空间（main size）大小。 */
+	/* 	这边设置为50px */
+	flex-basis: 50px;
+	/* flex-grow 属性定义项目的扩大系数 */
+	/* 这边设置为1 */
+	flex-grow: 1;
+}
+```
+
+运行效果：
+
+![image-20220812112908755](imgs/76811f822d60894dfeee25d9efc74dc4a3e8af89.png)
+
+我们观察到3个项目的宽度都变成了150px，可以看到项目被进行了扩大。
+
+现在套公式看下情况：
+
+1）计算总共要分配多少剩余空间。
+
+```css
+要分配的剩余空间
+ = 剩余空间 * ( 所有项目的flex-grow之和 >= 1 ? 1 : 所有项目的flex-grow之和 ) 
+ = 300px * (3 >= 1 ? 1 : 3)
+ = 300px * 1
+ = 300px
+```
+
+2）计算每个项目分配到多少剩余空间。
+
+因为每个项目flex-grow都为1，所以每个项目分配的剩余空间都一样。
+
+```css
+每个项目分配的剩余空间
+ = 要分配的剩余空间 * ( 单个项目flex-grow / 所有项目的flex-grow之和 )
+ = 300px * ( 1 / 3)
+ = 100px
+```
+
+每个项目多分配100px，加上自身设置的flex-basis，最终每个项目宽度就为150px了。
+
+**示例2**，设置项目1的flex-grow为1，项目2的flex-grow为2，项目3的flex-grow为3：
+
+我们直接套公式计算：
+
+1）计算总共要分配多少剩余空间。	
+
+```css
+要分配的剩余空间
+ = 剩余空间 * ( 所有项目的flex-grow之和 >= 1 ? 1 : 所有项目的flex-grow之和 ) 
+ = 300px * (6 >= 1 ? 1 : 6)
+ = 300px * 1
+ = 300px
+```
+
+2）计算每个项目分配到多少剩余空间。
+
+因为每个项目flex-grow都不一样，所以每个项目分配的剩余空间要分开计算。
+
+```css
+项目1分配的剩余空间
+ = 要分配的剩余空间 * ( 项目1flex-grow / 所有项目的flex-grow之和 )
+ = 300px * ( 1 / 6)
+ = 50px
+
+项目2分配的剩余空间
+ = 要分配的剩余空间 * ( 项目2flex-grow / 所有项目的flex-grow之和 )
+ = 300px * ( 2 / 6)
+ = 100px
+
+项目3分配的剩余空间
+ = 要分配的剩余空间 * ( 项目3flex-grow / 所有项目的flex-grow之和 )
+ = 300px * ( 3 / 6)
+ = 150px 
+
+```
+
+所以最终：项目1宽为100px、项目2宽为150px、项目3宽为200px。
+
+写上代码看看效果：
+
+```css
+.item {
+	/* 	flex-basis属性定义了项目占据主轴空间（main size）大小。 */
+	/* 	这边设置为50px */
+	flex-basis: 50px;
+}
+.item1 {
+	flex-grow: 1;
+}
+
+.item2 {
+	flex-grow: 2;
+}
+
+.item3 {
+	flex-grow: 3;
+}
+```
+
+运行效果：
+
+![](imgs/345481371c7123424e4403043fcd2d308801d9d2.gif)
+
+观察运行效果，符合预期。
+
+**示例3**：设置项目1的 flex-grow 为 0.1，项目2的 flex-grow 为0.2，项目3的 flex-grow 为 0.3：
+
+这个示例和上例差不多，只是数字变成了小数，并且总和不大于1。
+
+先套公式来计算一下：
+
+1）计算总共要分配多少剩余空间。
+
+```css
+要分配的剩余空间
+ = 剩余空间 * ( 所有项目的flex-grow之和 >= 1 ? 1 : 所有项目的flex-grow之和 ) 
+ = 300px * (0.6 >= 1 ? 1 : 0.6)
+ = 300px * 0.6
+ = 180px
+```
+
+2）计算每个项目分配到多少剩余空间。因为每个项目flex-grow都不一样，所以每个项目分配的剩余空间要分开计算。
+
+```css
+项目1分配的剩余空间
+ = 要分配的剩余空间 * ( 项目1flex-grow / 所有项目的flex-grow之和 )
+ = 180px * ( 0.1 / 0.6)
+ = 30px
+
+项目2分配的剩余空间
+ = 要分配的剩余空间 * ( 项目2flex-grow / 所有项目的flex-grow之和 )
+ = 180px * ( 0.2 / 0.6)
+ = 60px
+
+项目3分配的剩余空间
+ = 要分配的剩余空间 * ( 项目3flex-grow / 所有项目的flex-grow之和 )
+ = 180px * ( 0.3 / 0.6)
+ = 90px
+```
+
+所以最终：项目1宽为80px、项目2宽为110px、项目3宽为140px。
+
+样式代码如下：
+
+```css
+.item {
+	/* flex-basis属性定义了项目占据主轴空间（main size）大小。 */
+	flex-basis: 50px;
+}
+
+.item1 {
+	/* flex-grow属性定义项目的放大比例 */
+	flex-grow: 0.1;
+}
+
+.item2 {
+	/* flex-grow属性定义项目的放大比例 */
+	flex-grow: 0.2;
+}
+
+.item3 {
+	/* flex-grow属性定义项目的放大比例 */
+	flex-grow: 0.3;
+}
+```
+
+运行效果如下：
+
+![image-20220812113709146](imgs/70cdc6617eeca2b5d9aeea5e96f97c28116d19d8.png)
+
+符合计算预期。
+
+### 12.2 flow-grow应用
+
+flow-grow属性在项目中运用很多，比如页面布局、导航条、分页等。
+
+**实例1**：使用 flex 弹性布局实现如下效果：
+
+![image-20220812113818509](imgs/12890ae3e4fe65753139c6c56a63b9b64caa308f.png)
+
+这个其实就是腾讯首页的导航条了，我们模拟实现一下，步骤分为4步：
+
+1）首先先写html标签，标签很简单一个 nav 包含若干 a 标签：
+
+```html
+<nav class="container">
+	<a class="item" href="#">新闻</a>
+	<a class="item" href="#">视频</a>
+	<a class="item" href="#">图片</a>
+	<a class="item" href="#">军事</a>
+	<a class="item" href="#">体育</a>
+	<a class="item" href="#">NBA</a>
+	<a class="item" href="#">娱乐</a>
+	<a class="item" href="#">财经</a>
+	<a class="item" href="#">科技</a>
+</nav>
+```
+
+2）设置基本样式，背景、颜色、边框圆角等：
+
+```css
+.container {
+	height: 44px;
+	background-color: #1479d7;
+	border-radius: 3px;
+}
+
+.item {
+	color: white;
+	text-align: center;
+	text-decoration: none;
+}
+```
+
+运行效果：
+
+![image-20220812114128188](imgs/434734b1dedd911e790f580db33c20692198d684.png)
+
+3）设置容器为 flex 布局，项目 flex-grow 为1 平分剩余空间：
+
+```css
+.container {
+	/* 设置子元素的布局为flex布局 */
+	display: flex;
+}
+
+.item {
+	/* 设置项目放大系数 */
+	flex-grow: 1;
+}
+```
+
+运行效果：
+
+![image-20220812114149809](imgs/26aa97391cc163a66e6fe14c0d2128f81b56b43b.png)
+
+4）再来一个上下居中即可，flex 弹性布局将容器属性 align-items 设置为 center 即可：
+
+```css
+.container {
+	/* 设置辅轴上项目居中排列 */
+	align-items: center;
+}
+```
+
+运行效果：
+
+![image-20220812114302213](imgs/4647d0bc6d55bac2696290e774e95375980d0c27.png)
+
+至此这个例子就完成了。
+
+和之前使用float相比，**我们尝试改变容器大小，会发现项目也跟着变化，这个就是弹性的意思了**。如下图所示：
+
+![](imgs/b1c6285d6655afa9b670eb425c3ec7318aebc31d.gif)
+
+### 3.12.3 总结
+
+1. 容器内未被占用的空间称为剩余空间。
+2. flex-grow用于设置项目的放大系数。
+3. 项目放大尺寸计算包含两个公式：
+
+1）计算将多少剩余空间拿来分配。
+
+```css
+公式：剩余空间 * ( 所有项目的flex-grow之和 >= 1 ? 1 : 所有项目的flex-grow之和 ) 。
+```
+
+2）计算每个项目分配到多少剩余空间。
+
+```css
+公式：要分配的剩余空间 * ( 单个项目flex-grow / 所有项目的flex-grow之和 )
+```
+
+4. flex-grow不是设置具体的尺寸，在弹性布局中应用广泛。
+
+## ⭕13.缩减系数
+
+`flex-shrink` 指定弹性元素的收缩系数，默认值为1
+
+- 当父元素中的空间不足以容纳所有的子元素时，如何对子元素进行收缩
+
+- 缩减系数的计算方式比较复杂，缩减多少是根据 *缩减系数* 和 *元素大小* 来计算
+
+简单的说 flex-grow 用于放大，那么 flex-shrink 就是用于缩小了，两个属性就是反过来，计算方式都类似。放大是因为有剩余空间，缩小就是因为项目的宽度超过容器了，有一个**超出空间**，所以就要进行缩小。
+
+### 13.1 flex-shrink基础
+
+超出空间计算方式：
+
+```
+所有项目的总大小 - 容器大小
+```
+
+参考如下示例：	
+
+![image-20220812114904538](imgs/bf356ffc1aefa7b89271239e21dea1f15cd02dfd.png)
+
+容器宽度为450px，三个项目各为200px，总宽超过容器了，就自动缩小了。不难计算，这里超出的空间就是 **200px \* 3 - 450px = 150px**。
+
+其中：
+
+```css
+1. 默认值为1，表示所有项目等比例缩小。
+2. 如果为0，那么表示不缩小。
+```
+
+缩小的尺寸计算方式和flew-grow类似，涉及到**两个公式：**
+
+1）计算超出空间中多少用来压缩。
+
+```css
+公式：超出空间 * ( 所有项目的flex-shrink之和 >= 1 ? 1 : 所有项目的flex-shrink之和 ) 。
+```
+
+如果没有超出空间，那么就用压缩了；如果超出空间为150px，所有项目的flex-shrink之和为0.6，那么90px用来压缩。
+
+2）计算每个项目缩小多少空间。
+
+```css
+公式：要压缩的空间 * ( 单个项目flex-shrink / 所有项目的flex-shrink之和 )
+```
+
+简单的说，就是按照 flex-shrink 占比进行缩小。
+
+下面我们结合例子进行说明，对这边的计算公式进行理解。
+
+示例1，设置项目的 flex-shrink 为0：
+
+接上一篇例子，有一个div（容器，450px），容器内包含3个div（项目，flex-basis 为200px）。
+
+```css
+.item {
+	/* flex-basis属性定义了项目占据主轴空间（main size）大小。 */
+	flex-basis: 200px;
+	/* flex-shrink 属性定义项目的缩小系数 */
+	flex-shrink: 0;
+}
+```
+
+> flex-shrink 为0表示不压缩项目。 
+
+![](imgs/d1441e028eab5b0b2058baa141d9dc7d17739726.gif)
+
+可以看到item3项目那边超出了容器一截。
+
+**示例2**，接上例，设置项目1、2、3的 flex-shrink 分别为0、1、2：
+
+套公式计算：
+
+1）计算超出空间中多少用来压缩。
+
+```css
+要压缩的空间
+ = 总超出空间 * ( 所有项目的flex-shrink之和 >= 1 ? 1 : 所有项目的flex-shrink之和 ) 。
+ = 150px * ( 3 >= 1 ? 1 : 3)
+ = 150px
+```
+
+2）计算每个项目缩小多少空间。
+
+```css
+项目1压缩的空间
+ = 150px * ( 0 / 3 )
+ = 0
+
+项目2压缩的空间
+ = 150px * ( 1 / 3 )
+ = 50px
+
+项目3压缩的空间
+ = 150px * ( 2 / 3 )
+ = 100px
+```
+
+所以最终：项目1宽为200px、项目2宽为150px、项目3宽为100px。
+
+写上代码看看效果：
+
+```css
+.item {
+	/* flex-basis属性定义了项目占据主轴空间（main size）大小。 */
+	flex-basis: 200px;
+}
+		
+.item1 {
+	flex-shrink: 0;
+}
+
+.item2 {
+	flex-shrink: 1;
+}
+
+.item3 {
+	flex-shrink: 2;
+}
+```
+
+运行效果：
+
+![](imgs/1f278a5da9bb333386bc447a518c094bbe802b2d.gif)
+
+观察运行效果，符合预期。
+
+**示例3**：设置项目1、2、3的 flex-shrink 分别为 0.1、0.2、0.3：
+
+这个示例和上例差不多，只是数字变成了小数，并且总和不大于1。
+
+先套公式来计算一下：
+
+1）计算超出空间中多少用来压缩
+
+```css
+要压缩的空间
+ = 总超出空间 * ( 所有项目的flex-shrink之和 >= 1 ? 1 : 所有项目的flex-shrink之和 ) 。
+ = 150px * ( 0.6 >= 1 ? 1 : 0.6)
+ = 90px
+```
+
+2）计算每个项目缩小多少空间。
+
+```css
+项目1压缩的空间
+ = 90px * ( 0.1 / 0.6 )
+ = 15px
+
+项目2压缩的空间
+ = 90px * ( 0.2 / 0.6 )
+ = 30px
+
+项目3压缩的空间
+ = 90px * ( 0.3 / 0.6 )
+ = 45px
+```
+
+所以最终：项目1宽为185x、项目2宽为170px、项目3宽为155px。
+
+样式代码如下：
+
+```css
+.item {
+	/* flex-basis属性定义了项目占据主轴空间（main size）大小。 */
+	flex-basis: 200px;
+}
+
+.item1 {
+	flex-shrink: .1;
+}
+
+.item2 {
+	flex-shrink: .2;
+}
+
+.item3 {
+	flex-shrink: .3;
+}
+```
+
+运行效果如下：
+
+![](imgs/d480f8736cda00b4007bb0317b88db63caaead1e.gif)
+
+符合计算预期。
+
+### 13.2 总结
+
+1. 项目的总大小超出容器部分成为超出空间。
+2. flex-shrink用于设置项目的缩小系数。
+3. 项目缩小尺寸计算包含两个公式：
+
+1）计算超出空间中多少用来压缩。
+
+```css
+公式：总超出空间 * ( 所有项目的flex-shrink之和 >= 1 ? 1 : 所有项目的flex-shrink之和 ) 。
+```
+
+2）计算每个项目缩小多少空间。
+
+```css
+公式：要压缩的空间 * ( 单个项目flex-shrink / 所有项目的flex-shrink之和 )
+```
+
+## ⭕14.基础长度
+
+### 14.1 flex-basis基础
+
+`flex-basis` 指定的是元素在主轴上的基础长度	
+
+- 如果主轴是横向的，则该值指定的就是元素的宽度
+
+- 如果主轴是纵向的，则该值指定的就是元素的高度
+
+- 默认值是`auto`，表示参考元素自身的高度或宽度
+
+- 如果传递了一个具体的数值，则以该值为准
+
+> 在这里可以先理解成 宽（width）属性，用法和 width 的一致，只是优先级比 width 更高。
+
+**示例1** 有一个div（容器），容器内包含3个div（项目），容器设置为 flex 弹性布局。
+
+![image-20220812120114551](imgs/c5c50c20f8e56b0c60e27cf55f48898b4fc3e8c1.png)
+
+容器内项目的宽度是根据内容自适应的，这个也就是 flex-basis 默认值为 auto 的含义了。
+
+下面设置项目的宽度为120px：
+
+```css
+.item {
+	/* flex-basis属性定义了项目占据主轴空间（main size）大小。 */
+	flex-basis: 120px;
+}
+```
+
+运行效果：
+
+![image-20220812120209155](imgs/41fd1d59969a50e741dd50a6fa060167d567dbcf.png)
+
+可以看到3个项目的宽度都为120px了，这个就是 flex-basis 的含义了。
+
+**思考：**
+
+```css
+如果设置 width: 100px，那么项目实际为多宽呢？
+```
+
+解答：因为 flex-basis 属性的优先级比 width 高，所以项目的宽度还是120px。
+
+**思考：**
+
+```css
+设置宽度为什么不直接用 width 属性？还要再多一个 flex-basis 属性，不是多此一举吗？
+```
+
+**解答（难点）：**
+
+```css
+flex-basis 这边并没有说是定义项目的宽度，而是说：占据主轴空间的大小。
+因为设置容器属性 flex-direction 为 column或者column-reverse 的时候主轴会变成纵向的（可以想象成数学坐标轴的Y轴）。
+在这种情况下，flex-basis 就是设置高，可以理解成 height 属性。
+从这个意义上来讲，flex-basis 不全等于 width。
+```
+
+### 3.14.2 总结
+
+1. flex-basis 属性设置在项目上的。
+2. flex-basis 是设置项目 占据主轴空间的大小、不全等于width。
+3. flex-basis 优先级比 width 更高。
+
+## ⭕15.flex属性
+
+前面三节讲了 flex-grow、flex-shrink、flex-basis 三个项目属性。
+
+1. flex-grow 用于设置项目的放大系数。
+2. flex-shrink 用于设置项目的缩小系数。
+3. flex-basis 用于设置项目在主轴上的空间。
+
+那么项目属性 flex 就很简单了，他其实是3个属性的集中而已，语法格式如下：
+
+```css
+.item {
+	flex: flex-grow flex-shrink flex-basis | auto | none;
+}
+```
+
+其中：
+
+```css
+1. 这个属性可以独立设置 flex-grow flex-shrink flex-basis 的值，如：1 0 120px。
+2. auto 表示：1 1 auto，即等比例扩大或者压缩。
+3. none 表示：0 0 auto，即不扩大，也不压缩。
+```
+
+> `initial`：`flex: 0 1 auto` 默认值
+
+实务中经常会看到如下样式代码：
+
+```css
+.item {
+	flex: 1;
+}
+```
+
+这个其实就是表示 flex-grow 设置为1，各项目等比例放大。
+
+经常用作自适应布局，内容区会自动放大或缩小占满剩余空间。在chrome浏览器上也可以将flex: 1; 
+
+![image-20220812121004252](imgs/fa56d10c1397c95cd0311f904e0311cddd0f8fc2.png)
+
+flex: 2;
+
+![image-20220812121016075](imgs/83f04bf46dd3e74e8d143e40b2a484680b5880c1.png)
+
+下面有几个flex布局的常用场景：
+1、一个元素宽度（或高度）固定，另一个元素宽度（或高度）自适应。
+
+```css
+.parent {
+	display: flex;
+}
+// 高度/宽度固定
+.son1 {
+	width: 200px; //或者 height: 200px;
+	flex: none; // 加不加都可 相当于flex: 0 0 auto;
+}
+// 高度/宽度自适应
+.son2 {
+	flex: 1;  // flex: 1 1 0%;
+}
+```
+
+2、子元素都设置flex: 1; 子元素盒子会平分并占满父盒子；
+
+```css
+<div class="container">
+  <div class="div">我是一个div</div>
+  <div class="div">我是一个很多字div</div>
+  <div class="div">我是一个更多字而且第三个div</div>
+</div>
+<style>
+.container{
+  display: flex;
+}
+.div{
+  border: 1px solid red;
+  flex: 1;
+}
+</style>
+
+```
+
+![image-20220812121143203](imgs/ccc36c52a6e507043f403f9e0f2b7999d1f4ea1a.png)
+
+3、那么如果设置 flex: 1 1 auto;呢？ 子元素盒子会根据自己的内容来适配并一起占满整个空间；
+
+```css
+<div class="container">
+  <div class="div">我是一个div</div>
+  <div class="div">我是一个很多字div</div>
+  <div class="div">我是一个更多字而且第三个div</div>
+</div>
+<style>
+.container{
+  display: flex;
+}
+.div{
+  border: 1px solid red;
+  flex: 1 1 auto;
+}
+</style>
+```
+
+![image-20220812121218240](imgs/430479d8da8e7d6c5d4b7f43409ec183dbb8cd22.png)
+
+## ⭕16.order属性定义项目的排列顺序
+
+order 用于是设置项目的排序顺序，从小到大排列。
+
+项目的排序默认会按照html的结构进行排序，如果需要定义排序顺序，可以通过order属性定义项目的排序顺序，语法格式如下：
+
+```css
+.item {
+	/* 整数，默认值为 0，可以为负数 */
+	order: <integer>; 
+}
+```
+
+其中：
+
+```css
+order 为整数，可以为负数。
+order 默认值为 0。
+项目按照 order 值从小到大排列。
+```
+
+如果之前有学习过sql，那么对 order 就很熟悉了。因为sql中排序的关键词就是 order by。
+
+**示例1**：有一个div（容器，450px），容器内包含5个div（项目，flex-grow 为1）。
+
+1）和前面章节相比多两个项目，方便看出排序效果。
+
+未设置排序前的效果：
+
+![image-20220812121521482](imgs/5854f585e0eec3c54caaff56d26f0fb252203619.png)
+
+2）默认所有的项目 order 值都为0，设置项目1为99，项目3为-1，项目4为-2：
+
+因为项目是按照order从小到大排列，那么正常显示的顺序应该是：
+
+```css
+项目4、项目3、项目2、项目5、项目1。
+```
+
+写上代码：
+
+```css
+.item1 {
+	order: 99;
+}
+
+.item3 {
+	order: -1;
+}
+
+.item4 {
+	order: -2;
+}
+```
+
+运行效果：
+
+![image-20220812121638855](imgs/c1de61e6423afeceac2cd21cec17dd825ff825fd.png)
+
+## ⭕17.align-self属性
+
+项目属性 align-self，和 align-items 类似。align-items设置在容器上，作用所有的项目。align-self 设置在项目上，作用单个项目
+
+align-self 属性用来设置项目在辅轴方向上的对齐方式，设置在项目上，作用单个项目。
+而 align-items 设置在容器上，作用所有的项目。
+
+语法格式如下：
+
+```css
+.item {
+	align-self: auto(默认值) | flex-start | flex-end | center | baseline | stretch;
+}
+```
+
+其中：
+
+```css
+1. auto 表示继承容器的 align-items 属性。（默认值）
+2. flex-start 沿着辅轴方向 起点 对齐（默认值）。
+3. flex-end 沿着辅轴方向 结尾 对齐。
+4. center 沿着辅轴方向 居中 对齐。
+5. baseline 沿着辅轴方向，按照项目内的文字对齐。
+6. stretch 沿着辅轴方向自动进行拉升到最大。
+```
+
+**示例1**，有一个div（容器，450px），容器内包含3个div（项目，flex-basis 为50px），设置 align-items 为 flex-start，项目1的align-self设置为 flex-end：
+
+```css
+.container {
+	/* 设置子元素的布局为flex布局 */
+	display: flex;
+	/* 设置项目交叉轴方向上的对齐方式 */
+	/* 作用于所有项目 */
+	align-items: flex-start;
+}
+
+.item1 {
+	/* 设置单个项目交叉轴方向上的对齐方式 */
+	/* 作用于单个项目 */
+	align-self: flex-end;
+}
+```
+
+运行效果：
+
+![image-20220812122009637](imgs/44d9c79b1f90bba0f99b21d4b5c9cf1654b691d1.png)
+
+**本节总结**
+
+1. align-self 和 align-items 类似，默认值为auto，表示继承 align-items 的属性。
+2. align-self 设置在项目上，作用单个项目。align-items设置在容器上，作用所有的项目。
+
+# 20 【rem适配布局】
+
+
+
+【思考】
+
+1. 页面布局文字能否随着屏幕大小变化而变化？
+2. 流式布局和 flex 布局主要针对于宽度布局，那高度如何设置？
+3. 怎么样让屏幕发生变化的时候元素高度和宽度等比例缩放？
+
+## ⭕1.rem单位 
+
+`rem`（root em）是一个相对单位，类似于 `em`，em 是父元素字体大小。
+
+不同的是 rem 的基准是**相对于 html 元素的字体大小**。
+
+比如，根元素（html）设置 `font-size=12px`，非根元素设置 `width: 2rem;` 则换成 px 表示就是 24px。
+
+rem 的优势：父元素文字大小可能不一致，但是整个页面只有一个 `html`，可以很好来控制整个页面的元素大小。（即：达到统一控制全局字体大小的效果！）
+
+> 注意：rem 控制的不仅仅是字体大小，还能控制其他元素的大小。
+
+```css
+/* 根 html 为 12px */
+html {
+    font-size: 12px;
+}
+/* 此时 div 的字体大小就是 24px */
+div {
+    font-size: 2rem；
+}
+```
+
+【案例】
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>rem单位</title>
+    <style>
+        html {
+            font-size: 12px;
+        }
+
+        div {
+            font-size: 12px;
+            width: 15rem;
+            height: 15rem;
+            background-color: purple;
+        }
+
+        p {
+            /* 1. em 相对于父元素的字体大小来说的 */
+            /* 
+            width: 10em;
+            height: 10em;
+            */
+            /* 2. rem 相对于 html 元素字体大小来说的 */
+            width: 10rem;
+            height: 10rem;
+            background-color: pink;
+            /* 3.rem 的优点就是可以通过修改 html 里面的文字大小来改变页面中元素的大小可以整体控制 */
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <p></p>
+    </div>
+</body>
+
+</html>
+```
+
+注：虽然使用 rem 之后实现了全局字体大小的统一控制，但是依旧不能根据窗口大小自动适配，所以我们还要学习媒体查询。
+
+## ⭕2.媒体查询
+
+### 2.1 什么是媒体查询
+
+媒体查询（Media Query）是 CSS3 新语法。
+
+- 使用 `@media` 查询，可以争对不同的媒体类型定义不同的样式
+- `@media` 可以争对不同的屏幕尺寸设置不同的样式
+- 当你重置浏览器大小的过程中，页面也会根据浏览器的宽度和高度重新渲染页面
+- 目前针对很多苹果手机、Android 手机、平板等设备都用得到媒体查询
+
+### 2.2 语法规范
+
+```css
+@media mediatype and|not|only (media feature) {
+    CSS-Code;
+}
+```
+
+- 用 @media 开头，注意 `@` 符号
+- mediatype 媒体类型
+- 关键字 and not only
+- media feature 媒体特性，必须有小括号包含
+
+### 2.3 mediatype 查询类型
+
+将不同的终端设备划分成不同的类型，称为媒体类型。
+
+| 值       | 解释说明                           |
+| -------- | ---------------------------------- |
+| `all`    | 用于所有设备                       |
+| `print`  | 用于打印机和打印预览               |
+| `screen` | 用于电脑屏幕、平板电脑、智能手机等 |
+
+### 2.4 关键字
+
+关键字将媒体类型或多个媒体特性连接到一起做为媒体查询的条件。
+
+- and：可以将多个媒体特性连接到一起，相当于 “且” 的意思。
+- not：排除某个媒体类型，相当于 “非” 的意思，可以省略。
+- only：指定某个特定的媒体类型，可以省略。
+
+### 2.5 媒体特性
+
+每种媒体类型都具有各自不同的特性，根据不同媒体类型的媒体特性设置不同的展示风格。我们暂且了解三个。注意他们要加小括号包含。
+
+| 值          | 解释说明                           |
+| ----------- | ---------------------------------- |
+| `width`     | 定义输出设备中页面可见区域的宽度   |
+| `min-width` | 定义输出设备中页面最小可见区域宽度 |
+| `max-width` | 定义输出设备中页面最大可见区域宽度 |
+
+【案例】
+
+根据页面宽度改变背景颜色。
+
+实现思路：
+
+- 按照 **从大到小** 的或者 **从小到大** 的思路
+- 注意我们有最大值 `max-width` 和最小值 `min-width` 都是**包含等于**的
+- 当屏幕小于 540 像素，背景颜色变为蓝色（x <= 539）
+- 当屏幕大于等于 540 像素并且小于等于 969 像素的时候背景颜色为绿色（540 <= x <= 969）
+- 当屏幕大于等于 970 像素的时候，背景颜色为红色（x >= 970）
+
+注意：为了防止混乱，媒体查询我们要按照从小到大或者从大到小的顺序来写，但是我们最喜欢的还是**从小到大**来写，这样代码更简洁。
+
+举例：
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>媒体查询案例修改背景颜色</title>
+    <style>
+        /* 1. 媒体查询一般按照从大到小或者从小到大的顺序来 */
+        /* 2. 小于 540px 页面的背景颜色变为蓝色 */
+        @media screen and (max-width: 539px) {
+            body {
+                background-color: blue;
+            }
+        }
+
+        /* 3. 540 ~ 970 我们的页面颜色改为绿色 */
+        /* @media screen and (min-width: 540px) and (max-width: 969px) {
+            body {
+                background-color: green;
+            }
+        } */
+        /* 从小到大（层叠性） */
+        @media screen and (min-width: 540px) {
+            body {
+                background-color: green;
+            }
+        }
+
+        /* 4. 大于等于 970px 我们页面的颜色改为红色 */
+        @media screen and (min-width: 970px) {
+            body {
+                background-color: red;
+            }
+        }
+
+        /* 5. screen 还有 and 必须带上不能省略的 */
+        /* 6. 我们的数字后面必须跟单位 970px 这个 px 不能省略的 */
+    </style>
+</head>
+
+<body>
+
+</body>
+
+</html>
+```
+
+效果图：
+
+![](imgs/3feb1830572030faf302b82f95101a75c7d6e4ca.gif)
+
+媒体查询从小到大优势代码分析：
+
+![](imgs/8e69b6d6c2d26671f4224d8dd9522f7f94d22654.png)
+
+## ⭕3.媒体查询+rem实现元素动态大小变化
+
+`rem` 单位是跟着 html 来走的，有了 rem 页面元素可以设置不同大小尺寸。
+
+媒体查询可以根据不同设备宽度来修改样式。
+
+`媒体查询 + rem` 就可以实现不同设备宽度，实现页面元素大小的动态变化。
+
+【案例】
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>媒体查询+rem实现元素动态变化</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* html {
+            font-size: 100px;
+        } */
+        /* 从小到大的顺序 */
+
+        @media screen and (min-width: 320px) {
+            html {
+                font-size: 50px;
+            }
+        }
+
+        @media screen and (min-width: 640px) {
+            html {
+                font-size: 100px;
+            }
+        }
+
+        .top {
+            height: 1rem;
+            font-size: .5rem;
+            background-color: green;
+            color: #fff;
+            text-align: center;
+            line-height: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="top">购物车</div>
+</body>
+
+</html>
+```
+
+![](imgs/d75cfdd0da8e3bc8dbdae0a4dc95ce7ecde7bc89.gif)
+
+## ⭕4.引入资源（理解）
+
+当样式比较繁多的时候，我们可以针对不同的媒体使用不同 stylesheet（样式表）。
+
+> 比如：从 PC 端样式变移动端样式时，最好分开写样式表
+
+原理，就是直接在 link 中判断设备的设备的尺寸，然后引用不同的 CSS 文件。
+
+（1）语法规范
+
+```html
+<link rel="stylesheet" media="mediatype and|not|only (media feature)" href="mystylesheet.css">
+```
+
+（2）实例
+
+```html
+<link rel="stylesheet" media="screen and (min-width: 400px)" href="styleA.css">
+```
+
+【案例】
+
+- html
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>引入资源</title>
+    <style>
+        /* 当我们屏幕大于等于 640px 以上的，我们让 div 一行显示 2 个 */
+        /* 当我们屏幕小于 640px 我们让 div 一行显示一个 */
+        /* 一个建议：我们媒体查询最好的方法是从小到大 */
+        /* 引入资源就是针对于不同的屏幕尺寸调用不同的 css 文件 */
+    </style>
+    <link rel="stylesheet" href="style335.css" media="screen and (min-width: 320px)">
+    <link rel="stylesheet" href="style640.css" media="screen and (min-width: 640px)">
+</head>
+
+<body>
+    <div>1</div>
+    <div>2</div>
+</body>
+
+</html>
+```
+
+- style335.css
+
+```css
+div {
+  width: 100%;
+  height: 100px;
+}
+
+div:nth-child(1) {
+  background-color: pink;
+}
+
+div:nth-child(2) {
+  background-color: purple;
+}
+```
+
+- style640.css
+
+```css
+div {
+  float: left;
+  width: 50%;
+  height: 100px;
+}
+
+div:nth-child(1) {
+  background-color: pink;
+}
+
+div:nth-child(2) {
+  background-color: purple;
+}
+```
+
+- 效果
+
+![](imgs/5e1fdec36796f6d68c42ee610c8cd0fa4ee05c21.gif)
+
+## 5.rem适配方案介绍
+
+【思考】
+
+1. 我们适配的目标是什么？
+2. 怎么去达到这个目标的？
+3. 在实际的开发如何实现？
+
+【答案】
+
+1. 让一些不能等比自适应的元素，达到当设备尺寸发生改变的时候，等比例适配当前设备。
+2. 使用媒体查询根据不同的设备按比例设置 html 的字体大小，然后页面元素使用 rem 做尺寸单位，当 html 做尺寸单位，当 html 字体大小变化元素尺寸也会发生变化，从而达到等比缩放的适配。
+
+### 5.1 rem实际开发适配方案
+
+（1）按照设计稿与设备宽度的比例，动态计算并设置 html 根标签的 font-size 大小（媒体查询）。
+
+（2）CSS 中，设计稿元素的宽、高、相对位置等取值，按照同等比例换算为 rem 为单位的值。
+
+![](imgs/5cee9c9bbe50f5392a208f236e9a61009fbfbbe0.png)
+
+### 5.2 rem适配方案技术使用（市场主流）
+
+（1）技术方案1
+
+- less
+- 媒体查询
+- rem
+
+（2）技术方案2
+
+- flexible.js
+- rem
+
+（3）技术方案3
+
+- vw
+- rem
+
+总结：
+
+1. 两种方案的底层原理都是一样的
+2. 两种方案目前都在使用
+3. 方案2 更简单，现阶段大家无需了解里面的 js 代码
+
+## 6.rem实际开发适配方案1
+
+rem + 媒体查询 + less
+
+**（1）设计稿常见尺寸宽度**
+
+| 设备           | 常见宽度                                                     |
+| -------------- | ------------------------------------------------------------ |
+| iphone 4 5     | 640px                                                        |
+| iphone 6 7 8   | 750px                                                        |
+| iphone x 11 12 | 1170px                                                       |
+| Android        | 常见 320px、360px、375px、384px、400px、414px、500px、720px、1080px |
+
+一般情况下，我们以一套或两套效果图适应大部分的屏幕，放弃极端屏或对其优雅降级，牺牲一些效果，现在基本以 750px 为准。（目前应该是 1080px 2021年）
+
+**（2）动态设置 html 标签 font-size 大小**
+
+1. 假设设计稿是 750px
+2. 假设我们把整个屏幕划分为 15 等份（划分标准不一，可以是 20 份，也可以是 10 等份）
+3. 每一份作为 html 字体大小，这里就是 750/15 = 50px
+4. 那么在 320px 设备的时候，字体大小为 320/15 = 21.33px
+5. 用我们页面元素的大小除以不同的 html 字体大小会发现他们比例还是相同的
+6. 比如我们以 750px 设计稿
+7. 此时便实现了不同屏幕下页面元素盒子等比例缩放的效果
+
+**（3）元素大小取值方法**
+
+1. 最后的公式：`页面元素的 rem 值 = 页面元素值（px） / （屏幕宽度 / 划分份数）`
+2. `屏幕宽度 / 划分份数 = html font-size 的大小`
+3. 或者：`页面元素的 rem 值 = 页面元素值（px） / html font-size 字体大小`
+
+【案例】
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>rem适配方案</title>
+    <style>
+        @media screen and (min-width: 320px) {
+            html {
+                font-size: 21.33px;
+            }
+        }
+
+        @media screen and (min-width: 750px) {
+            html {
+                font-size: 50px;
+            }
+        }
+
+        div {
+            width: 2rem;
+            height: 2rem;
+            background-color: pink;
+        }
+
+        /* 1. 首先我们选一套标准尺寸 750px 为准 
+           2. 我们用屏幕尺寸 除以 我们划分的份数 得到了 html 里面的文字大小 但是我们知道不同屏幕下得到的文字大小是不一样的 */
+        /* 3. 页面元素的 rem值 =  页面元素在 750 像素的下px值 / html 里面的文字大小 */
+    </style>
+</head>
+
+<body>
+    <div></div>
+</body>
+
+</html>
+```
+
+![](imgs/2230d9d52c8cc06e450b39a4f2a6409ab8f900bd.gif)
+
+## 7.rem适配方案2
+
+### 7.1 简洁高效的rem适配方案flexible.js
+
+手机淘宝团队出的简洁高效的移动端适配库
+
+我们再也不需要在写不同屏幕的媒体查询，因为里面 js 做了处理
+
+它的原理是把当前设备划分为 10 等份，但是不同设备下，比例还是一致的
+
+我们要做的，就是确定好我们当前设备的 html 文字大小就可以了
+
+比如当前设计稿是 750px，那么我们只需要把 html 文字大小设置为 75px（750 / 10）就可以
+
+里面页面元素 rem 值：页面元素的 px 值 / 75
+
+剩余的，让 flexible.js 来去算
+
+github 地址：https://github.com/amfe/lib-flexible/
+
+### 7.2 使用适配方案2制作苏宁移动端首页
+
+【技术选型】
+
+方案：我们采取单独制作移动页面方案
+
+技术：布局采取 rem 适配布局2（flexible.js + rem）
+
+设计图：本设计图采用 750px 设计尺寸
+
+【搭建相关文件夹结构】
+
+<img src="imgs/93effbaf39f0cbe66877851c1149ad832a0c44ec.png" style="zoom:50%;" />
+
+【设置视口标签以及引入初始化样式还有 js 文件】
+
+```html
+<meta name="viewport" content="width=device-width, user-scalable=no,
+initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+<link rel="stylesheet" href="css/normalize.css">
+<link rel="stylesheet" href="css/index.css">
+```
+
+【我们页面需要引入这个 js 文件】
+
+```html
+<!-- 在 index.html 中 引入 flexible.js 这个文件 -->
+<script src=“js/flexible.js”> </script>
+```
+
+【body 样式】
+
+```css
+body {
+	min-width: 320px;
+    max-width: 750px;
+    /* flexible 给我们划分了 10 等份 */
+	width: 10rem;
+	margin: 0 auto;
+	line-height: 1.5;
+	font-family: Arial,Helvetica;
+	background: #F2F2F2;
+}
+```
+
+【VSCode px 转 rem 插件 cssrem】
+
+cssrem 插件默认的 html 文字大小（cssroot）为 `16px`，即：`16px = 1rem`。
+
+所以，我们需要根据具体情况修改 html 字体大小基准值。
+
+比如：750px 分 10 等份时 `750px / 10 = 75px`，我们就需要将其基准值设置为 `75px`。
+
+1. 打开插件的设置按钮
+2. 找到基准
+3. 修改值
+4. 重启 VSCode
+
+【案例代码】
+
+- index.css
+
+```css
+body {
+  min-width: 320px;
+  /* flexible 默认以浏览器窗口为 10 等份的划分区域，所以我们要先设置一个最大宽度 */
+  max-width: 750px;
+  /* flexible 给我们划分了 10 等份 */
+  width: 10rem;
+}
+
+
+/* 如果我们的屏幕超过了 750px 那么我们就按照 750 设计稿来走 不会让我们页面超过 750px */
+
+@media screen and (min-width: 750px) {
+  html {
+    font-size: 75px !important;
+  }
+}
+
+```
+
+- flexible.js（注意：分为几等份是可以在 js 中修改的）
+
+```javascript
+(function flexible(window, document) {
+...
+
+  // set 1rem = viewWidth / 10
+  function setRemUnit() {
+    var rem = docEl.clientWidth / 10;
+    docEl.style.fontSize = rem + "px";
+  }
+...
+})(window, document);
+```
+
+- index.html
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, user-scalable=no,initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/index.css">
+    <!-- 引入我们的 flexible.js 文件 -->
+    <script src="js/flexible.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <div class="search-content">
+        <a href="#" class="classify"></a>
+        <div class="search">
+            <form action="">
+                <input type="search" value="rem适配方案2很开心哦">
+            </form>
+        </div>
+        <a href="#" class="login">登录</a>
+    </div>
+</body>
+
+</html>
+```
+
+- 效果图
+
+![](imgs/32fd0a65d2a5c98fe64ebe71d4813584581e2ad9.png)
+
+## 8.rem适配方案3
+
+> `vw`表示的是视口的宽度（viewport width）
+>
+> - 100vw = 一个视口的宽度
+> - 1vw = 1%视口宽度
+>
+> **vw单位永远参考于视口宽度进行计算**
+
+常规的设计图宽度750px，使用vw如何通过设计图中的大小来设计网站大小？
+
+设计图中48x 35像素大小的元素如何在页面中保证元素大小？
+
+100vw = 750px （设计图中像素）
+
+0.1333333333333333333vw = 1px
+
+0.13333333333vw x 48px = 6.4vw
+
+0.13333333333vw x 35px = 4.66666666666vw
+
+如果根据设计图像素计算vw ， 必须通过0.133333333333*px ，数值的换算非常不方便
+
+1rem = 1 html的字体大小
+
+能否将font-size设置为0.1333333333来方便设置vw呢？
+
+```css
+font-size: 0.1333333333333333vw;
+```
+
+> 网页中字体大小最小是12px，不能设置一个比12像素还小的字体
+>
+> 如果我们设置了一个小于12px的字体，则字体自动设置为12
+
+现在将font-size 扩大100倍
+
+```css
+font-size: 13.33333333333333vw;
+```
+
+每次使用时设计图像素除100
+
+> 0.01rem = 1px 也可以用设计图像素乘以0.01
+
+```css
+width: 0.48rem;
+height: 0.35rem;
+```
+
+# 21 【vw布局】
+
+## 1.移动端布局
+
+移动端布局 --- flex 布局
+
+为了实现可以适配移动端，页面元素可以宽度和高度等比例缩放
+
+需要移动端适配有如下方案：
+
+（1）rem
+
+市场比较常见：
+
+1. 需要不断修改 html 文字大小
+2. 需要媒体查询 media
+3. 需要 flexible.js
+
+（2）vw / vh
+
+未来的趋势：
+
+1. 省去各种判断和修改
+2. 代表：bilibili、小米……
+
+## ⭕2.vw/vh是什么？
+
+- vw/vh 是一个相对单位（类似 em 和 rem 相对单位）
+  - vw 是：viewport width 视口宽度单位
+  - vh 是：viewport height 视口高度单位
+- 相对视口的尺寸计算结果
+  - 1vw = 1/100 视口宽度
+  - 1vh = 1/100 视口高度
+
+例如：
+
+当前屏幕视口是 375px，则 1vw 就是 3.75px，如果当前屏幕视口为 414px，则 1vw 就是 4.14px。
+
+**注意：和百分比有区别，百分比是相对于父元素来说的，而 vw 和 vh 总是针对于当前视口来说的。**
+
+## ⭕3.vw/vh怎么用？
+
+- 超级简单，元素单位直接使用新单位 vw/vh 即可
+- 因为 vw/vh 是相对单位，所以不同视口（屏幕）下，宽高一起变化完成适配
+
+> 直接使用即可！永远滴神！
+
+【案例】
+
+```css
+div {
+    width: 10vw;
+    height: 10vh;
+    background-color: pink;
+}
+```
+
+ **如何还原设计稿？**
+
+前提：我们设计稿按照 iPhone 6/7/8 来设计，有个盒子是 50px * 50px 的，如何使用 vw 呢？
+
+分析：
+
+1. 设计稿参照 iPhone 6/7/8，所以视口宽度尺寸是 375px（设计原型图平台切换到 2x 模式再测量，因为 UI 设计图是 750px 的）
+
+2. 那么 1vw 是多少像素？
+
+   375px / 100 = 3.75px
+
+3. 我们元素的目标是多少像素？
+
+   50px * 50px
+
+4. 那么 50 * 50 是多少个 vw？
+
+   50 / 3.75 = 13.3333vw
+
+> 在像素大厨等 UI 软件中，直接选择 vw 单位然后测量即可，不用人工计算。
+
+## ⭕4.vw注意事项
+
+- 因为涉及到大量除法且有除不尽的情况，所以还是适应 LESS 搭配更好点
+
+- 我们本质是根据视口宽度来等比例缩放页面元素高度和宽度的，所以开发中使用 vw 就基本够用了。vh 很少使用（高度变化时，我们一般不需要元素大小进行变化，所以用不到 vh）
+
+  ```css
+  div {
+      /* 都用vm */
+      width: 13.333333vw;
+      height: 12.666666vw;
+      font-size: 5.333333vw;
+      background-color: pink;
+  }
+  ```
+
+- 兼容性，网站：https://caniuse.com/
+
+> 目前适用于移动端，PC 端不适用。
+
+## 5.VSCode px->vw 插件
+
+![](imgs/911c795fd54971b3cda2cab06ade197bf65735e0.png)
+
+记得进行设置：
+
+> 打开 px2vw 插件主页、点击设置按钮、点击扩展设置。
+
+![](imgs/e4e3af30b5d81f3c426e2aa311ed7214067ddaf6.png)
+
+## 6.移动端布局推荐
+
+`flex` + `less` + `vw` 
+
+# 22 【响应式布局】
+
+## 1.响应式开发
+
+### ⭕1.1 响应式开发原理
+
+就是使用媒体查询针对不同宽度的设备进行布局和样式的设置，从而适配不同设备的目的。
+
+| 设备划分                 | 尺寸区间            |
+| ------------------------ | ------------------- |
+| 超小屏幕（手机）         | < 768px             |
+| 小屏设备（平板）         | >= 768px ~ < 992px  |
+| 中等屏幕（桌面显示器）   | >= 992px ~ < 1200px |
+| 宽屏设置（大桌面显示器） | >= 1200px           |
+
+### ⭕1.2 响应式布局容器
+
+响应式需要一个父级作为布局容器，来配合子级元素来实现变化效果。
+
+原理就是在不同屏幕下，通过媒体查询来改变这个布局容器的大小，再改变里面子元素的排列方式和大小，从而实现不同屏幕下，看到不同的页面布局和样式变化。
+
+【平时我们的响应式尺寸划分】
+
+- 超小屏幕（手机，小于 768px）：设置宽度为 100%
+- 小屏幕（平板，大于等于 768px）：设置宽度为 750px
+- 中等屏幕（桌面显示器，大于等于 992px）：宽度设置为 970px
+- 大屏幕（大桌面显示器，大于等于 1200px）：宽度设置为 1170px
+
+但是我们也可以根据实际情况自己定义划分。
+
+【案例】
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>01-响应式布局原理</title>
+    <style>
+        .container {
+            height: 150px;
+            background-color: black;
+            margin: 0 auto;
+        }
+
+        /* 1. 超小屏幕下  小于 768  布局容器的宽度为 100% */
+
+        @media screen and (max-width: 767px) {
+            .container {
+                width: 100%;
+            }
+        }
+
+        /* 2. 小屏幕下  大于等于 768px  布局容器改为 750px */
+
+        @media screen and (min-width: 768px) {
+            .container {
+                width: 750px;
+            }
+        }
+
+        /* 3. 中等屏幕下  大于等于 992px  布局容器修改为 970px */
+
+        @media screen and (min-width: 992px) {
+            .container {
+                width: 970px;
+            }
+        }
+
+        /* 4. 大屏幕下  大于等于 1200px  布局容器修改为 1170 */
+
+        @media screen and (min-width: 1200px) {
+            .container {
+                width: 1170px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- 响应式开发里面，首先需要一个布局容器 -->
+    <div class="container"></div>
+</body>
+
+</html>
+```
+
+- 效果图
+
+![](imgs/6bf3ec30e68cece94b32256f02e93f81ed4c5af6.gif)
+
+【案例：响应式导航】
+
+- 需求分析
+
+1. 当我们屏幕大于等于 800 像素，我们给 nav 宽度为 800px，因为里面子盒子需要浮动，所以 nav 需要清除浮动
+2. nav 里面包含 8 个小 li 盒子，每个盒子的宽度定位 100px，高度为 30px，浮动一行显示
+3. 当我们屏幕缩放，宽度小于 800 像素的时候，nav 盒子宽度修改为 100% 宽度
+4. nav 里面的 8 个小 li，宽度修改为 33.33%，这样一行就只能显示 3 个小 li，剩余下行显示
+
+```html
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>02-响应式导航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        .container {
+            width: 750px;
+            margin: 0 auto;
+        }
+
+        .container ul li {
+            float: left;
+            width: 93.75px;
+            height: 30px;
+            background-color: green;
+        }
+
+        @media screen and (max-width: 767px) {
+            .container {
+                width: 100%;
+            }
+
+            .container ul li {
+                width: 33.33%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <ul>
+            <li>导航栏</li>
+            <li>导航栏</li>
+            <li>导航栏</li>
+            <li>导航栏</li>
+            <li>导航栏</li>
+            <li>导航栏</li>
+            <li>导航栏</li>
+            <li>导航栏</li>
+        </ul>
+    </div>
+</body>
+
+</html>
+```
+
+![](imgs/99ee51d0f38e4415f4d6018b9ce2427fc5f542a1.gif)
+
+## 2.Bootstrap前端开发框架
+
+### 2.1 Bootstrap简介
+
+Bootstrap 来自 Twitter（推特），是目前最受欢迎的前端框架。
+
+Bootstrap 是基于 HTML、CSS 和 JavaScript 的，它简洁灵活，使得 Web 开发更加快捷。
+
+- 中文官网：http://www.bootcss.com/
+- 官网：https://getbootstrap.com/
+
+框架：顾名思义就是一套架构，它有一套比较完整的网页功能解决方案，而且控制权在框架本身，有预制样式库、组件和插件。使用者要按照框架所规定的某种规则进行开发。
+
+**（1）优点**
+
+- 标准化的 html + css 编码规范
+- 提供了一套简洁、直观、强悍的组件
+- 有自己的生态圈，不断的更新迭代
+- 让开发更简单，提高了开发的效率
+
+**（2）版本**
+
+- 2.x.x：停止维护，兼容性好，代码不够简洁，功能不够完善
+- 3.x.x：目前使用最多，稳定，但是放弃了 IE6-IE7。对 IE8 支持但是界面效果不好，偏向用于开发响应式布局、移动设备优先的 Web 项目
+- 4.x.x：最新版，目前还不是很流行
+
+> 以下内容基于 3.x.x
+
+### 2.2 Bootstrap使用
+
+在现阶段我们还没有接触 JavaScript 相关课程，所以我们只考虑使用它的 CSS 样式库。
+
+控制权在框架本身，使用者要按照框架所规定的某种规范进行开发。
+
+Bootstrap 使用四步曲：
+
+1. 创建文件夹结构
+2. 创建 html 骨架结构
+3. 引入相关样式文件
+4. 书写内容
+
+**（1）创建文件夹结构**
+
+![](imgs/e466251f9e693d88d4508061b6ac10c884d6e908.png)
+
+**（2）创建 html 骨架结构**
+
+```html
+<!-- 要求当前网页使用 IE 浏览器最高版本的内核来渲染 -->
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<!-- 视口的设置：视口的宽度和设备一致，默认的缩放比例和 PC 端一致，用户不能自行缩放 -->
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=0">
+<!--[if lt IE 9]>
+<!-- 解决 ie9 以下浏览器对 html5 新增标签的不识别，并导致CSS不起作用的问题 -->
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<!-- 解决 ie9 以下浏览器对 css3 Media Query 的不识别 -->
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+```
+
+注：`<!--[if lt IE 9]>` 及 `<![endif]-->`：为 HTML 的条件注释判断，当条件满足时便执行。
+
+**（3）引入相关样式文件**
+
+```html
+<!-- Bootstrap 核心样式-->
+<link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+```
+
+**（4）书写内容**
+
+- 复制 Bootstrap 预先定义好的样式来使用
+- 修改 Bootstrap 原来的样式，注意权重问题
+- 学好 Bootstrap 的关键在于知道它定义了哪些样式，以及这些样式能实现什么样的效果
+
+【案例】
+
+- 项目结构
+
+<img src="imgs/736ff75a3d967adc339b1879f59db3c0a68ad438.png" style="zoom:50%;" />
+
+> 注意：Bootstrap 中默认使用的就是 normalize.css 初始化样式表，所以我们就不用再引入了。
+
+### 2.3 布局容器
+
+Bootstrap 需要为页面内容和栅格系统包裹一个 `.container` 容器，它提供了两个作此用处的类。
+
+1. container 类
+
+container是 Bootstrap 中专门提供的类名，所有应用该类名的盒子，默认已被指定宽度且居中。
+
+- 响应式布局容器 固定宽度
+- 大屏（>= 1200px）宽度定为 1170px
+- 中屏（>= 992px）宽度定为 970px
+- 小屏（>= 768px）宽度定为 750px
+- 超小屏（100%）
+
+2. container-fluid 类
+
+container-fluid也是 Bootstrap 中专门提供的类名，所有应用该类名的盒子，宽度均为 100%。
+
+- 流式布局容器，百分百宽度
+- 占据全部视口（viewport）的容器
+
+> **注意:** 
+>
+> 1. container和container-fluid类自带左右内边距15px; 
+> 2. row类自带间距-15px
+> 3. col类自带左右内边距15px; 
+
+【案例】
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
+		<!--[if lt IE 9]>
+			<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+			<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+		<![endif]-->
+		<!-- 一定不要忘记引入bootstrap 的样式文件 -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.0.2/css/bootstrap.min.css"
+		/>
+		<title>05-bootstrap布局容器</title>
+	</head>
+
+	<body>
+		<div class="container">container</div>
+		<div class="container-fluid">container-fluid</div>
+	</body>
+</html>
+
+```
+
+![](imgs/155b19fac71143f839db899f0b344c2a99e05681.gif)
+
+## 3.Bootstrap栅格系统
+
+### 3.1 栅格系统简介
+
+栅格系统英文为（grid systems），也有人翻译为 “网格系统”，它是指将页面布局划分为等宽的列，然后通过列数的定义来模块化页面布局。
+
+目标：使用BootStrap栅格系统布局响应式网页
+
+![image-20220819225607418](imgs/d442237b6c70d83291e8bb27f2ef2f3fff5cf0b6.png)
+
+Bootstrap 提供了一套响应式、移动设备优先的流式栅格系统，随着屏幕或视口（viewport）尺寸的增加，系统会自动分为最多 12 列。
+
+> **其实就是将父元素分成12等份**
+
+### ⭕3.2 栅格选项参数
+
+栅格系统用于通过一系列的行（row）与列（column）的组合来创建页面布局，你的内容就可以放入这些创建好的布局中。
+
+|                     | 超小屏幕（手机）< 768px | 小屏设备（平板）>= 768px | 中等屏幕（桌面显示器）>= 992px | 宽屏设备（大桌面显示器） >= 1200px |
+| ------------------- | ----------------------- | ------------------------ | ------------------------------ | ---------------------------------- |
+| .container 最大宽度 | 自动（100%）            | 750px                    | 970px                          | 1170px                             |
+| 类前缀              | `.col-xs-`              | `.col-sm-`               | `.col-md-`                     | `.col-lg-`                         |
+| 列（column）数      | 12                      | 12                       | 12                             | 12                                 |
+| 列间距              | 30px                    | 30px                     | 30px                           | 30px                               |
+
+- 按照不同屏幕划分为 1~12 等份
+- 行（row）可以去除父容器默认的 15px 内边距
+- xs-extra small：超小；sm-small：小；md-medium：中等；lg-large：大；
+- 列（column）大于 12，多余的 “列（column）” 所在的元素将被作为一个整体另起一行排列
+- 每一列默认有左右 15 像素的 padding
+- 可以同时为一列指定多个设备的类名，以便在不同的窗口尺寸下划分不同份数，例如：`class="col-md-4 col-sm-6"`
+- 当只指定一个类前缀时，大于类前缀的宽度默认符合类前缀所规定的份数，小于类前缀的宽度默认每个元素占12 份
+
+【案例：栅格系统的使用】
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- 一定不要忘记引入 bootstrap 的样式文件 -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.0.2/css/bootstrap.min.css"
+		/>
+		<title>06-栅格系统使用</title>
+		<!-- 修改 Bootstrap 原来的样式，由于权重问题，所以放在 link 后 -->
+		<style>
+			[class^="col"] {
+				border: 1px solid #ccc;
+			}
+
+			.row:nth-child(1) {
+				background-color: pink;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">1</div>
+				<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">2</div>
+				<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">3</div>
+				<div class="col-lg-3 col-md-4 col-sm-6 col-xs-12">4</div>
+			</div>
+
+			<!-- 如果孩子的份数相加等于 12 则孩子能占满整个的 container 的宽度 -->
+			<div class="row">
+				<!-- 当只指定一个类前缀时，大于类前缀的宽度默认符合类前缀所规定的份数，小于类前缀的宽度默认每个元素占12 份 -->
+				<div class="col-lg-6">1</div>
+				<div class="col-lg-2">2</div>
+				<div class="col-lg-2">3</div>
+				<div class="col-lg-2">4</div>
+			</div>
+
+			<!-- 如果孩子的份数相加 小于 12 则会？ 则占不满整个 container 的宽度会有空白 -->
+			<div class="row">
+				<div class="col-lg-6">1</div>
+				<div class="col-lg-2">2</div>
+				<div class="col-lg-2">3</div>
+				<div class="col-lg-1">4</div>
+			</div>
+
+			<!-- 如果孩子的份数相加 大于 12 则会？ 多于的那一列会另起一行显示 -->
+			<div class="row">
+				<div class="col-lg-6">1</div>
+				<div class="col-lg-2">2</div>
+				<div class="col-lg-2">3</div>
+				<div class="col-lg-3">4</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+```
+
+![](imgs/33685544665051722d8e31e867e72c34ad9f3902.gif)
+
+### ⭕3.3 列嵌套
+
+栅格系统内置的栅格系统将内容再次嵌套。简单理解就是一个列内再分成若干份小列。我们可以通过添加一个新的 `.row` 元素和一系列 `.col-sm-*` 元素到已经存在的 `.col-sm-*` 元素内。
+
+![](imgs/055d403df215ddaf6d2bb4b94f4fdc3dad30aeac.png)
+
+```html
+<!-- 列嵌套 -->
+<div class="col-sm-4">
+	<div class="row">
+		<div class="col-sm-6">小列</div>
+		<div class="col-sm-6">小列</div>
+	</div>
+</div>
+```
+
+【案例：列嵌套】
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<!-- 一定不要忘记引入 bootstrap 的样式文件 -->
+		<link
+			rel="stylesheet"
+			href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.0.2/css/bootstrap.min.css"
+		/>
+		<title>07-栅格系统列嵌套</title>
+		<style>
+			.row > div {
+				height: 50px;
+				background-color: pink;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="container">
+			<div class="row">
+				<div class="col-md-4">
+					<!-- 我们列嵌套最好加 1 个行 row 这样可以取消父元素的 padding 值，而且高度自动和父级一样高 -->
+					<div class="row">
+						<div class="col-md-4">a</div>
+						<div class="col-md-8">b</div>
+					</div>
+				</div>
+				<div class="col-md-4">2</div>
+				<div class="col-md-4">3</div>
+			</div>
+		</div>
+	</body>
+</html>
+
+```
+
+![](imgs/f13b2a1ff5139e5cac9095ab2441fa97cc76f6fa.gif)
+
+注：b 被 2 盖住了。
+
+### ⭕3.4 列偏移
+
+使用 `.col-md-offset-*` 类可以将列向右侧偏移。
+
+这些类实际是通过使用 `*` 选择器为当前元素增加了左侧的边距（margin）。
+
+![](imgs/e60403b2b95787b9f28bd1c654fba020071413d2.png)
+
+```html
+<!-- 列偏移 -->
+<div class="row">
+	<div class="col-lg-4">1</div>
+	<div class="col-lg-4 col-lg-offset-4">2</div>
+</div>
+```
+
+【案例：列偏移】
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <title>08-栅格系统列偏移</title>
+    <style>
+        .row div {
+            height: 50px;
+            background-color: pink;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">左侧</div>
+            <!-- 偏移的份数 就是 12 - 两个盒子的份数 = 6 -->
+            <div class="col-md-3 col-md-offset-6">右侧</div>
+        </div>
+        <div class="row">
+            <!-- 如果只有一个盒子 那么就偏移 = (12 - 8) / 2 -->
+            <div class="col-md-8 col-md-offset-2">中间盒子</div>
+        </div>
+
+    </div>
+</body>
+
+</html>
+```
+
+![](imgs/05a8759243f145798bfef12d8fdac45f8dfa0329.png)
+
+### ⭕3.5 列排序
+
+通过使用 `.col-md-push-*` 和 `.col-md-pull-*` 类就可以很容易的改变列（column）的顺序。
+
+![](imgs/a063e9518e98519868e94d37e56be34e1c1a9adc.png)
+
+```html
+<!-- 列排序 -->
+<div class="row">
+	<div class="col-lg-4 col-lg-push-8">左侧</div>
+	<div class="col-lg-8 col-lg-pull-4">右侧</div>
+</div>
+```
+
+【案例：列排序】
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <title>09-栅格系统列排序</title>
+    <style>
+        .row div {
+            height: 50px;
+            background-color: pink;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-push-8">左侧</div>
+            <div class="col-md-8 col-md-pull-4">右侧</div>
+        </div>
+    </div>
+</body>
+
+</html>
+```
+
+![](imgs/cdedf5ef00f02d816af4304396b714d5eb76f28b.png)
+
+## ⭕4.响应式工具
+
+为了加快对移动设备友好的页面开发工作，利用媒体查询功能，并使用这些工具类可以方便的针对不同设备展示或隐藏页面内容。
+
+![image-20220819230837972](imgs/d4525ba8d159395830fad331affde6f5654355ae.png)
+
+Bootstrap 其他（按钮、表单、表格）请参考 Bootstrap 文档。
+
+【案例：响应式工具】
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- 一定不要忘记引入 bootstrap 的样式文件 -->
+    <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css">
+    <title>10-栅格系统响应式工具</title>
+    <style>
+        .row div {
+            height: 300px;
+            background-color: purple;
+            
+        }
+
+        .row div:nth-child(3) {
+            background-color: pink;
+        }
+
+        span {
+            font-size: 50px;
+            color: #fff;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-3">
+                <span class="visible-lg">我会显示哦</span>
+            </div>
+            <div class="col-xs-3">2</div>
+            <div class="col-xs-3 hidden-md hidden-xs">我会变魔术哦</div>
+            <div class="col-xs-3">4</div>
+        </div>
+    </div>
+</body>
+
+</html>
+```
+
+![](imgs/562959b1ae404fc26182d182226c4387df6974fb.gif)
+
+## ⭕移动端技术选型
+
+- 流式布局（百分比布局）
+- flex 弹性布局（推荐）
+- rem 适配布局（推荐）
+- 响应式布局
+
+建议：我们选取一种主要技术选型，其他技术作为辅助，这种混合技术开发。
+
+# 23 【grid布局】
+
+## 1.概述
+
+网格布局（Grid）是最强大的 CSS 布局方案。
+
+它将网页划分成一个个网格，可以任意组合不同的网格，做出各种各样的布局。以前，只能通过复杂的 CSS 框架达到的效果，现在浏览器内置了。
+
+<img src="imgs/2729550f5b4e45483dd0521776047c455a544861.png" alt="img" style="zoom:50%;" />
+
+上图这样的布局，就是 Grid 布局的拿手好戏。
+
+Grid 布局与 Flex 布局有一定的相似性，都可以指定容器内多个项目的位置。但是它们也存在重大区别。
+
+Flex 布局是轴线布局，只能指定 “项目” 针对轴线的位置，可以看作是**一维布局**。Grid 布局则是将容器划分成 “行” 和 “列” 产生单元格，然后指定 “项目所在” 的单元格，可以看作是**二维布局**。Grid 布局远比 Flex 布局强大。
+
+> 目前 Grid 布局的浏览器兼容性不是太好，移动端比 PC 端要好得多。
+
+## 2.基本概念
+
+![webp](imgs/8967e17bdb9223a952bc90d8307b69f264fb1f75.jpg)
+
+### 2.1 容器和项目
+
+采用网格布局的区域，称为 “容器”（container）。容器内部采用网格定位的子元素，称为 “项目”（item）。
+
+```html
+<div>
+  <div><p>1</p></div>
+  <div><p>2</p></div>
+  <div><p>3</p></div>
+</div>
+```
+
+上面代码中，最外层的 `<div>` 元素就是容器，内层的三个 `<div>` 元素就是项目。
+
+注意：项目只能是容器的顶层子元素，不包含项目的子元素，比如上面代码的 `<p>` 元素就不是项目。Grid 布局只对项目生效。
+
+### 2.2 行和列
+
+容器里面的水平区域称为 “行”（row），垂直区域称为 “列”（column）。
+
+<img src="imgs/f33c8a992cb3b51f0a5a3e78cef3193163eb096b.png" alt="img" style="zoom:50%;" />
+
+上图中，水平的深色区域就是 “行”，垂直的深色区域就是 “列”。
+
+### 2.3 单元格
+
+行和列的交叉区域，称为 “单元格”（cell）。
+
+正常情况下，`n` 行和 `m` 列会产生 `n x m` 个单元格。比如，3 行 3 列会产生 9 个单元格。
+
+### 2.4 网格线
+
+划分网格的线，称为 “网格线”（grid line）。水平网格线划分出行，垂直网格线划分出列。
+
+正常情况下，`n` 行有 `n + 1` 根水平网格线，`m` 列有 `m + 1` 根垂直网格线，比如三行就有四根水平网格线。
+
+<img src="imgs/7530d44a520865ed6cf9f44c0480daaf2e843a2e.png" alt="img" style="zoom: 67%;" />
+
+上图是一个 4 x 4 的网格，共有 5 根水平网格线和 5 根垂直网格线。
+
+## 3.容器属性
+
+Grid 布局的属性分成两类。一类定义在容器上面，称为**容器属性**；另一类定义在项目上面，称为**项目属性**。这部分先介绍容器属性。
+
+### ⭕3.1 display 属性
+
+`display: grid` 指定一个容器采用网格布局。
+
+- 默认情况下，容器元素都是块级元素
+
+![img](imgs/15bc7e7000e8c29525336ffd00acf8fa5fd8cf60.png)
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title>默认情况下，容器元素都是块级元素</title>
+    <style>
+        span {
+            font-size: 2em;
+        }
+
+        #container {
+            display: grid;
+            /* grid-template-columns属性定义每一列的列宽 */
+            grid-template-columns: 50px 50px 50px;
+            /* grid-template-rows属性定义每一行的行高 */
+            grid-template-rows: 50px 50px 50px;
+        }
+
+        .item {
+            font-size: 2em;
+            text-align: center;
+            border: 1px solid #e5e4e9;
+        }
+
+        .item-1 {
+            background-color: #ef342a;
+        }
+
+        .item-2 {
+            background-color: #f68f26;
+        }
+
+        .item-3 {
+            background-color: #4ba946;
+        }
+
+        .item-4 {
+            background-color: #0376c2;
+        }
+
+        .item-5 {
+            background-color: #c077af;
+        }
+
+        .item-6 {
+            background-color: #f8d29d;
+        }
+
+        .item-7 {
+            background-color: #b5a87f;
+        }
+
+        .item-8 {
+            background-color: #d0e4a9;
+        }
+
+        .item-9 {
+            background-color: #4dc7ec;
+        }
+    </style>
+</head>
+<body>
+<span>foo</span>
+<div id="container">
+    <div class="item item-1">1</div>
+    <div class="item item-2">2</div>
+    <div class="item item-3">3</div>
+    <div class="item item-4">4</div>
+    <div class="item item-5">5</div>
+    <div class="item item-6">6</div>
+    <div class="item item-7">7</div>
+    <div class="item item-8">8</div>
+    <div class="item item-9">9</div>
+</div>
+<span>bar</span>
+</body>
+</html>
+```
+
+- 容器元素也可以设成行内元素。
+
+![img](imgs/f0cbf1115b811a2f03686463d7fd057675f9235e.png)
+
+```html
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+          name="viewport">
+    <meta content="ie=edge" http-equiv="X-UA-Compatible">
+    <title>容器元素也可以设置为行内元素</title>
+    <style>
+        span {
+            font-size: 2em;
+        }
+
+        #container {
+            display: inline-grid;
+            /* grid-template-columns属性定义每一列的列宽 */
+            grid-template-columns: 50px 50px 50px;
+            /* grid-template-rows属性定义每一行的行高 */
+            grid-template-rows: 50px 50px 50px;
+        }
+
+        .item {
+            font-size: 2em;
+            text-align: center;
+            border: 1px solid #e5e4e9;
+        }
+
+        .item-1 {
+            background-color: #ef342a;
+        }
+
+        .item-2 {
+            background-color: #f68f26;
+        }
+
+        .item-3 {
+            background-color: #4ba946;
+        }
+
+        .item-4 {
+            background-color: #0376c2;
+        }
+
+        .item-5 {
+            background-color: #c077af;
+        }
+
+        .item-6 {
+            background-color: #f8d29d;
+        }
+
+        .item-7 {
+            background-color: #b5a87f;
+        }
+
+        .item-8 {
+            background-color: #d0e4a9;
+        }
+
+        .item-9 {
+            background-color: #4dc7ec;
+        }
+    </style>
+</head>
+<body>
+<span>foo</span>
+<div id="container">
+    <div class="item item-1">1</div>
+    <div class="item item-2">2</div>
+    <div class="item item-3">3</div>
+    <div class="item item-4">4</div>
+    <div class="item item-5">5</div>
+    <div class="item item-6">6</div>
+    <div class="item item-7">7</div>
+    <div class="item item-8">8</div>
+    <div class="item item-9">9</div>
+</div>
+<span>bar</span>
+</body>
+</html>
+```
+
+> 注意，设为网格布局以后，容器子元素（项目）的 `float`、`display: inline-block`、`display: table-cell`、`vertical-align` 和 `column-*` 等设置都将失效。
+
+### ⭕3.2 grid-template-columns 属性，grid-template-rows 属性
+
+容器指定了网格布局以后，接着就要划分行和列。`grid-template-columns` 属性定义每一列的列宽，`grid-template-rows` 属性定义每一行的行高。
+
+> 若只指定了 `grid-template-columns`，没有指定 `grid-template-rows` 或是指定的  `grid-template-rows` 行数不够，那么浏览器会自动增加行以确保能装下容器里的所有项目（增加行的高度由浏览器自行决定，一般行的高度为：恰好能装下项目内容）。
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: 100px 100px 100px;
+  grid-template-rows: 100px 100px 100px;
+}
+```
+
+上面代码指定了一个三行三列的网格，列宽和行高都是 `100px`。
+
+<img src="imgs/7bda51a2a535c4d781a1c3a5f8a4aaa87de1adb8.png" alt="img" style="zoom:50%;" />
+
+除了使用绝对单位，也可以使用百分比。
+
+> 百分比是基于容器宽度的比例。
+
+```css
+.container {
+  display: grid;
+  /* 100 ÷ 3 ≈ 33.33333333333333（一般保留两位小数即可）*/
+  grid-template-columns: 33.33% 33.33% 33.33%;
+  grid-template-rows: 33.33% 33.33% 33.33%;
+}
+```
+
+**（1）repeat()**
+
+有时候，重复写同样的值非常麻烦，尤其网格很多时。这时，可以使用 `repeat()` 函数，简化重复的值。上面的代码用 `repeat()` 改写如下。
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: repeat(3, 33.33%);
+  grid-template-rows: repeat(3, 33.33%);
+}
+```
+
+`repeat()` 接受两个参数，第一个参数是重复的次数（上例是3），第二个参数是所要重复的值。
+
+`repeat()` 重复某种模式也是可以的。
+
+```css
+grid-template-columns: repeat(2, 100px 20px 80px);
+/* 100px 20px 80px 100px 20px 80px */
+```
+
+上面代码定义了 6 列，第一列和第四列的宽度为 `100px`，第二列和第五列为 `20px`，第三列和第六列为 `80px`。
+
+<img src="imgs/0ac7a520f35bac1cde134c0974f4760deb7a7c23.png" alt="img" style="zoom:50%;" />
+
+**（2）auto-fill 关键字**
+
+有时，单元格的大小是固定的，但是容器的大小不确定。如果希望每一行（或每一列）容纳尽可能多的单元格，这时可以使用 `auto-fill` 关键字表示自动填充。
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 100px);
+}
+```
+
+上面代码表示每列宽度 `100px`，然后自动填充，直到容器不能放置更多的列，然后换行继续依次排列。
+
+<img src="imgs/bb329a4740bf0330af65f903ad136ed6da0c9dab.png" alt="img" style="zoom:50%;" />
+
+**（3）fr 关键字**
+
+`fr`：剩余空间分配数。fr单位被用于在一系列长度值中分配剩余空间，如果多个已指定了多个部分，则剩下的空间根据各自的数字按比例分配。
+简单来说fr就是讲剩余空间等比例划分，然后将剩余空间按照一定的比例分给容器。
+
+如果两列的宽度分别为 `1fr` 和 `2fr`，就表示后者是前者的两倍。
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+```
+
+上面代码表示两个相同宽度的列。
+
+<img src="imgs/de3dc2e7a33393de88ba844a8e26c29a63469f58.png" alt="img" style="zoom: 33%;" />
+
+`fr` 可以与绝对长度的单位结合使用，这时会非常方便。
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: 150px 1fr 2fr;
+}
+```
+
+上面代码表示，第一列的宽度为 150 像素，第二列的宽度是第三列的一半。
+
+<img src="imgs/0d69856921eb1c34a39ccc423ee2753bdbf864f1.png" alt="image-20220227180532881" style="zoom:33%;" />
+
+**（4）minmax()**
+
+`minmax()` 函数产生一个长度范围，表示长度就在这个范围之中。它接受两个参数，分别为最小值和最大值。
+
+```css
+grid-template-columns: 1fr 1fr minmax(100px, 1fr);
+```
+
+上面代码中，`minmax(100px, 1fr)` 表示列宽不小于 `100px`，不大于 `1fr`。
+
+![1](imgs/19bd0f1c75ed0ce732cb30a8c13a91ea5fe8b695.gif)
+
+**（5）auto 关键字**
+
+`auto` 关键字表示由浏览器自己决定长度。
+
+```css
+grid-template-columns: 100px auto 100px;
+```
+
+上面代码中，第二列的宽度，基本上等于该列单元格的最大宽度，除非单元格内容设置了 `min-width`，且这个值大于最大宽度。
+
+**（6）网格线的名称**
+
+`grid-template-columns` 属性和 `grid-template-rows` 属性里面，还可以使用方括号，指定每一根网格线的名字，方便以后的引用。
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: [c1] 100px [c2] 100px [c3] auto [c4];
+  grid-template-rows: [r1] 100px [r2] 100px [r3] auto [r4];
+}
+```
+
+上面代码指定网格布局为 3 行 3 列，因此有 4 根垂直网格线和 4 根水平网格线。方括号里面依次是这八根线的名字。
+
+网格布局允许同一根线有多个名字，比如 `[fifth-line row-5]`。
+
+**（7）布局实例**
+
+`grid-template-columns` 属性对于网页布局非常有用。两栏式布局只需要一行代码。
+
+```css
+.wrapper {
+  display: grid;
+  grid-template-columns: 70% 30%;
+}
+```
+
+上面代码将左边栏设为 70%，右边栏设为 30%。
+
+传统的十二网格布局，写起来也很容易。
+
+```css
+grid-template-columns: repeat(12, 1fr);
+```
+
+### ⭕3.3 grid-row-gap 属性，grid-column-gap 属性，grid-gap 属性
+
+`grid-row-gap` 属性设置行与行的间隔（行间距），`grid-column-gap` 属性设置列与列的间隔（列间距）。
+
+```css
+.container {
+  grid-row-gap: 20px;
+  grid-column-gap: 20px;
+}
+```
+
+上面代码中，`grid-row-gap` 用于设置行间距，`grid-column-gap` 用于设置列间距。
+
+<img src="imgs/ab2d32f340b80ea9a3d5414f296945ba8621eb70.png" alt="img" style="zoom:50%;" />
+
+`grid-gap` 属性是 `grid-column-gap` 和 `grid-row-gap` 的合并简写形式，语法如下。
+
+```css
+grid-gap: <grid-row-gap> <grid-column-gap>;
+```
+
+因此，上面一段 CSS 代码等同于下面的代码。
+
+```css
+.container {
+  grid-gap: 20px 20px;
+}
+```
+
+如果 `grid-gap` 省略了第二个值，浏览器认为第二个值等于第一个值。
+
+> 根据最新标准，上面三个属性名的 `grid-` 前缀已经删除，`grid-column-gap` 和 `grid-row-gap` 写成 `column-gap` 和 `row-gap`，`grid-gap` 写成 `gap`。
+
+### ⭕3.4 grid-template-areas 属性
+
+网格布局允许指定 “区域”（area），一个区域由单个或多个单元格组成。`grid-template-areas` 属性用于定义区域。
+
+```css
+.container {
+  display: grid;
+  grid-template-columns: 100px 100px 100px;
+  grid-template-rows: 100px 100px 100px;
+  grid-template-areas: 'a b c'
+                       'd e f'
+                       'g h i';
+}
+```
+
+上面代码先划分出9个单元格，然后将其定名为 `a` 到 `i` 的九个区域，分别对应这九个单元格。
+
+多个单元格合并成一个区域的写法如下。
+
+```css
+grid-template-areas: 'a a a'
+                     'b b b'
+                     'c c c';
+```
+
+上面代码将 9 个单元格分成 `a`、`b`、`c` 三个区域。
+
+下面是一个布局实例。
+
+```css
+grid-template-areas: "header header header"
+                     "main main sidebar"
+                     "footer footer footer";
+```
+
+上面代码中，顶部是页眉区域 `header`，底部是页脚区域 `footer`，中间部分则为 `main` 和 `sidebar`。
+
+如果某些区域不需要利用，则使用 “点”（`.`）表示。
+
+```css
+grid-template-areas: 'a . c'
+                     'd . f'
+                     'g . i';
+```
+
+上面代码中，中间一列为点，表示没有用到该单元格，或者该单元格不属于任何区域。
+
+> 注意，区域的命名会影响到网格线。每个区域的起始网格线，会自动命名为 `区域名-start`，终止网格线自动命名为 `区域名-end`。
+>
+> 比如，区域名为 `header`，则起始位置的水平网格线和垂直网格线叫做 `header-start`，终止位置的水平网格线和垂直网格线叫做 `header-end`。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>区域</title>
+    <style>
+        .container {
+            width: 980px;
+            height: 600px;
+            margin: 10px auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            grid-template-areas:
+                                "header header header"
+                                "main main sidebar"
+                                "footer footer footer";
+        }
+
+        .header {
+            grid-area: header;
+            background-color: red;
+        }
+
+        .main {
+            grid-area: main;
+            background-color: green;
+        }
+
+        .sidebar {
+            grid-area: sidebar;
+            background-color: blue;
+        }
+
+        .footer {
+            grid-area: footer;
+            background-color: gray;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header"></div>
+    <div class="main"></div>
+    <div class="sidebar"></div>
+    <div class="footer"></div>
+</div>
+</body>
+</html>
+```
+
+![image-20220227184302178](imgs/81a3c64d60d7a2c8111ea0404ad4b3ca983044b5.png)
+
+### ⭕3.5 grid-auto-flow 属性
+
+划分网格以后，容器的子元素会按照顺序，自动放置在每一个网格。默认的放置顺序是 “先行后列”，即先填满第一行，再开始放入第二行，即下图数字的顺序。
+
+<img src="imgs/7bda51a2a535c4d781a1c3a5f8a4aaa87de1adb8.png" alt="img" style="zoom:50%;" />
+
+这个顺序由 `grid-auto-flow` 属性决定，默认值是 `row`，即 “先行后列”。也可以将它设成 `column`，变成 “先列后行”。
+
+```css
+grid-auto-flow: column;
+```
+
+上面代码设置了 `column` 以后，放置顺序就变成了下图。
+
+<img src="imgs/720f94e4f0fcf584362634a6e9a011c99fde4dd3.png" alt="img" style="zoom:50%;" />
+
+`grid-auto-flow` 属性除了设置成 `row` 和 `column`，还可以设成 `row dense` 和 `column dense`。这两个值主要用于，某些项目指定位置以后，剩下的项目怎么自动放置。
+
+下面的例子让 1 号项目和 2 号项目各占据两个单元格，然后在默认的 `grid-auto-flow: row` 情况下，会产生下面这样的布局。
+
+<img src="imgs/e7b63c4e053828a45ff96705907f44b3c85cc7d0.png" alt="img" style="zoom:50%;" />
+
+上图中，1 号项目后面的位置是空的，这是因为 3 号项目默认跟着 2 号项目，所以会排在 2 号项目后面。
+
+现在修改设置，设为 `row dense`，表示 “先行后列”，并且尽可能紧密填满，尽量不出现空格。
+
+```css
+grid-auto-flow: row dense;
+```
+
+上面代码的效果如下。
+
+<img src="imgs/54b532fbca61efb06b09c8e3b62dea2ceaa5b1ca.png" alt="img" style="zoom:50%;" />
+
+上图会先填满第一行，再填满第二行，所以 3 号项目就会紧跟在 1 号项目的后面。8 号项目和 9 号项目就会排到第四行。
+
+如果将设置改为 `column dense`，表示 “先列后行”，并且尽量填满空格。
+
+```css
+grid-auto-flow: column dense;
+```
+
+上面代码的效果如下。
+
+<img src="imgs/7d32bdff8491eb68e07b45cafcad42021b545d2d.png" alt="img" style="zoom:50%;" />
+
+上图会先填满第一列，再填满第 2 列，所以 3 号项目在第一列，4 号项目在第二列。8 号项目和 9 号项目被挤到了第四列。
+
+### ⭕3.6 justify-items 属性，align-items 属性，place-items 属性
+
+`justify-items` 属性设置单元格内容的水平位置（左中右），`align-items` 属性设置单元格内容的垂直位置（上中下）。
+
+```css
+.container {
+  justify-items: start | end | center | stretch;
+  align-items: start | end | center | stretch;
+}
+```
+
+这两个属性的写法完全相同，都可以取下面这些值。
+
+> - start：对齐单元格的起始边缘。
+> - end：对齐单元格的结束边缘。
+> - center：单元格内部居中。
+> - stretch：拉伸，占满单元格的整个宽度（默认值）。
+
+```css
+.container {
+  justify-items: start;
+}
+```
+
+上面代码表示，单元格的内容左对齐，效果如下图。
+
+![img](imgs/4bfb4eb6d827eb24072f94cf2fa744534b8f7b6d.png)
+
+```css
+.container {
+  align-items: start;
+}
+```
+
+上面代码表示，单元格的内容头部对齐，效果如下图。
+
+![img](imgs/501ac28d9e1306c1dfc3af381bc1f1d1b2a4d345.png)
+
+`place-items` 属性是 `align-items` 属性和 `justify-items` 属性的合并简写形式。
+
+```css
+place-items: <align-items> <justify-items>;
+```
+
+下面是一个例子。
+
+```css
+place-items: start end;
+```
+
+如果省略第二个值，则浏览器认为与第一个值相等。
+
+### ⭕3.7 justify-content 属性，align-content 属性，place-content 属性
+
+`justify-content` 属性是整个内容区域在容器里面的水平位置（左中右），`align-content` 属性是整个内容区域的垂直位置（上中下）。
+
+```css
+.container {
+	justify-content: start | end | center | stretch | space-around | space-between | space-evenly;
+	align-content: start | end | center | stretch | space-around | space-between | space-evenly;  
+}
+```
+
+这两个属性的写法完全相同，都可以取下面这些值。（下面的图都以 `justify-content` 属性为例，`align-content` 属性的图完全一样，只是将水平方向改成垂直方向。）
+
+> - start - 对齐容器的起始边框。
+
+![img](imgs/af4a3d2bbfd66c22785b3682d26ed6726fabfbcd.png)
+
+> - end - 对齐容器的结束边框。
+
+![img](imgs/e31f94bb725893d6a55f37001ca1e733243d83ea.png)
+
+> - center - 容器内部居中。
+
+![img](imgs/2d3d12d17283e06deb570eecb29a2cc1e3a77955.png)
+
+> - stretch - 项目大小没有指定时，拉伸占据整个网格容器。
+
+![img](imgs/ba90587fff83e94d0513aeb8bdeb106087a50391.png)
+
+> - space-around - 每个项目两侧的间隔相等。所以，项目之间的间隔比项目与容器边框的间隔大一倍。
+
+![img](imgs/6e3c96971ff12f5928ce75f0cc6c94ab00272d4d.png)
+
+> - space-between - 项目与项目的间隔相等，项目与容器边框之间没有间隔。
+
+![img](imgs/5c874eb112fdb09b5398bc37d9420c7add488aa9.png)
+
+> - space-evenly - 项目与项目的间隔相等，项目与容器边框之间也是同样长度的间隔。
+
+![img](imgs/6fab85e3fba58e5a6e5ac13a749d0969a646306e.png)
+
+`place-content` 属性是 `align-content` 属性和 `justify-content` 属性的合并简写形式。
+
+```css
+place-content: <align-content> <justify-content>
+```
+
+下面是一个例子。
+
+```css
+place-content: space-around space-evenly;
+```
+
+如果省略第二个值，浏览器就会假定第二个值等于第一个值。
+
+### ⭕3.8 grid-auto-columns 属性，grid-auto-rows 属性
+
+有时候，一些项目的指定位置，在现有网格的外部。比如网格只有 3 行，但是某一个项目指定在第 5 行。这时，浏览器会自动生成多余的网格，以便放置项目。
+
+`grid-auto-columns` 属性和 `grid-auto-rows` 属性用来设置，浏览器自动创建的多余网格的列宽和行高。它们的写法与 `grid-template-columns` 和 `grid-template-rows` 完全相同。如果不指定这两个属性，浏览器完全根据单元格内容的大小，决定新增网格的列宽和行高。
+
+下面的例子里面，划分好的网格是 3 行 3 列，但是，8 号项目指定在第 4 行，9 号项目指定在第 5 行。
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>grid-auto</title>
+    <style>
+        #container {
+            display: grid;
+            grid-template-columns: 100px 100px 100px;
+            grid-template-rows: 100px 100px 100px;
+            grid-auto-rows: 50px;
+        }
+
+        .item {
+            font-size: 2em;
+            text-align: center;
+            border: 1px solid #e5e4e9;
+        }
+
+        .item-1 {
+            background-color: #ef342a;
+        }
+
+        .item-2 {
+            background-color: #f68f26;
+        }
+
+        .item-3 {
+            background-color: #4ba946;
+        }
+
+        .item-4 {
+            background-color: #0376c2;
+        }
+
+        .item-5 {
+            background-color: #c077af;
+        }
+
+        .item-6 {
+            background-color: #f8d29d;
+        }
+
+        .item-7 {
+            background-color: #b5a87f;
+        }
+
+        .item-8 {
+            background-color: #d0e4a9;
+            grid-row-start: 4;
+            grid-column-start: 2;
+        }
+
+        .item-9 {
+            background-color: #4dc7ec;
+            grid-row-start: 5;
+            grid-column-start: 3;
+        }
+    </style>
+</head>
+<body>
+<div id="container">
+    <div class="item item-1">1</div>
+    <div class="item item-2">2</div>
+    <div class="item item-3">3</div>
+    <div class="item item-4">4</div>
+    <div class="item item-5">5</div>
+    <div class="item item-6">6</div>
+    <div class="item item-7">7</div>
+    <div class="item item-8">8</div>
+    <div class="item item-9">9</div>
+</div>
+</body>
+</html>
+```
+
+上面代码指定新增的行高统一为 50px（原始的行高为 100px）。
+
+<img src="imgs/ca1fb291705d46ee27c028b27331fad282aab498.png" alt="img" style="zoom:50%;" />
+
+### ⭕3.9 grid-template 属性，grid 属性
+
+`grid-template` 属性是 `grid-template-columns`、`grid-template-rows` 和 `grid-template-areas` 这三个属性的合并简写形式。
+
+`grid` 属性是 `grid-template-rows`、`grid-template-columns`、`grid-template-areas`、 `grid-auto-rows`、`grid-auto-columns`、`grid-auto-flow` 这六个属性的合并简写形式。
+
+从易读易写的角度考虑，还是建议不要合并属性，所以这里就不详细介绍这两个属性了。
+
+## 4.项目属性
+
+> 下面这些属性定义在项目上面。
+
+### ⭕4.1 grid-column-start 属性，grid-column-end 属性，grid-row-start 属性，grid-row-end 属性
+
+项目的位置是可以指定的，具体方法就是指定项目的四个边框，分别定位在哪根网格线。
+
+- `grid-column-start` 属性：左边框所在的垂直网格线
+- `grid-column-end` 属性：右边框所在的垂直网格线
+- `grid-row-start` 属性：上边框所在的水平网格线
+- `grid-row-end` 属性：下边框所在的水平网格线
+
+```css
+.item-1 {
+  grid-column-start: 2;
+  grid-column-end: 4;
+}
+```
+
+上面代码指定，1 号项目的左边框是第二根垂直网格线，右边框是第四根垂直网格线。
+
+<img src="imgs/efa5d993b2a3296b7b14dbdb16a6bc0c379ded53.png" alt="img" style="zoom:50%;" />
+
+上图中，只指定了 1 号项目的左右边框，没有指定上下边框，所以会采用默认位置，即上边框是第一根水平网格线，下边框是第二根水平网格线。
+
+除了 1 号项目以外，其他项目都没有指定位置，由浏览器自动布局，这时它们的位置由容器的 `grid-auto-flow` 属性决定，这个属性的默认值是 `row`，因此会 “先行后列” 进行排列。读者可以把这个属性的值分别改成 `column`、`row dense` 和 `column dense`，看看其他项目的位置发生了怎样的变化。
+
+下面的例子是指定四个边框位置的效果。
+
+```css
+.item-1 {
+    grid-column-start: 1;
+    grid-column-end: 3;
+    grid-row-start: 2;
+    grid-row-end: 4;
+}
+```
+
+<img src="imgs/9520dddf1a9772b9422709b79025e72c2981aed6.png" alt="img" style="zoom:50%;" />
+
+这四个属性的值，除了指定为第几个网格线，还可以指定为网格线的名字。
+
+```css
+.item-1 {
+  grid-column-start: header-start;
+  grid-column-end: header-end;
+}
+```
+
+上面代码中，左边框和右边框的位置，都指定为网格线的名字。
+
+这四个属性的值还可以使用 `span` 关键字，表示 “跨越”，即左右边框（上下边框）之间跨越多少个网格。
+
+```css
+.item-1 {
+  grid-column-start: span 2;
+}
+```
+
+上面代码表示，1 号项目的左边框距离右边框跨越 2 个网格。
+
+<img src="imgs/a79f91fb10774fb02ff9eda1b4138fa56de415b7.png" alt="img" style="zoom:50%;" />
+
+这与下面的代码效果完全一样。
+
+```css
+.item-1 {
+  grid-column-end: span 2;
+}
+```
+
+> 使用这四个属性，如果产生了项目的重叠，则使用 `z-index` 属性指定项目的重叠顺序。
+>
+> > 在 CSS Grid 布局中，我们可以通过网格项目放置的方式，让不同的元素重叠在一起，并且通过 CSS 的 `z-index` 来控制网格项目在 `z` 轴上的层叠顺序。也就是说，以往需要使用 CSS 的 [`position` 的绝对定位（`absolute`）来实现的布局](https://www.w3cplus.com/css/css-position-and-z-index.html)，现在可以直接使用 CSS Grid 来解决。
+> > 原文: https://www.w3cplus.com/css/overlapping-grid-layout.html © [w3cplus.com](https://www.w3cplus.com/)
+> >
+> > <img src="imgs/73ae3caba94597aa5377e324421870fd1a8fa56d.jpg" alt="img" style="zoom: 25%;" />
+> >
+> > <img src="imgs/344d017f370f6a8a386d339c281396d49775afeb.jpg" alt="img" style="zoom:25%;" />
+
+### ⭕4.2 grid-column 属性，grid-row 属性
+
+`grid-column` 属性是 `grid-column-start` 和 `grid-column-end` 的合并简写形式，`grid-row` 属性是`grid-row-start` 属性和 `grid-row-end` 的合并简写形式。
+
+```css
+.item {
+  grid-column: <start-line> / <end-line>;
+  grid-row: <start-line> / <end-line>;
+}
+```
+
+下面是一个例子。
+
+```css
+.item-1 {
+  grid-column: 1 / 3;
+  grid-row: 1 / 2;
+}
+/* 等同于 */
+.item-1 {
+  grid-column-start: 1;
+  grid-column-end: 3;
+  grid-row-start: 1;
+  grid-row-end: 2;
+}
+```
+
+上面代码中，项目 `item-1` 占据第一行，从第一根列线到第三根列线。
+
+这两个属性之中，也可以使用 `span` 关键字，表示跨越多少个网格。
+
+```css
+.item-1 {
+  background: #b03532;
+  grid-column: 1 / 3;
+  grid-row: 1 / 3;
+}
+/* 等同于 */
+.item-1 {
+  background: #b03532;
+  grid-column: 1 / span 2;
+  grid-row: 1 / span 2;
+}
+```
+
+上面代码中，项目 `item-1` 占据的区域，包括第一行 + 第二行、第一列 + 第二列。
+
+<img src="imgs/9d9e0bb28aaf2773c7e7248e4328f1ffff0d5e69.png" alt="img" style="zoom:50%;" />
+
+斜杠以及后面的部分可以省略，默认跨越一个网格。
+
+```css
+.item-1 {
+  grid-column: 1;
+  grid-row: 1;
+}
+```
+
+上面代码中，项目 `item-1` 占据左上角第一个网格。
+
+### ⭕4.3 grid-area 属性
+
+`grid-area` 属性指定项目放在哪一个区域。
+
+```css
+.item-1 {
+    grid-area: e;
+}
+```
+
+上面代码中，1 号项目位于 `e` 区域，效果如下图。
+
+<img src="imgs/9ab03a62905e1159d9dd9f61caea448a66954805.png" alt="img" style="zoom:50%;" />
+
+`grid-area` 属性还可用作 `grid-row-start`、`grid-column-start`、`grid-row-end`、`grid-column-end` 的合并简写形式，直接指定项目的位置。
+
+```css
+.item {
+	grid-area: <row-start> / <column-start> / <row-end> / <column-end>;
+}
+```
+
+下面是一个例子。
+
+```css
+.item-1 {
+  grid-area: 1 / 1 / 3 / 3;
+}
+```
+
+<img src="imgs/5ecb9ee008a2f1ee5691bd6256f94e7a0f092671.png" alt="image-20220228102207300" style="zoom: 33%;" />
+
+### ⭕4.4 justify-self 属性，align-self 属性，place-self 属性
+
+`justify-self` 属性设置单元格内容的水平位置（左中右），跟 `justify-items` 属性的用法完全一致，但只作用于单个项目。
+
+`align-self` 属性设置单元格内容的垂直位置（上中下），跟 `align-items` 属性的用法完全一致，也是只作用于单个项目。
+
+```css
+.item {
+    justify-self: start | end | center | stretch;
+    align-self: start | end | center | stretch;
+}
+```
+
+这两个属性都可以取下面四个值。
+
+- start：对齐单元格的起始边缘。
+- end：对齐单元格的结束边缘。
+- center：单元格内部居中。
+- stretch：拉伸，占满单元格的整个宽度（默认值）。
+
+下面是 `justify-self: start` 的例子。
+
+```css
+.item-1  {
+    justify-self: start;
+}
+```
+
+<img src="imgs/d97149ca810107414bd95d92c73fe2ef67d3dc27.png" alt="image-20230130145300501" style="zoom: 50%;" />
+
+`place-self` 属性是 `align-self` 属性和 `justify-self` 属性的合并简写形式。
+
+```css
+place-self: <align-self> <justify-self>;
+```
+
+下面是一个例子。
+
+```css
+place-self: center center;
+```
+
+如果省略第二个值，`place-self` 属性会认为这两个值相等。
+
+## 5.grid 布局工具
+
+[零代码 - 在线快速设计CSS网页布局 (lingdaima.com)](https://www.lingdaima.com/grid/)
+
+![image-20220228120835928](imgs/13a0a3f27542882e8eac074663e83b3f2faac8a0.png)
