@@ -341,3 +341,114 @@ npx hardhat run scripts/deploy.js --network testnet
 ![image-20231104224221923](imgs/image-20231104224221923.png)
 
 可以前往测试网浏览器查看detail
+
+---
+
+## 六、测试驱动开发 TDD
+
+测试驱动开发(Test Driven Development)，是一种不同于传统软件开发流程的新型的开发方法。它要求在编写某个功能的代码之前先编写测试代码，然后只编写使测试通过的功能代码通过测试来推动整个开发的进行。这有助于编写简洁可用和高质量的代码，并加速开发过程。
+
+![image-20231107093513852](imgs/image-20231107093513852.png)
+
+TDD流程：
+
+<img src="imgs/image-20231107093949946.png" alt="image" width="70%" height="70%">
+
+### 测试驱动开发的好处
+
+- 降低开发者负担
+- 保护网
+- 提前澄清需求
+- 快速反馈
+
+---
+
+### 实施测试驱动开发的要点
+
+1. 分析问题并拆分：把问题分解成一个个可以操作的任务
+2. 代码设计：规划、设计功能的实现
+
+### 案例演示
+
+**功能设计：**
+
+1. 可以查看总共有多少信件
+2. 当有新的信件到来时，总信件数 + 1
+3. 存储信件内容并可查看
+4. 存储信件发送人并可查看
+
+JS测试代码：
+
+```js
+const { expect } = require("chai");
+const { ethers } = require("hardhat");
+
+describe("Mailbox", async () => {
+	it("should get mailbox contract", async () => {
+		const mailboxContract = await ethers.getContractFactory("Mailbox");
+	});
+
+	it("should get total letters in the box", async () => {
+		const mailboxContract = await ethers.getContractFactory("Mailbox");
+		const mailbox = await mailboxContract.deploy();
+
+		expect(await mailbox.totalLetters()).to.equal(0);
+	});
+
+	it("should increase by one when get new letter", async () => {
+		const mailboxContract = await ethers.getContractFactory("Mailbox");
+		const mailbox = await mailboxContract.deploy();
+
+		await mailbox.write("hello");
+		expect(await mailbox.totalLetters()).to.equal(1);
+	});
+
+	it("should get mail contract", async () => {
+		const mailboxContract = await ethers.getContractFactory("Mailbox");
+		const mailbox = await mailboxContract.deploy();
+
+		await mailbox.write("hello");
+		const letters = await mailbox.read();
+		expect(letters[0].letter).to.equal("hello");
+	});
+
+	it("should get mail sender", async () => {
+		const mailboxContract = await ethers.getContractFactory("Mailbox");
+		const mailbox = await mailboxContract.deploy();
+
+		await mailbox.write("hello");
+		const letters = await mailbox.read();
+		expect(letters[0].sender).to.equal(
+			"0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+		);
+	});
+});
+```
+
+合约代码：
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.19;
+
+contract Mailbox {
+    uint public totalLetters;
+
+    struct Letter {
+        string letter;
+        address sender;
+    }
+
+    Letter[] private letters;
+
+    function write(string memory letter) public {
+        letters.push(Letter(letter, msg.sender));
+        totalLetters++;
+    }
+
+    function read() public view returns (Letter[] memory) {
+        return letters;
+    }
+}
+```
+
