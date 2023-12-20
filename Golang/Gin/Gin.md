@@ -70,6 +70,14 @@ ginServer.Use(favicon.New("./皮卡丘.ico"))
 
 RESTful API是一种API代码风格
 
+RESTful风格的主要特点包括：
+
+- 资源（Resources）：将应用程序的功能和数据抽象为资源，每个资源都有一个唯一的标识符（URI）。
+- 统一接口（Uniform Interface）：使用统一的HTTP方法（GET、POST、PUT、DELETE等）对资源进行操作，通过不同的HTTP方法来表示不同的操作。
+- 无状态（Stateless）：每个请求都是独立的，服务器不会存储客户端的状态信息，每个请求都包含足够的信息来处理请求。
+- 按需响应（Response on Demand）：服务器根据客户端的请求，按需返回资源的表示形式（如JSON、XML等）。
+- 超媒体驱动（HATEOAS）：通过在响应中包含超链接，使客户端能够动态地发现和访问相关资源。
+
 以前写网站：
 
 ```go

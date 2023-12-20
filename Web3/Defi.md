@@ -375,8 +375,429 @@ contract CPAMM {
 
 3. 手续费部分给项目方：
 
-   ![image-20231106222202788](imgs/image-20231106222202788.png)
+   ![image-20231107110643489](imgs/image-20231107110643489.png)
 
 ​		其中的比例在第一种方案中为1，在第二种方案中为0。
 
-​		
+​		UniswapV2Pair合约中的代码，其中的phi比例为1/6：
+
+![image-20231107105317345](imgs/image-20231107105317345.png)
+
+​	mintFee代表手续费开关，如果打开需要将手续费的一部分分给自己。
+
+---
+
+### Spot Price
+
+在加密货币市场中，Spot Price 通常是指某个加密货币在当前市场上的即时价格。这个价格可以通过各种加密货币交易所或市场数据提供商获取。Spot Price 可以用于计算加密货币的市值、波动率和其他指标，也可以用于进行加密货币交易和投资决策。
+
+由`x * y = （x + dx) * (y - dy)`中得到的`p0：y / x`与`p1：dy / dx`，则 p0 与 p1 的差价就是滑点，当dx不断增大时，你所获得的dy所对应的代币可能会低于市场价的价格。所以大额用户想要提交就要注意对池子的影响以及需要提高滑点。
+
+#### TWAP
+
+TWAP 全称是 time-weighted average price（时间加权平均价格）。它是一种定价算法，用于计算特定时期内资产的平均价格。在 DeFi 中，一种称为自动做市商 (AMM) 的去中心化交易所 (DEX) 可用于生成可在其他协议中使用的 TWAP 价格。 TWAP 也可以用来指用于执行大批量订单的交易策略，通过在设定的时间内将其分成相等的部分，以最大限度地减少滑点。
+
+**TWAP是如何被计算的：**
+
+![image-20231107193119539](imgs/image-20231107193119539.png)
+
+**写一个智能合约：**
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity 0.6.6;
+
+import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
+import "@uniswap/lib/contracts/libraries/FixedPoint.sol";
+import "@uniswap/v2-periphery/contracts/libraries/UniswapV2OracleLibrary.sol";
+import "@uniswap/v2-periphery/contracts/libraries/UniswapV2Library.sol";
+
+
+contract UniswapV2TWAP {
+    using FixedPoint for *;
+
+    uint public constant PERIOD = 1 hours;
+
+    IUniswapV2Pair public immutable pair;
+    address public immutable token0;
+    address public immutable token1;
+
+    uint public price0CumulativeLast;
+    uint public price1CumulativeLast;
+    uint public blockTimestampLast;
+
+    FixedPoint.uq112x112 public price0Average;
+    FixedPoint.uq112x112 public price1Average;
+
+    constructor(IUniswapV2Pair _pair) public {
+        pair = IUniswapV2Pair(_pair);
+        token0 = _pair.token0();
+        token1 = _pair.token1();
+        price0CumulativeLast = _pair.price0CumulativeLast();
+        price1CumulativeLast = _pair.price1CumulativeLast();
+        (, , blockTimestampLast)= _pair.getReserves();
+    }
+
+    function update() external {
+       (
+           uint price0Cumulative,
+           uint price1Cumulative,
+           uint32 blockTimestamp
+       ) = UniswapV2OracleLibrary.currentCumulativePrices(address(pair));
+
+       uint timeElapsed = blockTimestamp - blockTimestampLast;
+       require(timeElapsed > 1 hours, "time elapsed < 1h");
+
+       price0Average = FixedPoint.uq112x112(
+           uint224((price0Cumulative - price0CumulativeLast) / timeElapsed)
+           );
+        price1Average = FixedPoint.uq112x112(
+           uint224((price1Cumulative - price1CumulativeLast) / timeElapsed)
+           );
+
+        price0CumulativeLast = price0Cumulative;
+        price1CumulativeLast = price1Cumulative;
+        blockTimestampLast = blockTimestamp;
+    }
+
+    function consult(address token, uint amountIn) 
+       external view returns(uint amountOut) {
+           require(token == token0 || token == token1);
+           if (token == token0) {
+               amountOut = price0Average.mul(amountIn).decode144();
+           } else {
+               amountOut = price1Average.mul(amountIn).decode144();
+           }
+       }
+
+}
+```
+
+---
+
+## 五、计算无常损失
+
+![image-20231108110042182](imgs/image-20231108110042182.png)
+
+因为添加了流动性，无论是在涨价还是降价，都会导致无常损失的产生。
+
+![image-20231108141136755](imgs/image-20231108141136755.png)
+
+## 六、Flash Swaps
+
+### Flash Swaps
+
+Flash Swaps 是一种 DeFi（去中心化金融）交易模式，它允许用户在不需要提供任何抵押品的情况下进行借贷和交易。Flash Swap 的基本原理是利用智能合约在同一笔交易中进行借贷和交易，从而实现无需抵押品的借贷和交易：
+
+![image-20231108141337151](imgs/image-20231108141337151.png)
+
+**使用 Flash Swaps 加杠杆：**
+用户持有3个ETH，每个ETH到价格为200DAl，抵押率为150%。用户想要2倍杠杆
+
+1. 添加3ETH到Maker Vault
+2. 借出400DAI出来
+3. 在Uniswap 把DAI换成ETH
+4. 重复1-3步
+
+Flash Swap：
+
+1. 跟Uniswap借3个ETH
+2. 把用户的3个ETH和借的3个ETH抵押到Maker Vault
+3. 借出800个DAI出来
+4. 还给Uniswap 600DAI
+
+---
+
+### Uniswap代码结构
+
+**Uniswap主要合约的交互：**
+
+![image-20231108160150498](imgs/image-20231108160150498.png)
+
+**查看K线：**
+
+[Uniswap INFO](https://info.uniswap.org/)
+
+![image-20231108160515896](imgs/image-20231108160515896.png)
+
+Uniswap的后端使用 [The Graph](https://thegraph.com/explorer) 来查询数据，比如上面图中K线的生成。
+
+![image-20231108162220604](imgs/image-20231108162220604.png)
+
+---
+
+### Uniswap V2 总结
+
+一个核心：CPAMM
+
+三个操作：添加流动性 / 加密资产交易 / 移除流动性
+
+几个概念：手续费 / Price Oracle / TWAP / Flash Swaps / 无常损失 / 滑点 等
+
+## 七、Uniswap V3
+
+### Uniswap V3 的改进
+
+1. 提高资金利用率（集中流动性），增加LP深度
+2. 增强价格预言机的方便性与准确性
+3. 灵活的手续费收取机制（0.05%/0.3%/1%）
+
+---
+
+### Concentrated Liquidity 集中流动性
+
+概念解释：
+
+只在某个价格区间内提供流动性
+
+![image-20231108204728311](imgs/image-20231108204728311.png)
+
+案例：
+
+设，
+
+c（10，200），Pc = 20；
+
+b（5， 400），Pb = 80；
+
+a（20，100），Pa = 5；
+
+而 Xreal = 5ETH，Yreal = 100DAI，相比V2资金利用率提升一倍。在现实生活中，货币价值波动不会像例子中的那么大，如果b和a贴近于c，利用率相比Uniswap V2有明显的提高。
+
+---
+
+### 流动性提供的方式
+
+![image-20231108210723066](imgs/image-20231108210723066.png)
+
+图标3为区间流动性。
+
+![image-20231108211747250](imgs/image-20231108211747250.png)
+
+课堂笔记：
+
+![image-20231115200137075](imgs/image-20231115200137075.png)
+
+![image-20231115200159031](imgs/image-20231115200159031.png)
+
+![image-20231115200222138](imgs/image-20231115200222138.png)
+
+---
+
+### 应用场景
+
+- 稳定币的兑换（0.99~1.01)
+- Interest-bearing ASSET：xSushi/Sushi等
+- 固定收益债券
+- IDO
+- 保险
+
+---
+
+### 影响
+
+- 波动比例大
+
+- 无常损失高
+
+- LP挖矿实现机制的更改
+
+- 手续费计算复杂
+
+- LP Token：ERC20 -> ERC721
+
+---
+
+## 八、Staking Rewards
+
+![06 StakingReward](imgs/06 StakingReward.png)
+
+---
+
+## 九、Curve
+
+### DeFiLlama
+
+[DeFiLlama](https://defillama.com/)是一个汇总各种defi项目的网站：
+
+![image-20231117155411286](imgs/image-20231117155411286.png)
+
+---
+
+### Curve特点
+
+1. 低滑点
+2. 低手续费：代币交换费用统一为0.04%，存取款手续费在0%~0.02%
+3. 资金利用率高
+
+ 恒定乘积（0, +无穷）都可以兑换，但是滑点大。而恒定和价格可能会归零，但没有滑点。Curve使用一种中和的办法，在一定的价格区间内使用近似恒定和的算法来降低滑点，若价格浮动较大则使用恒定乘积。
+
+回顾 UniswapV2 的滑点计算：
+
+![image-20231117212656265](imgs/image-20231117212656265.png)
+
+Curve优化后的AMM算法：
+
+![image-20231117212150235](imgs/image-20231117212150235.png)
+
+AMM算法反向推理过程：
+
+- [Liangpeili Defi](https://www.bilibili.com/video/BV11u4y1Z781/?p=16&spm_id_from=pageDriver) 19:00
+- [知乎](https://zhuanlan.zhihu.com/p/461398413)
+
+![image-20231117194814917](imgs/image-20231117194814917.png)
+
+Curve官网：[Curve](https://curve.fi/#/ethereum/swap)
+
+![image-20231117195408168](imgs/image-20231117195408168.png)
+
+---
+
+### Curve 如何激励 LP
+
+1. 部分手续费分红
+2. 获取治理代币CRV
+
+**CRV代币：**
+
+Curve DAO 的治理代币，LP根据份额与时间来赚取CRV，交易费的50%分给将CRV存到治理合约锁仓的用户。
+
+**CRV代币分配及释放周期：**
+
+![image-20231117202916697](imgs/image-20231117202916697.png)
+
+3.03亿的总供应量分配如下：
+
+- 62%分配给社区流动性提供者
+- 30%分配给股东（团队和投资者）需要2-4年的锁定期 
+- 3%分配给员工，需要2年的锁定期 
+- 5%分配给社区储备基金
+
+**veCRV 代币：**
+
+- VeToken（Vote-Escrowed Tokens）模型
+- 1 CRV 锁仓四年就能获得 1 veCRV，而锁定一年只能获得 0.25 veCRV
+- veCRV不能转账，只能通过锁定CRV获得
+
+**veCRV 的用途：**
+
+- 交易费：0.03% Curve交易费用中的其他50%分配给 veCRV 持有人，以回购 Curve 3Poll 稳定池（即DAI+USDT+USDC 资金池）的LP Token 3CRV的方式回馈给 veCRV 的持有者。
+- 奖励增加：veCRV 的持有者如果同时为协议提供流通性，会根据质押的年期最高获得2.5倍的流动性奖励，进而提高提供流动性的整体收益。如果LP在 3Pool 中提供流动性，则他们最初将获得0.22%的APR，如果锁定 veCRV 可将奖励提高到极限2.5倍，即0.55%。
+- 治理投票: 通过投票来影响CRV的分配。
+
+**Curve War**：
+
+Curve 平台上每个矿池的流动性激励，将会由其 veCRV 投票权决定，越多 veCRV 持有者为其投票，它的流动性激励就会越高。这样一来，CRV 成为了其他协议为自己利益相关者提供的收益的重要组成部分，为了提高自己的 APY/APR，这些协议就不得不以各种方式积累 veCRV，来争夺 Curve 流动性激励，Curve War 也随之而来：
+
+![image-20231117204733651](imgs/image-20231117204733651.png)
+
+### Curve 稳定币
+
+- LLAMMA机制-算法实时结算
+- 自动稳定器 PegKeeper
+- 货币政策
+
+## 十、AAVE与Compound
+
+### AAVE
+
+#### **AAVE简介**
+
+AAVE 是一个去中心化金融（DeFi）协议，旨在为用户提供借贷和存款服务。它建立在以太坊区块链上，允许用户以去中心化的方式借入和借出加密资产。AAVE 平台的代币也被称为 AAVE，它是协议的治理代币，持有者可以参与协议的治理和决策。AAVE 通过采用一些创新的机制，如闪电贷和利息激励，提供了更高的灵活性和效率。用户可以在 AAVE 上借入和借出各种加密资产，同时享受相应的利息和奖励。
+
+#### **AAVE的利率模型**
+
+AAVE 的利率模型是基于供需动态调整的。AAVE 使用一种称为 "借贷池" 的机制来管理用户的借贷和存款。每个借贷池都有自己的资产和利率模型。利率模型基于供需平衡来确定利率。当借贷池中的资金供应较多时，利率会下降，以吸引更多的借款人。相反，当借贷需求增加时，利率会上升，以鼓励更多的存款者提供资金。
+
+AAVE 还采用了一种名为 "利息激励" 的机制。这意味着存款者可以通过提供资金来获得一部分借款人支付的利息。这种激励机制有助于吸引更多的资金流入借贷池，从而增加供应并降低利率。
+
+#### **不同资产的利率模型策略**
+
+- 最佳利用率的百分比不一样
+
+  DAI：
+
+  ![image-20231118110601019](imgs/image-20231118110601019.png)
+
+  WBTC：
+
+  ![image-20231118110654199](imgs/image-20231118110654199.png)
+
+- 超过最佳利用率部分的增长速率不一样
+  DAI：
+  ![image-20231118111049243](imgs/image-20231118111049243.png)
+
+  WBTC：
+
+  ![image-20231118110953874](imgs/image-20231118110953874.png)
+
+#### 清算机制与过程
+
+- 健康因子 Health Factor：
+  借出资产的价值与抵押资产价值的比例  =（抵押物价值 * 清算阈值）/  借款数量
+- 由第三方清算人执行
+- 被清算者需要支付一笔额外的清算费用
+
+![image-20231118133611809](imgs/image-20231118133611809.png)
+
+#### 闪电贷
+
+在一个区块内完成包含借款、交易、还款等各种操作，来实现无抵押贷款。
+
+#### AAVE Token
+
+- 总量1600万枚
+- 协议治理
+- 质押分红
+
+#### AAVE EcosystemOverview
+
+![image-20231118135100621](imgs/image-20231118135100621.png)
+
+#### AAVE 提案流程
+
+![image-20231118140107259](imgs/image-20231118140107259.png)
+
+#### AAVE安全模块
+
+1. 智能合约风险
+2. 清算风险
+3. 预言机风险
+
+#### 套利与杠杆
+
+![image-20231118140521548](imgs/image-20231118140521548.png)
+
+#### 稳定币-GHO
+
+1. 2022年7月8日发布提案
+2. 提供持续性收益
+3. 获取治理代币AAVE
+
+### Compound
+
+#### cToken
+
+1. 2022年1月，存入1000DAl，收到1000CDAI
+2. 年化10%
+3. 2023年1月，兑换1000CDAl，收到
+   1100DA
+
+#### 兑换率
+
+![image-20231118141346300](imgs/image-20231118141346300.png)
+
+1. underlyingBalance: 在智能合约还未被借走的DAI数量
+2. totalBorrowBalance: 所有借款人应偿还的DAl的数量(利)
+3. reserves:保留金总数量
+4. cTokenSupply: CDAl的总量
+
+#### COMP Token
+
+6月14日，去中心化借贷协议Compound宣布已通过治理提案007，将于6月15日开始进行治理代币COMP的分配。
+按照分发时间表，每天将在Compound的八个借贷市场上分发大约2.880个COMP，包括ETH、DAUSDC、USDT、BAT、REP、WBTC和ZRX。每个市场收到的COMP数量将与该市场中应计的利息成比例，并且用户实时根据其在Compound上的余额获得COMP。在未来四年中，一千万个COMP供应中的42%将分配给用户
+
+#### 借贷即挖矿
+
+![image-20231118143155113](imgs/image-20231118143155113.png)
+
