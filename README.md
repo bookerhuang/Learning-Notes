@@ -1,2 +1,2 @@
 # Learning-Notes
-Applying what one has learned. 
+1.4 Applying what one has learned. 
