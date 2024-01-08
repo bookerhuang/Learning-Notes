@@ -835,7 +835,7 @@ contract Market is IERC721Receiver {
 
 ### 测试合约
 
-在`test`目录下创建`markt.js`文件：
+在`test`目录下创建`market.js`文件：
 
 ```js
 const { expect } = require("chai");
