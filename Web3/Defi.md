@@ -239,7 +239,7 @@ DSR 是 MakerDAO 系统中的一个参数，它是 DAI 存款利率（DAI Saving
 
    设 L0：添加之前的Liquidity为`T`，L1：添加之后的Liquidity为`T+S`
 
-   则`L0 / L1 = T / (T + S)`，**推到后得到`S = min(dy / (y * T), dx / (x * T)) `**。
+   则`L0 / L1 = T / (T + S)`，**推到后得到`S = min(dy / y * T, dx / x * T) `**。
 
 3. 移除流动性：
 
