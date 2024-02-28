@@ -6,3 +6,10 @@ node_modules
 package.json
 pnpm-lock.yaml
 .idea
+.DS_Store
+
+# Generated files
+/target/
+
+# Well, this depends... See below!
+Cargo.lock
