@@ -1,4 +1,14 @@
-# Chainlink lessons
+# Foundry
+
+Foundry是智能合约的开发框架，与Hardhat依赖 JS 不同，Foundry不需要使用者学习Solidity以外的任何语言
+
+# Security and auditing
+
+Github：[Security and auditing course](https://github.com/Cyfrin/security-and-auditing-full-course-s23)
+
+工具配置：Linux、Foundry or Hardhat、Phind or ChatGPT
+
+---
 
 ## EIP:1559
 
