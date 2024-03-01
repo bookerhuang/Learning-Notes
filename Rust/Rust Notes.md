@@ -1663,3 +1663,314 @@ I am a superman. You are batman.
 
 借用结束后，原本的所有权变量会重新恢复可读可写的状态。不可变引用可以被任意复制多份，但是**可变引用不能被复制，只能转移**，这也体现了**可变引用具有一定的所有权特征**。所有权和引用模型是 Rust 语言编写高可靠和高性能代码的基础，理解这些模型有助于优化程序的效率，提高代码质量。
 
+## 三、字符串
+
+Rust 里的字符串内容相比于其他语言来说还要多一些。是否熟练掌握 Rust 的字符串的使用，对 Rust 代码开发效率有很大影响。
+
+Rust 里常常会见到一些字符串相关的内容，比如下面这些：
+
+```rust
+String, &String, 
+str, &str, &'static str
+[u8], &[u8], &[u8; N], Vec<u8>
+as_str(), as_bytes()
+OsStr, OsString
+Path, PathBuf
+CStr, CString
+```
+
+一张图形象地表达 Rust 语言里字符串的复杂性：
+
+![image-20240229170925108](./imgs/image-20240229170925108.png)
+
+图里显示，C 中的字符串统一叫做` char *`，这确实很简洁，相当于是统一的抽象。但是这个统一的抽象也付出了代价，就是丢失了很多额外的信息。
+
+计算机 CPU 执行的指令都是二进制序列，所有语言写的程序最后执行时都会归结为二进制序列来执行。之所以不直接写二进制打孔开发，而是出现了几百上千种计算机语言，就是因为**抽象**。
+
+抽象是用来解决现实问题建模的工具。在 Rust 里也一样，之所以 Rust 有那么多看上去都是字符串的类型，就是因为 **Rust 把字符串在各种场景下的使用给模型化、抽象化了**。相比 C 语言的` char *`，多了建模的过程，在这个模型里面多了很多额外的信息。
+
+### 1. 不同类型的字符串
+
+示例：
+
+```rust
+fn main() {
+  let s1: &'static str = "I am a superman."; 
+  let s2: String = s1.to_string(); 
+  let s3: &String = &s2;
+  let s4: &str = &s2[..];
+  let s5: &str = &s2[..6];
+}
+```
+
+上述示例中，s1、s2、s3、s4、s5 看起来好像是 4 种不同类型的字符串表示，它们在内存中的结构图：
+
+![image-20240229171350164](./imgs/image-20240229171350164.png)
+
+`"I am a superman." `这个用双引号括起来的部分是字符串的字面量，存放在静态数据区。而 s1 是指向静态数据区中的这个字符串的切片引用，形式是` &'static str`，这是静态数据区中的字符串的表示方法。
+
+通过执行` s1.to_string()`，Rust 将静态数据区中的字符串字面量拷贝了一份到堆内存中，通过 s2 指向，s2 具有这个堆内存字符串的所有权，String 在 Rust 中就代表具有所有权的字符串。
+
+s3 就是对 s2 的不可变引用，因此类型为` &String`。
+
+s4 是对 s2 的切片引用，类型是` &str`。切片就是一块连续内存的某种视图，它可以提取目标对象的全部或一部分。这里 s4 就是取的目标对象字符串的全部。
+
+s5 是对 s2 的另一个切片引用，类型也是` &str`。与 s4 不同的是，s5 是 s2 的部分视图。具体来说，就是` "I am a"`这一部分。
+
+`String `是字符串的所有权形式，常常在堆中分配。`String `字符串的内容大小是可以动态变化的。而`str `是字符串的切片类型，通常以切片引用` &str `形式出现，是字符串的视图的借用形式。
+
+字符串字面量默认会存放在静态数据区里，而静态数据区中的字符串总是贯穿程序运行的整个生命期，直到程序结束的时候才会被释放。因此不需要某一个变量对其拥有所有权，也没有哪个变量能够拥有这个字符串的所有权（也就是这个资源的分配责任）。因此对于字符串字面量这种数据类型，我们只能拿到它的借用形式` &'static str`。这里` 'static `表示这个引用可以贯穿整个程序的生命期，直到这个程序运行结束。
+
+`&String `仅仅是对 String 类型的字符串的普通引用。
+
+对 String 做字符串切片操作后，可以得到` &str`。这里这个` &str `就是指向由 String 管理的内存资源的切片引用，是目标字符串资源的借用形式，不会再把字符串内容复制一份。
+
+从上面的图示里可以看到，`&str `既可以引用堆中的字符串，也可以引用静态数据区中的字符串（`&'static str `是` &str `的一种特殊形式）。其实内存本来就是一个线性空间，一个指针（引用是指针的一种）理论上来说可以指向这个线性空间中的任何地址。
+
+`&str `也可转换`String`：
+
+```rust
+let s: String = "I am a superman.".to_string(); 
+let a_slice: &str = &s[..];
+let another_String: String = a_slice.to_string();
+```
+
+### 2. 切片
+
+切片是一段连续内存的一个视图（view），在 Rust 中由 [T] 表示，T 为元素类型。这个视图可以是这块连续内存的全部或一部分。切片一般通过切片的引用来访问：
+
+```rust
+let s = String::from("abcdefg");
+let s1 = &s[..];    // s1 内容是 "abcdefg"
+let s2 = &s[0..4];  // s2 内容是 "abcd"
+let s3 = &s[2..5];    // s3 内容是 "cde"
+```
+
+上面示例中，s 是堆内存中所有权型字符串类型。s1 作为 s 的一个切片引用，它也指向堆内存中那个字符串的头部，表示 s 的完整内容。s2 与 s1 指向的堆内存地址是相同的，但是内容不同，s2 是 "abcd"，而 s1 是 "abcdefg"。s3 则是 s 的中间位置的一段切片引用，内容是 "cde"。s3 指向的地址与 s、s1、s2 不同：
+
+![image-20240229180949108](./imgs/image-20240229180949108.png)
+
+字符串切片引用，如何转换成所有权型字符串：
+
+```rust
+let s: &str = "I am a superman.";
+let s1: String = String::from(s);  // 使用 String 的from构造器
+let s2: String = s.to_string();    // 使用 to_string() 方法
+let s3: String = s.to_owned();     // 使用 to_owned() 方法
+```
+
+### 3. ` [u8]`、`&[u8]`、`&[u8; N]`、`Vec<u8>`
+
+- `[u8]`是字符串切片，大小是可以动态变化的。
+- `&[u8] `是对字节串切片的引用，即切片引用，与` &str `是类似的。
+- `&[u8; N]` 是对 u8 数组（其长度为 N）的引用。
+- `Vec `是 u8 类型的动态数组。与` String `类似，这是一种具有所有权的类型。
+
+`Vec `与` &[u8]`的关系如下：
+
+```rust
+let a_vec: Vec<u8> = vec![1,2,3,4,5,6,7,8];
+// a_slice 是 [1,2,3,4,5]
+let a_slice: &[u8] = &a_vec[0..5];   
+// 用 .to_vec() 方法将切片转换成Vec
+let another_vec = a_slice.to_vec();
+// 或者用 .to_owned() 方法
+let another_vec = a_slice.to_owned();
+```
+
+对比表格：
+
+![image-20240301105341258](./imgs/image-20240301105341258.png)
+
+### 4. `as_str()`、`as_bytes()`、`as_slice()`
+
+`String `类型上有个方法是` as_str()`。它返回` &str `类型。这个方法效果其实等价于` &a_string[..]`，也就是包含完整的字符串内容的切片。
+
+```rust
+let s = String::from("foo");
+assert_eq!("foo", s.as_str());
+```
+
+`String `类型上还有个方法是` as_bytes()`，它返回` &[u8] `类型。
+
+```rust
+let s = String::from("hello");
+assert_eq!(&[104, 101, 108, 108, 111], s.as_bytes());
+```
+
+通过上面两个示例可以对比这两个方法的不同之处，`&str `其实也是可以转成` &[u8] `的，查询标准库文档发现，用的正是同名方法：
+
+```rust
+let bytes = "bors".as_bytes();
+assert_eq!(b"bors", bytes);
+```
+
+Vec 上有个` as_slice() `函数，与 String 上的` as_str() `对应，把完整内容转换成切片引用` &[T]`，等价于` &a_vec[..]`：
+
+```rust
+let a_vec = vec![1, 2, 3, 5, 8];
+assert_eq!(&[1, 2, 3, 5, 8], a_vec.as_slice());
+```
+
+### 5. 隐式引用类型转换
+
+Rust 中 &String 与 &str 其实是不同的，这种细节的区分，在某些情况下，会造成一些不方便，而且这些情况还比较常见：
+
+```rust
+fn foo(s: &String) {  
+}
+
+fn main() {
+  let s = String::from("I am a superman.");
+  foo(&s);
+  let s1 = "I am a superman.";    
+  foo(s1);                        
+}
+```
+
+上面示例中，函数的参数类型我们定义成 &String。那么在函数调用时，这个函数只接受 &String 类型的参数传入：
+
+```shell
+error[E0308]: mismatched types
+ --> src/main.rs:8:7
+  |
+8 |   foo(s1);                        // error on this line
+  |   --- ^^ expected `&String`, found `&str`
+  |   |
+  |   arguments to this function are incorrect
+  |
+  = note: expected reference `&String`
+             found reference `&str`
+```
+
+这种严格也导致了平时使用不方便，必须注意字符串处理时的各种细节问题，有时显得过于迂腐了。但是 Rust 也并不是那么死板，它在保持严格性的同时，通过一些精妙的机制，也可以实现一定程度上的灵活性。可以更改上述示例来体会一下：
+
+```rust
+fn foo(s: &str) {      // 只需要把这里的参数改为 &str 类型
+}
+
+fn main() {
+  let s = String::from("I am a superman.");
+  foo(&s);
+  let s1 = "I am a superman.";    
+  foo(s1);                        
+}
+```
+
+在 Rust 中对 String 做引用操作时，可以告诉 Rust 编译器，我想把 &String 直接转换到 &str 类型。只需要在代码中明确指定目标类型就可以了：
+
+```rust
+let s = String::from("I am a superman.");
+let s1 = &s;
+let s2: &str = &s;
+```
+
+上述代码，s1 不指定具体类型，对所有权字符串 s 的引用操作，只转换成 &String 类型。而如果指定了目标类型为 &str，那么对所有权字符串 s 的引用操作，就进一步转换成了 &str 类型。
+
+于是在上面的 foo() 函数中，只定义一种参数，就可以接收两种入参类型：&String 和 &str。这让函数的调用更符合直觉，使用更方便了。
+
+同样的原理，不仅可以作用在 String 上，也可以作用在 Vec 上 ，更进一步的话，还可以作用在 Vec 上：
+
+![image-20240301134502879](./imgs/image-20240301134502879.png)
+
+下面的示例表示同一个函数可以接受` &Vec `和` &[u32] `两种类型的传入：
+
+```rust
+fn foo(s: &[u32]) {
+}
+
+fn main() {
+  let v: Vec<u32> = vec![1,2,3,4,5];
+  foo(&v);
+  let a_slice = v.as_slice();
+  foo(a_slice);
+}
+```
+
+### 6. 字节串转换成字符串
+
+可以通过` as_bytes() `方法将字符串转换成` &[u8]`，相反的操作也是有的，就是把` &[u8] `转换成字符串。Rust 中的字符串实际是一个 UTF-8 序列，因此转换的过程也是与 UTF-8 编码相关的：
+
+- `String::from_utf8() `可以把` Vec<u8> `转换成` String`，转换不一定成功，因为一个字节序列不一定是有效的 UTF-8 编码序列。它返回的是 Result，需要自行做错误处理。
+- `String::from_utf8_unchecked() `可以把` Vec<u8> `转换成` String`。不检查字节序列是不是无效的 UTF-8 编码，直接返回` String `类型。但是这个函数是 unsafe 的，一般不推荐使用。
+- `str::from_utf8()`可以将` &[u8] `转换成` &str`。它返回的是 Result，需要自行做错误处理。
+- `str::from_utf8_unchecked() `可以把` &[u8] `转换成` &str`。它直接返回` &str `类型。但是这个函数是 unsafe 的，一般不推荐使用。
+
+注意` from_utf8 `系列函数，返回的是 Result。有时候会让人觉得很繁琐，但是**这种繁琐实际是客观复杂性的体现，Rust 的严谨性要求对这种转换不成功的情况做严肃的自定义处理**。反观其他语言，对于这种转换不成功的情况往往用一种内置的策略做处理，而无法自定义。
+
+### 7. 字符串切割成字符数组
+
+`&str`类型里有个`chars()`函数，可以用来把字符串转换为一个迭代器，迭代器是一种通用的抽象，就是用来按顺序安全迭代的，通过这个迭代器，就可以取出 char：
+
+```rust
+fn main() {
+    let s = String::from("中国你好");                                                                                 
+    let char_vec: Vec<char> = s.chars().collect();                                                                     
+    println!("{:?}", char_vec); 
+    
+    for ch in s.chars() {
+        println!("{:?}", ch); 
+    }
+}
+```
+
+输出：
+
+```shell
+['中', '国', '你', '好']
+'中'
+'国'
+'你'
+'好'
+```
+
+### 8. `Path`、`PathBuf`、`OsStr`、`OsString`、`CStr`、`CString`
+
+有了前面的知识背景。现在来看这些与字符串相关的类型：`Path`、`PathBuf`、`OsStr`、`OsString`、`CStr`、`CString`。
+
+相对于普通的` String `或` &str`，它们只是包含了更多的特定场景的信息。比如` Path` 类型，它就要处理跨平台的目录分隔符（Unix 下是`/`，Windows 下是`\`），以及一些其他信息。而`PathBuf`与` Path `的区别就对应于` String `与` str `的区别。
+
+`OsStr `的存在是因为各个操作系统平台上的原生字符串定义其实是不同的。比如 Unix 系统，原生字符串是任意非 0 字节序列，不过常常解释为 UTF-8 编码；而在 Windows 上，原生字符串定义为任意非 0 字节 16 位序列，正常情况下解释为 UTF-16 编码序列。而 Rust 自带的标准 str 定义和它们都不同，它是一个可以包含 0 这个字节的严格 UTF-8 编码序列。在开发平台相关的应用时，往往需要处理这种类型转换的细节，于是就有了` OsStr `类型。而` OsString` 与` OsStr `的关系对应于`String `与` str `的关系。
+
+`CStr `是 C 语言风格的字符串，字符串以 0 这个字节作结束符，在字符串中不能包含 0。因为 Rust 要无缝集成 C 的能力。所以这些类型出现在 Rust 中就很合理了。而` CString `与` CStr `的关系就对应于` String `与` str `的关系。
+
+### 9. Parse方法
+
+`str `有一个` parse() `方法非常强大，可以从字符串转换到任意 Rust 类型，只要这个类型实现了` FromStr `这个` Trait`即可。把字符串解析成 Rust 类型，肯定有不成功的可能，所以这个方法返回的是一个 Result，需要自行处理解析错误的情况：
+
+```rust
+fn main() {
+    let a = "10".parse::<u32>();
+    let aa: u32 = "10".parse().unwrap(); // 这种写法也很常见
+    println!("{:?}", a);
+    
+    let a = "10".parse::<f32>();
+    println!("{:?}", a);
+    
+    let a = "4.2".parse::<f32>();
+    println!("{:?}", a);
+    
+    let a = "true".parse::<bool>();
+    println!("{:?}", a);
+
+    let a = "a".parse::<char>();
+    println!("{:?}", a);
+    
+    let a = "192.168.1.100".parse::<std::net::IpAddr>();
+    println!("{:?}", a);
+}
+```
+
+已实现了标准库的类型：[FromStr trait](https://doc.rust-lang.org/std/str/trait.FromStr.html#implementors)
+
+`parse() `函数就相当于 Rust 语言内置的统一的解析器接口，如果实现的类型需要与字符串互相转换，就可以考虑实现这个接口，这样的话就比较能被整个 Rust 社区接受，这就是所谓的 Rust 地道风格的体现。
+
+而对于更复杂和更通用的与字符串转换的场景，可能会更倾向于序列化和反序列化的方案。这块在 Rust 生态中也有标准的方案——`serde`，它作为序列化框架，可以支持各种数据格式协议，功能非常强大、统一，目前仅做了解。
+
+ ![image-20240301142645119](./imgs/image-20240301142645119.png)
+
+思考：`chars `函数是定义在` str `上的，为什么` String `类型能直接调用` str `上定义的方法？实际上` str `上的所有方法，`String `都能调用，请问这是为什么呢？
+
+1. `String`类型为`struct`类型，实现了`Deref`特征。 
+2. 当`String`类型调用`chars`方法时，编译器会检查`String`类型是否实现了`chars`方法，检查项包括`self`，`&self`，`&mut self `
+3. 如果都没有实现`chars`方法，编译器则调用`deref`方法解引用(智能指针)，得到`str`，此时编译器才会调用`chars`方法，也就是可以调用`str`实现的所有方法

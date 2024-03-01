@@ -1,9 +1,9 @@
+fn foo(s: &[u32]) {
+}
+
 fn main() {
-    fn main() {
-        let a = 10u32;
-        let b = &mut a;
-        *b = 20;
-    
-        println!("{b}");
-    }
+  let v: Vec<u32> = vec![1,2,3,4,5];
+  foo(&v);
+  let a_slice = v.as_slice();
+  foo(a_slice);
 }
