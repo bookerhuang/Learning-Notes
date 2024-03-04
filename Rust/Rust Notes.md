@@ -1974,3 +1974,1282 @@ fn main() {
 1. `String`类型为`struct`类型，实现了`Deref`特征。 
 2. 当`String`类型调用`chars`方法时，编译器会检查`String`类型是否实现了`chars`方法，检查项包括`self`，`&self`，`&mut self `
 3. 如果都没有实现`chars`方法，编译器则调用`deref`方法解引用(智能指针)，得到`str`，此时编译器才会调用`chars`方法，也就是可以调用`str`实现的所有方法
+
+## 四、复合类型
+
+### 1. 结构体
+
+先来看一下结构体示例，定义一个 User 结构体：
+
+```rust
+struct User {
+    active: bool,
+    username: String,
+    email: String,
+    sign_in_count: u64,
+}
+```
+
+示例中的 User 结构体由 4 个字段组成：
+
+1. active 字段：bool 类型，表示这个用户是否是激活状态。
+2. username 字段：字符串类型，表示这个用户的名字。
+3. email 字段：字符串类型，表示这个用户的邮箱名。
+4. sign_in_count 字段：u64 类型，用来记录这个用户登录了多少次。
+
+User 完全由 4 个基础类型的字段组合而成，User 的**实例化需要这 4 个字段同时起作用，缺一不可**，比如：
+
+```rust
+fn main() {
+    let user1 = User {
+        active: true,
+        username: String::from("someusername123"),
+        email: String::from("someone@example.com"),
+        sign_in_count: 1,
+    };
+}
+```
+
+结构体类型也可以参与更复杂结构体的构建：
+
+```rust
+struct Class {
+  serial_number: u32,
+  grade_number: u32,
+  entry_year: String,
+  members: Vec<User>,  
+}
+```
+
+结构体类型可以不断往上一层一层地套。而在实际应用中，**结构体往往是一个程序的骨干，用来承载对目标问题进行建模和描述的重任**。
+
+#### 结构体的形式
+
+结构体有三种形式，分别是命名结构体、元组结构体和单元结构体。
+
+##### 命名结构体
+
+命名结构体是指每个字段都有名字的结构体，比如前面提到的 User 结构体，它的每个字段都有明确的名字和类型。
+
+如果在实例化结构体之前，命名了结构体字段名的同名变量，那么用下面这种写法可以偷懒少写几个字符：
+
+```rust
+fn main() {
+    let active = true;
+    let username = String::from("someusername123");
+    let email = String::from("someone@example.com");
+    let user1 = User {
+        active,    // 这里本来应该是 active: active,
+        username,  // 这里本来应该是 username: username,
+        email,     // 这里本来应该是 email: email,
+        sign_in_count: 1,
+    };
+}
+```
+
+结构体创建好之后，可以更新结构体的部分字段。下面的示例里就单独更新了 email 字段：
+
+```rust
+fn main() {
+    let mut user1 = User {
+        active: true,
+        username: String::from("someusername123"),
+        email: String::from("someone@example.com"),
+        sign_in_count: 1,
+    };
+
+    user1.email = String::from("anotheremail@example.com");
+}
+```
+
+注意 user1 前面的 mut 修饰符，不加的话就没办法修改这个结构体里的字段。
+
+而如果已经有了一个 User 的实例 user1，想再创建一个新的 user2，而两个实例之间只有部分字段不同。这时，Rust 也提供了偷懒的办法，比如：
+
+```rust
+数据fn main() {
+    let active = true;
+    let username = String::from("someusername123");
+    let email = String::from("someone@example.com");
+    let user1 = User {
+        active,
+        username,
+        email,
+        sign_in_count: 1,
+    };
+    let user2 = User {
+        email: String::from("another@example.com"),
+        ..user1    // 注意这里，直接用 ..user1
+    };
+}
+```
+
+用这种写法可以少写很多重复代码。特别是当这个结构体比较大的时候，比如有几十个字段，当只想更新其中的一两个字段的时候，就显得特别有用了，这能够让代码保持干净清爽。
+
+比如有一个场景就正好符合这个语法特性。用户的信息存在数据库里，当更新一个用户的一个字段的信息时，首先需要从数据库里把这个用户的信息取出来，做一些基本的校验，然后把要更新的字段替换成新的内容，再把这个新的用户实例存回数据库，这个过程可以这样写：
+
+```rust
+// 这个示例是伪代码
+let user_id = get_id_from_request;
+let new_user_name = get_name_from_request();
+let old_user: User = get_from_db(user_id);
+let new_user: User = User {
+    username: new_user_name,
+    ..old_user    // 注意这里的写法
+}
+new_user.save()
+```
+
+有了这些语法糖，用 Rust 写业务代码是非常清爽的。
+
+##### 元组结构体
+
+除了前面那种最普通的命名结构体形式，Rust 中也支持一种匿名结构体的形式，也叫做元组结构体。所谓元组结构体，也就是**元组和结构体的结合体**：
+
+```rust
+struct Color(i32, i32, i32);
+struct Point(i32, i32, i32);
+
+fn main() {
+    let black = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+}
+```
+
+元组结构体有类型名，但是无字段名，也就是说字段是匿名的。在有些情况下这很有用，因为想名字是一件很头痛的事情。并且某些场景下用元组结构体表达会更有效。比如对于 RGB 颜色对、三维坐标这种各分量之间有对称性，又总是一起出现的情景，直接用元组结构体表达会显得更紧凑。
+
+上述示例中，Color 类型和 Point 类型的元组部分其实是一样的，都是 (i32, i32, i32)，但是由于类型名不同，它们就是不同的类型，因此上面的 black 实例和 origin 实例就是两个完全不同的东西，前者表示黑色，后者表示原点。
+
+##### 单元结构体
+
+Rust 还支持单元结构体。单元结构体就是只有一个类型名字，没有任何字段的结构体。单元结构体在定义和创建实例的时候，连后面的花括号都可以省略。比如：
+
+```rust
+struct ArticleModule;
+
+fn main() {
+    let module = ArticleModule;    // 请注意这一句，也做了实例化操作
+}
+```
+
+可以看到，这个示例中结构体 ArticleModule 类型实际创建了一个实例，ArticleModule 的定义和实例化都没有使用花括号。这种写法非常紧凑，所以要注意分辨，不然会疑惑：类型为什么能直接赋给一个变量，其实它就相当于定义了一种类型，它的名字就是一种信息，有类型名就可以进行实例化，承载很多东西。
+
+#### 结构体中的所有权
+
+##### 部分移动
+
+Rust 的结构体有一种与所有权相关的特性，叫做部分移动（Partial Move），就是说结构体中的部分字段是可以被移出去的：
+
+```rust
+#[derive(Debug)]
+struct User {
+    active: bool,
+    username: String,
+    email: String,
+    sign_in_count: u32,
+}
+
+fn main() {
+    let active = true;
+    let username = String::from("someusername123");
+    let email = String::from("someone@example.com");
+    let user1 = User {
+        active,
+        username,
+        email,
+        sign_in_count: 1,
+    };
+    
+    let email = user1.email;  // 在这里发生了partially moved
+    
+    println!("{:?}", user1)   // 这一句无法通过编译
+}
+```
+
+提示：
+
+```shell
+error[E0382]: borrow of partially moved value: `user1`
+  --> src/main.rs:22:22
+   |
+20 |     let email = user1.email;
+   |                 ----------- value partially moved here
+21 |     
+22 |     println!("{:?}", user1)
+   |                      ^^^^^ value borrowed here after partial move
+```
+
+下面这句对于习惯的编程的人来说，其实是非常普通的一行，就是将结构体的一个字段值赋值给一个新的变量：
+
+```rust
+let email = user1.email;
+```
+
+但这里就发生了一件很奇妙的事情，因为 email 字段是 String 类型，是一种所有权类型，于是 email 字段的值被移动了。移动后，email 变量拥有了那个值的所有权。而 user1 中的 email 字段就被标记无法访问了。
+
+稍微改一下这段代码，不直接打印 user1 实例整体，而是分别打印 email 之外的另外三个字段：
+
+```rust
+let email = user1.email;
+
+println!("{}", user1.username);      // 分别打印另外3个字段 
+println!("{}", user1.active);
+println!("{}", user1.sign_in_count);
+```
+
+这时可以得到正确的输出，而如果单独打印 email 字段也是不行的，这就是结构体中所有权字段被部分移动的情景。
+
+##### 引用类型的字段
+
+还是用前面定义的 User 类型，它里面的所有字段都是带所有权的字段。而在赋值行为上，bool 和 u32 会默认复制一份新的所有权，而 String 会移动之前那份所有权到新的变量，全部定义带所有权的字段，是定义结构体类型的主要方式。
+
+但是既然都是类型，Rust 的结构体没有理由不能支持借用类型。比如：
+
+```rust
+struct User {
+    active: &bool,       // 这里换成了 &bool
+    username: &str,      // 这里换成了 &str
+    email: &str,         // 这里换成了 &str
+    sign_in_count: &u32, // 这里换成了 &u32
+}
+```
+
+这种写法当然是可以的，不过上面的代码暂时还没办法通过 Rust 的编译，需要加一些额外的标注才能让其通过。
+
+几乎所有的地方，Rust 都会把问题一分为二，一是所有权形式的表示，二是借用形式的表示。借用形式的表示又可进一步细分为不可变借用的表示和可变借用的表示。一般来说，对于业务系统用的几乎都是所有权形式的结构体，而这就已经够用了。对于初学者来说，切忌贪图所有语言特性，应该以实用为主。
+
+#### 给结构体添加标注
+
+在Rust中，可以给类型添加标注：
+
+```rust
+#[derive(Debug)]        // 这里，在结构体上面添加了一种标注
+struct User {
+    active: bool,
+    username: String,
+    email: String,
+    sign_in_count: u32,
+}
+```
+
+这样标注后，就可以在打印语句的时候把整个结构体打印出来了：
+
+```rust
+println!("{:?}", user1);    // 注意这里的 :? 符号
+```
+
+这种` #[derive(Debug)] `语法在 Rust 中叫属性标注，具体来说这里用的是派生宏属性，派生宏作用在下面紧接着的结构体类型上，可以为结构体自动添加一些功能。比如，派生 Debug 这个宏可以让我们在` println! `中用` {:?} `格式把结构体打印出来，这对于调试是非常方便的。
+
+#### 面向对象特性
+
+Rust 不是一门面向对象的语言，但是它确实有部分面向对象的特性。而 Rust 承载面向对象特性的主要类型就是结构体，R**ust 有个关键字 impl 可以用来给结构体或其他类型实现方法，也就是关联在某个类型上的函数**。
+
+##### 方法
+
+使用`impl`关键字为结构体实现方法，可以像下面这样：
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {                // 就像这样去实现
+    fn area(self) -> u32 {      // area就是方法，被放在impl实现体中
+        self.width * self.height
+    }
+}
+
+fn main() {
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+
+    println!(
+        "The area of the rectangle is {} square pixels.",
+        rect1.area()      // 使用点号操作符调用area方法
+    );
+}
+// 输出
+// The area of the rectangle is 1500 square pixels.
+```
+
+##### Self
+
+注意看 area 方法的签名：
+
+```rust
+fn area(self) -> u32 
+```
+
+这个参数好像有点特殊，是一个单 self，不太像标准的参数定义语法。实际上这里是 Rust 的一个语法糖，self 的完整写法是 self: Self，而 Self 是 Rust 里一个特殊的类型名，它表示正在被实现（impl）的那个类型。
+
+Rust 中所有权形式和借用形式总是成对出现，在 impl 的时候也是如此。方法的签名中也会对应三种参数形式，扩展一下上面的例子：
+
+```rust
+impl Rectangle {
+    fn area1(self) -> u32 {
+        self.width * self.height
+    }
+    fn area2(&self) -> u32 {
+        self.width * self.height
+    }
+    fn area3(&mut self) -> u32 {
+        self.width * self.height
+    }
+}
+```
+
+方法是实现在类型上的特殊函数，它的第一个参数是 Self 类型，包含 3 种形式：
+
+1. self: Self：传入实例的所有权。
+2. self: &Self：传入实例的不可变引用。
+3. self: &mut Self：传入实例的可变引用。
+
+因为是标准用法，所以 Rust 简写成了 self、&self、&mut self，这种简写并不会产生歧义。
+
+上述代码展开后是这样的：
+
+```rust
+impl Rectangle {
+    fn area1(self: Self) -> u32 {
+        self.width * self.height
+    }
+    fn area2(self: &Self) -> u32 {
+        self.width * self.height
+    }
+    fn area3(self: &mut Self) -> u32 {
+        self.width * self.height
+    }
+}
+```
+
+方法调用的时候，直接在实例上使用 . 操作符调用，然后第一个参数是实例自身，会默认传进去，因此不需要单独写出来：
+
+```rust
+rect1.area1();  // 传入rect1
+rect1.area2();  // 传入&rect1
+rect1.area3();  // 传入&mut rect1
+```
+
+很像 golang 的方法。
+
+实例的引用也是可以直接调用方法的。比如，对于不可变引用，可以像下面这样调用，Rust 会自动做正确的多级解引用操作：
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+fn main() {
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+
+    // 在这里，取了实例的引用
+    let r1 = &rect1;
+    let r2 = &&rect1;
+    let r3 = &&&&&&&&&&&&&&&&&&&&&&rect1; // 不管有多少层
+    let r4 = &&r1;
+
+    // 以下4行都能打印出正确的结果
+    println!("r1 is {}", r1.area());
+    println!("r2 is {}", r2.area());
+    println!("r3 is {}", r3.area());
+    println!("r4 is {}", r4.area());
+}
+```
+
+对同一个类型，impl 可以分开写多次，这在组织代码的时候比较方便：
+
+```rust
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+impl Rectangle {
+    fn can_hold(&self, other: &Rectangle) -> bool {
+        self.width > other.width && self.height > other.height
+    }
+}
+```
+
+##### 关联函数（静态方法）
+
+前面讲过，方法的第一个参数为 self，从函数参数定义上来说，第一个参数当然也可以不是 self。如果实现在类型上的函数，它的第一个参数不是 self 参数，那么它就叫做此类型的关联函数：
+
+```rust
+impl Rectangle {
+    fn numbers(rows: u32, cols: u32) -> u32 {
+        rows * cols
+    }
+}
+```
+
+调用时，关联函数使用类型配合路径符` ::`来调用，注意这里与实例用点运算符调用方法的区别：
+
+```rust
+Rectangle::numbers(10, 10);
+```
+
+##### 构造函数
+
+不像 C++、Java 等语言，Rust 中没有专门的构造函数，但是用于构造实例的需求是不会变的。
+
+那 Rust 中一般是怎么处理的呢？首先，Rust 中结构体可以直接实例化，比如前面定义的 Rectangle：
+
+```rust
+impl Rectangle {
+  pub fn new(width: u32, height: u32) -> Self {
+    Rectangle {
+        width,
+        height,
+    }
+  }  
+}
+```
+
+然后，使用下面这行代码创建新实例：
+
+```rust
+let rect1 = Rectangle::new(30, 50);
+```
+
+但是 new 这个名字并不是强制的，在社区的很多库里还会看到 from()、from_xxx() 等其他名字起构造函数的功能。Rust 在这块并没有强制要求，多熟悉社区中的惯用法，能写出更地道的 Rust 代码。
+
+##### Default
+
+在对结构体做实例化的时候，Rust 又给我们提供了一个便利的设施，Default：
+
+```rust
+#[derive(Debug, Default)]      // 这里加了一个Default派生宏
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+fn main() {
+    let rect1: Rectangle = Default::default();    // 使用方式1
+    let rect2 = Rectangle::default();             // 使用方式2
+    
+    println!("{:?}", rect1);
+    println!("{:?}", rect2);
+}
+
+// 打印出如下：
+// Rectangle { width: 0, height: 0 }
+// Rectangle { width: 0, height: 0 }
+```
+
+Default 有两种使用方式，一种是直接用` Default::default()`，第二种是用`类型名::default()`，它们的实例化效果是一样的。
+
+可以看到，打出来的实例字段值都 0，是因为 u32 类型默认值就是 0。对于通用类型，比如 u32 这种类型来说，取 0 是最适合的值了，但是，对于特定场景的 Rectangle ，可能希望给它赋一个初始的非 0 值。在 Rust 中，这可以做到，但是需要用到后面的知识，目前就可以先用约定的 new 关联函数 + 参数来达到目的：
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+  pub fn new(width: u32, height: u32) -> Self {
+    Rectangle {
+        width,
+        height,
+    }
+  }  
+}
+
+const INITWIDTH: u32 = 50;
+const INITHEIGHT: u32 = 30;
+
+fn main() {
+    // 创建默认初始化值的Rectangle实例
+    let rect1 = Rectangle::new(INITWIDTH , INITHEIGHT);
+    println!("{:?}", rect1);
+}
+```
+
+![image-20240301174918971](./imgs/image-20240301174918971.png)
+
+思考：如何给原生类型做impl呢：
+
+可以用newtype模式对i8封装一下再impl，也可以通过trait来添加操作：
+
+```rust
+trait Operate {
+  fn plus(self) -> Self;
+}
+
+impl Operate for i8 {
+    fn plus(self) -> Self {
+        self + self
+    }
+}
+
+fn main() {
+    let  a = 1i8;
+    println!("{}",a.plus());
+}
+```
+
+### 2. 枚举与模式匹配
+
+#### 枚举
+
+枚举是 Rust 中非常重要的复合类型，也是最强大的复合类型之一，广泛用于属性配置、错误处理、分支流程、类型聚合等场景中。它容纳选项的可能性，每一种可能的选项都是一个变体（variant）。Rust 中的枚举使用关键字 **enum** 定义，这点与 Java、C++ 都是一样的。与它们不同的是，Rust 中的枚举具有更强大的表达能力。
+
+在 Rust 中，枚举中的所有条目被叫做这个枚举的变体。比如：
+
+```rust
+enum Shape {
+    Rectangle,
+    Triangle,
+    Circle,
+}
+```
+
+定义了一个形状（Shape）枚举，它有三个变体：长方形 Rectangle、三角形 Triangle 和圆形 Circle。
+
+枚举与结构体不同，**结构体的实例化需要所有字段一起起作用**，而**枚举的实例化只需要且只能是其中一个变体起作用**。
+
+##### 负载
+
+Rust 中枚举的强大之处在于，enum 中的变体可以挂载各种形式的类型。所有其他类型，比如字符串、元组、结构体等等，都可以作为 enum 的负载（payload）被挂载到其中一个变体上。比如，扩展一下上面的代码示例：
+
+```rust
+enum Shape {
+    Rectangle { width: u32, height: u32},
+    Triangle((u32, u32), (u32, u32), (u32, u32)),
+    Circle { origin: (u32, u32), radius: u32 },
+}
+```
+
+Shape 枚举的三个变体都挂载了不同的负载，Rectangle 挂载了一个结构体负载表示宽和高的属性。
+
+```rust
+{width: u32, height: u32}
+```
+
+也可以单独定义一个结构体，然后把它挂载到 Rectangle 变体上：
+
+```rust
+struct Rectangle {
+  width: u32, 
+  height: u32
+}
+
+enum Shape {
+  Rectangle(Rectangle),
+  // ...
+}
+```
+
+Triangle 变体挂载了一个元组负载`((u32, u32), (u32, u32), (u32, u32))`，表示三个顶点。
+
+Circle 变体挂载了一个结构体负载` { origin: (u32, u32), radius: u32 }`，表示一个原点加半径长度。
+
+枚举的变体能够挂载各种类型的负载，是 Rust 中的枚举超强能力的来源。
+
+enum 就像一个筐，什么都能往里面装，下面的示例中 WebEvent 表示浏览器里面的 Web 事件可以帮助熟悉 Rust 的枚举表达形式：
+
+```rust
+enum WebEvent {
+    PageLoad,
+    PageUnload,
+    KeyPress(char),
+    Paste(String),
+    Click { x: i64, y: i64 },
+}
+```
+
+##### 枚举的实例化
+
+枚举的实例化实际是枚举变体的实例化，比如：
+
+```rust
+let a = WebEvent::PageLoad;
+let b = WebEvent::PageUnload;
+let c = WebEvent::KeyPress('c');
+let d = WebEvent::Paste(String::from("batman"));
+let e = WebEvent::Click { x: 320, y: 240 };
+```
+
+可以看到，不带负载的变体实例化和带负载的变体实例化不一样，带负载的变体实例化要根据不同变体附带的类型做特定的实例化。
+
+##### 类C枚举
+
+```rust
+// 给枚举变体一个起始数字值 
+enum Number {
+    Zero = 0,
+    One,
+    Two,
+}
+
+// 给枚举每个变体赋予不同的值
+enum Color {
+    Red = 0xff0000,
+    Green = 0x00ff00,
+    Blue = 0x0000ff,
+}
+
+fn main() {
+    // 使用 as 进行类型的转化
+    println!("zero is {}", Number::Zero as i32);
+    println!("one is {}", Number::One as i32);
+
+    println!("roses are #{:06x}", Color::Red as i32);
+    println!("violets are #{:06x}", Color::Blue as i32);
+}
+// 输出 
+// zero is 0
+// one is 1
+// roses are #ff0000
+// violets are #0000ff
+```
+
+可以看到，能够像 C 语言那样，在定义枚举变体的时候，指定具体的值。这在底层系统级开发、协议栈开发、嵌入式开发的场景会经常用到。
+
+打印的时候，只需要使用 as 操作符将变体转换为具体的数值类型即可。
+
+代码中的` println! `里的` {:06x} `是格式化参数，这里表示打印出值的 16 进制形式，占位 6 个宽度，不足的用 0 补齐。你可以顺便了解一下 println 打印语句中[格式化参数](https://doc.rust-lang.org/std/fmt/index.html)的详细内容。
+
+##### 空枚举
+
+Rust 中也可以定义空枚举。比如` enum MyEnum {};`。它其实与单元结构体一样都表示一个类型，但是它不能被实例化。
+
+```rust
+enum Foo {}  
+
+let a = Foo {}; // 错误的
+
+// 提示
+// expected struct, variant or union type, found enum `Foo`
+// not a struct, variant or union type
+```
+
+##### impl 枚举
+
+```rust
+enum MyEnum {
+    Add,
+    Subtract,
+}
+
+impl MyEnum {
+    fn run(&self, x: i32, y: i32) -> i32 {
+        match self {                  // match 语句
+            Self::Add => x + y,
+            Self::Subtract => x - y,
+        }
+    }
+}
+
+fn main() {
+    // 实例化枚举
+    let add = MyEnum::Add;
+    // 实例化后执行枚举的方法
+    add.run(100, 200);
+}
+```
+
+但是不能对枚举的变体直接 impl：
+
+```rust
+enum Foo {
+  AAA,
+  BBB,
+  CCC
+}
+
+impl Foo::AAA {   // 错误的
+}
+```
+
+一般情况下，枚举会用来做配置，并结合 match 语句使用来做分支管理，**如果要定义一个新类型，在 Rust 中主要还是使用结构体**。
+
+#### match
+
+##### match + 枚举
+
+其实在上面的示例中，就已经出现 match 关键字了，它的作用是判断或匹配值是哪一个枚举的变体：
+
+```rust
+#[derive(Debug)]
+enum Shape {
+    Rectangle,
+    Triangle,
+    Circle,
+}
+
+fn main() {
+    let shape_a = Shape::Rectangle;  // 创建实例
+    match shape_a {                  // 匹配实例
+        Shape::Rectangle => {
+            println!("{:?}", Shape::Rectangle);  // 进了这个分支
+        }
+        Shape::Triangle => {
+            println!("{:?}", Shape::Triangle);
+        }
+        Shape::Circle => {
+            println!("{:?}", Shape::Circle);
+        }
+    }  
+}
+// 输出
+// Rectangle
+```
+
+##### match 可返回值
+
+就像大多数 Rust 语法一样，match 语法也是可以有返回值的，所以也叫做 match 表达式：
+
+```rust
+#[derive(Debug)]
+enum Shape {
+    Rectangle,
+    Triangle,
+    Circle,
+}
+
+fn main() {
+    let shape_a = Shape::Rectangle;  // 创建实例
+    let ret = match shape_a {        // 匹配实例，并返回结果给ret
+        Shape::Rectangle => {
+            1
+        }
+        Shape::Triangle => {
+            2
+        }
+        Shape::Circle => {
+            3
+        }
+    };
+    println!("{}", ret);  
+}
+// 输出
+// 1
+```
+
+因为`shape_a `被赋值为` Shape::Rectangle`，所以程序匹配到第一个分支并返回 1，变量` ret`的值为 1。
+
+```rust
+let ret = match shape_a {   
+```
+
+这种写法就是比较地道的 Rust 写法，可以让代码显得更紧凑。
+
+##### 所有分支都必须处理
+
+match 表达式里所有的分支都必须处理：
+
+```rust
+#[derive(Debug)]
+enum Shape {
+    Rectangle,
+    Triangle,
+    Circle,
+}
+
+fn main() {
+    let shape_a = Shape::Rectangle;  // 创建实例
+    let ret = match shape_a {        // 匹配实例
+        Shape::Rectangle => {
+            1
+        }
+        Shape::Triangle => {
+            2
+        }
+        // Shape::Circle => {
+        //     3
+        // }
+    };
+    println!("{}", ret);  
+}
+```
+
+上面这段代码在编译的时候会出错。
+
+```rust
+error[E0004]: non-exhaustive patterns: `Shape::Circle` not covered
+  --> src/main.rs:10:19
+   |
+10 |   let ret = match shape_a {                  // 匹配实例
+   |                   ^^^^^^^ pattern `Shape::Circle` not covered
+   |
+note: `Shape` defined here
+  --> src/main.rs:5:3
+   |
+2  | enum Shape {
+   |      -----
+...
+5  |   Circle,
+   |   ^^^^^^ not covered
+   = note: the matched value is of type `Shape`
+help: ensure that all possible cases are being handled by adding a match arm with a wildcard pattern or an explicit pattern as shown
+   |
+16 ~     },
+17 +     Shape::Circle => todo!()
+   |
+```
+
+`Shape::Circle `分支没有覆盖到，不允许通过，另外注意，**match 表达式中各个分支返回的值的类型必须相同**。
+
+##### _ 占位符
+
+如果不想处理一些分支，可以用` _`：
+
+```rust
+#[derive(Debug)]
+enum Shape {
+    Rectangle,
+    Triangle,
+    Circle,
+}
+
+fn main() {
+    let shape_a = Shape::Rectangle;  
+    let ret = match shape_a {                  
+        Shape::Rectangle => {
+            1
+        }
+        _ => {
+            10
+        }
+    };
+    println!("{}", ret);  
+}
+```
+
+相当于除` Shape::Rectangle `之外的分支都统一用 _ 占位符进行处理了。
+
+##### 更广泛的分支
+
+match 除了配合枚举进行分支管理外，还可以与其他基础类型结合进行分支分派：
+
+```rust
+fn main() {
+    let number = 13;
+    // 可以试着修改上面的数字值，看看下面走哪个分支
+
+    println!("Tell me about {}", number);
+    match number {
+        // 匹配单个数字
+        1 => println!("One!"),
+        // 匹配几个数字
+        2 | 3 | 5 | 7 | 11 => println!("This is a prime"),
+        // 匹配一个范围，左闭右闭区间
+        13..=19 => println!("A teen"),
+        // 处理剩下的情况
+        _ => println!("Ain't special"),
+    }
+}
+```
+
+可以看到，match 可以用来匹配一个具体的数字、一个数字的列表，或者一个数字的区间等等，非常灵活。
+
+##### 模式匹配
+
+match 实际是模式匹配的入口，从 match 表达式我们可引出模式匹配的概念。模式匹配就是**按对象值的结构**进行匹配，并且可以取出符合模式的值，下面通过一些示例来解释这句话。
+
+模式匹配不限于在 match 中使用。除了 match 外，Rust 还给模式匹配提供了其他一些语法层面的设施：
+
+###### if let
+
+当要匹配的分支只有两个或者在这个位置只想先处理一个分支的时候，可以直接用 if let：
+
+```rust
+  let shape_a = Shape::Rectangle;  
+  match shape_a {                  
+    Shape::Rectangle => {
+      println!("1");
+    }
+    _ => {
+      println!("10");
+    }
+  };
+```
+
+改写为：
+
+```rust
+  let shape_a = Shape::Rectangle;  
+  if let Shape::Rectangle = shape_a {                  
+    println!("1");
+  } else {
+    println!("10");
+  }
+```
+
+###### While let
+
+while 后面也可以跟 let，实现模式匹配。比如：
+
+```rust
+#[derive(Debug)]
+enum Shape {
+    Rectangle,
+    Triangle,
+    Circle,
+}
+
+fn main() {
+    let mut shape_a = Shape::Rectangle; 
+    let mut i = 0;
+    while let Shape::Rectangle = shape_a {    // 注意这一句
+        if i > 9 {
+            println!("Greater than 9, quit!");
+            shape_a = Shape::Circle;
+        } else {
+            println!("`i` is `{:?}`. Try again.", i);
+            i += 1;
+        }
+    }
+}
+// 输出
+// `i` is `0`. Try again.
+// `i` is `1`. Try again.
+// `i` is `2`. Try again.
+// `i` is `3`. Try again.
+// `i` is `4`. Try again.
+// `i` is `5`. Try again.
+// `i` is `6`. Try again.
+// `i` is `7`. Try again.
+// `i` is `8`. Try again.
+// `i` is `9`. Try again.
+// Greater than 9, quit!
+```
+
+看起来，在条件判断语句那里用` while Shape::Rectangle == shape_a`也行，好像用` while let `的意义不大。来试一下，编译之后，报错了：
+
+```rust
+error[E0369]: binary operation `==` cannot be applied to type `Shape`
+```
+
+> 该错误表示`==`号不能作用在类型 Shape 上，在 Rust 中，`==` 运算符用于比较两个值是否相等。为了使用 `==` 运算符，你的类型需要实现 `PartialEq` trait，`PartialEq` trait 定义了一种可以进行部分相等性比较的类型。关于这点，`{}`与`{:?}`也是类似。
+
+如果一个枚举变体带负载，使用模式匹配可以把这个负载取出来，下面使用带负载的枚举来举例。
+
+#### let
+
+let 本身就支持模式匹配。其实前面的 if let、while let 使用的就是 let 模式匹配的能力：
+
+```rust
+#[derive(Debug)]
+enum Shape {
+    Rectangle {width: u32, height: u32},
+    Triangle,
+    Circle,
+}
+
+fn main() {
+    // 创建实例
+    let shape_a = Shape::Rectangle {width: 10, height: 20}; 
+    // 模式匹配出负载内容
+    let Shape::Rectangle {width, height} = shape_a else {
+        panic!("Can't extract rectangle.");
+    };
+    println!("width: {}, height: {}", width, height);
+}
+
+// 输出
+// width: 10, height: 20
+```
+
+在这个示例中，利用模式匹配解开了` shape_a `中带的负载（结构体负载），同时定义了` width `和` height `两个局部变量，并初始化为枚举变体的实例负载的值，这两个局部变量在后续的代码块中可以使用。
+
+注意第 12 行代码：
+
+```rust
+let Shape::Rectangle {width, height} = shape_a else {
+```
+
+这种语法是匹配结构体负载，获取字段值的方式。
+
+#### 匹配元组
+
+```rust
+fn main() {
+    let a = (1,2,'a');
+    
+    let (b,c,d) = a;
+    
+    println!("{:?}", a);
+    println!("{}", b);
+    println!("{}", c);
+    println!("{}", d);
+}
+```
+
+这种用法叫做**元组的析构**，常用来从函数的多个返回值里取出数据：
+
+```rust
+fn foo() -> (u32, u32, char) {
+    (1,2,'a')
+}
+
+fn main() {
+    let (b,c,d) = foo();
+    
+    println!("{}", b);
+    println!("{}", c);
+    println!("{}", d);
+}
+```
+
+#### 匹配枚举
+
+```rust
+struct Rectangle {
+    width: u32, 
+    height: u32
+}
+
+enum Shape {
+    Rectangle(Rectangle),
+    Triangle((u32, u32), (u32, u32), (u32, u32)),
+    Circle { origin: (u32, u32), radius: u32 },
+}
+
+fn main() {
+    let a_rec = Rectangle {
+        width: 10,
+        height: 20,
+    };
+  
+    // 请打开下面这一行进行实验
+    //let shape_a = Shape::Rectangle(a_rec);
+    // 请打开下面这一行进行实验
+    //let shape_a = Shape::Triangle((0, 1), (3,4), (3, 0));
+    
+    let shape_a = Shape::Circle { origin: (0, 0), radius: 5 };
+    
+    // 这里演示了在模式匹配中将枚举的负载解出来的各种形式
+    match shape_a {
+        Shape::Rectangle(a_rec) => {  // 解出一个结构体
+            println!("Rectangle {}, {}", a_rec.width, a_rec.height);
+        }
+        Shape::Triangle(x, y, z) => {  // 解出一个元组
+            println!("Triangle {:?}, {:?}, {:?}", x, y, z);
+        }
+        Shape::Circle {origin, radius} => {  // 解出一个结构体的字段
+            println!("Circle {:?}, {:?}", origin, radius);
+        }
+    }
+}
+// 输出
+// Circle (0, 0), 5
+```
+
+这个示例展示了如何将变体中的结构体整体、元组各部分、结构体各字段解析出来的方式。
+
+用这种方式，可以在做分支处理的时候，顺便处理携带的信息，让代码变得相当紧凑而有意义（高内聚）。
+
+#### 匹配结构体
+
+```rust
+#[derive(Debug)]
+struct User {
+    name: String,
+    age: u32,
+    student: bool
+}
+
+fn main() {
+    let a = User {
+        name: String::from("mike"),
+        age: 20,
+        student: false,
+    };
+    let User {
+        name,
+        age,
+        student,
+    } = a;
+    
+    println!("{}", name);
+    println!("{}", age);
+    println!("{}", student);
+    println!("{:?}", a);
+}
+```
+
+编译输出：
+
+```rust
+error[E0382]: borrow of partially moved value: `a`
+  --> src/main.rs:24:22
+   |
+16 |         name,
+   |         ---- value partially moved here
+...
+24 |     println!("{:?}", a);
+   |                      ^ value borrowed here after partial move
+   |
+   = note: partial move occurs because `a.name` has type `String`, which does not implement the `Copy` trait
+   = note: this error originates in the macro `$crate::format_args_nl` which comes from the expansion of the macro `println` (in Nightly builds, run with -Z macro-backtrace for more info)
+help: borrow this binding in the pattern to avoid moving the value
+   |
+16 |         ref name,
+   |         +++
+```
+
+编译提示出错了，在模式匹配的过程中发生了` partially moved`，模式匹配过程中新定义的三个变量 name、age、student 分别得到了对应 User 实例 a 的三个字段值的所有权。
+
+age 和 student 采用了复制所有权的形式，而 name 字符串值则是采用了移动所有权的形式。a.name 被部分移动到了新的变量 name ，所以接下来 a.name 就无法直接使用了。这个示例说明 Rust 中的模式匹配是一种释放原对象的所有权的方式。
+
+从 Rust 小助手的建议里看到了一个关键字：ref。
+
+#### ref 关键字
+
+Rustc AI 建议添加一个关键字 ref，按它说的改改：
+
+```rust
+#[derive(Debug)]
+struct User {
+    name: String,
+    age: u32,
+    student: bool
+}
+
+fn main() {
+    let a = User {
+        name: String::from("mike"),
+        age: 20,
+        student: false,
+    };
+    let User {
+        ref name,    // 这里加了一个ref
+        age,
+        student,
+    } = a;
+    
+    println!("{}", name);
+    println!("{}", age);
+    println!("{}", student);
+    println!("{:?}", a);
+}
+// 输出 
+// mike
+// 20
+// false
+// User { name: "mike", age: 20, student: false }
+```
+
+可以看到，打印出了正确的值。
+
+有些情况下，只是需要读取一下字段的值而已，不需要获得它的所有权，这时就可以通过 ref 这个关键字修饰符告诉 Rust 编译器，现在只需要获得那个字段的引用，不要所有权。这就是 ref 出现的原因，用来在模式匹配过程中提供一个额外的信息。
+
+使用了 ref 后，新定义的 name 变量的值其实是 &a.name ，而不是 a.name，Rust 就不会再把所有权给 move 出来了，因此也不会发生 partially moved 这种事情，原来的 User 实例 a 还有效，因此就能被打印出来了。
+
+相应的，还有 **ref mut** 的形式。它是用于在模式匹配中获得目标的可变引用。
+
+```rust
+#[derive(Debug)]
+struct User {
+    name: String,
+    age: u32,
+    student: bool
+}
+
+fn main() {
+    let mut a = User {   // 这里加了一个mut
+        name: String::from("mike"),
+        age: 20,
+        student: false,
+    };
+    let User {
+        ref mut name,    // 这里加了一个mut
+        age,
+        student,
+    } = a;
+
+    name.push_str("!");
+    
+    println!("{}", name);
+    println!("{}", age);
+    println!("{}", student);
+    println!("{:?}", a);
+}
+// 输出 
+// mike!
+// 20
+// false
+// User { name: "mike!", age: 20, student: false }
+```
+
+Rust 中强大的模式匹配这个概念并不是 Rust 原创的，它来自于函数式语言，可以了解一下 Ocaml、Haskell 或 Scala 中模式匹配的相关概念。
+
+#### 函数参数中的模式匹配
+
+函数参数其实就是定义局部变量，因此模式匹配的能力在这里也能得到体现。
+
+示例一：
+
+```rust
+fn foo((a, b, c): (u32, u32, char)) {  // 注意这里的定义
+    println!("{}", a);
+    println!("{}", b);
+    println!("{}", c);  
+}
+
+fn main() {
+    let a = (1,2, 'a');
+    foo(a); 
+}
+```
+
+上例，把元组 a 传入了函数` foo()`，`foo() `的参数直接定义成模式匹配，解析出了 a、b、c 三个元组元素的内容，并在函数中使用。
+
+示例二：
+
+```rust
+#[derive(Debug)]
+struct User {
+    name: String,
+    age: u32,
+    student: bool
+}
+
+fn foo(User {        // 注意这里的定义
+    name,
+    age,
+    student
+}: User) {
+    println!("{}", name);
+    println!("{}", age);
+    println!("{}", student);  
+}
+
+fn main() {
+    let a = User {
+        name: String::from("mike"),
+        age: 20,
+        student: false,
+    };
+    foo(a);
+}
+```
+
+上例，把结构体 a 传入了函数 foo()，foo() 的参数直接定义成对结构体的模式匹配，解析出了 name、age、student 三个字段的内容，并在函数中使用。
+
+枚举是 Rust 中的重要概念，广泛用于属性配置、错误处理、分支流程、类型聚合等。在实际场景中，一般把结构体作为模型的主体承载，把枚举作为周边的辅助配置和逻辑分类，它们经常会搭配使用。
+
+模式匹配是 Rust 里非常有特色的语言特性，在做分支逻辑处理的时候，可以通过模式匹配带上要处理的相关信息，还可以把这些信息解析出来，让代码的逻辑和数据内聚得更加紧密，让程序看起来更加赏心悦目。
+
+![image-20240304154520010](./imgs/image-20240304154520010.png)
