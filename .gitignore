@@ -9,7 +9,7 @@ pnpm-lock.yaml
 .DS_Store
 
 # Generated files
-./Rust/Project/helloworld/target/
+Rust/Project/helloworld/target/
 
 # Well, this depends... See below!
 Cargo.lock

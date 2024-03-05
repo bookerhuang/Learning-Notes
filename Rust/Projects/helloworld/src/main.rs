@@ -1,31 +1,6 @@
-#[derive(Debug)]
-struct User {
-    name: String,
-    age: u32,
-    student: bool
-}
-
 fn main() {
-    let mut a = User {
-        name: String::from("mike"),
-        age: 20,
-        student: false,
-    };
-    let User {
-        ref mut name,    // 这里加了一个ref
-        age,
-        student,
-    } = a;
-
-    name.push_str("!");
+    let a = 1.0f32;
+    let b = 10 as f32;    // 添加了 as f32
     
-    println!("{}", name);
-    println!("{}", age);
-    println!("{}", student);
-    println!("{:?}", a);
+    let c = a * b;
 }
-// 输出 
-// mike!
-// 20
-// false
-// User { name: "mike!", age: 20, student: false }
