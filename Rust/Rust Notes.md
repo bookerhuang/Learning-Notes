@@ -3799,3 +3799,341 @@ pub type Result<T> = Result<T, Error>;
 决于这个泛型能否表示相应的具化类型。比如为泛型 T 和 String 实现了相同的方法，由于 T 没有施加任何约束，它可以代表 String。那么当调用方法时，对于具化类型 String 来说，要调用哪一个呢？因此会出现歧义，编译器会报错：方法被重复定义了。
 
  但如果给泛型 T 施加了一个 Copy 约束，要求 T 必须实现了 Copy trait，那么就不会报错了，因为此时 T 代表不了 String，所以调用方法不会出现歧义。但如果再为 i32 实现一个同名方法就会报错了，因为 i32 实现了 Copy，它可以被 T 表示。
+
+## 六、`Option<T>`、`Result<T, E>`和迭代器
+
+`Option<T>`和`Result<T, E>`并不是 Rust 的独创设计，在 Rust 之前，OCaml、Haskell、Scala等已经使用他们很久了。
+
+### 1. `Option<T>`和`Result<T, E>`
+
+`Option<T>`和`Result<T, E>`在 Rust 代码中随处可见，但是到现在才开始正式介绍，就是因为它们实际是带类型参数的枚举类型：
+
+#### `Option<T>`的定义
+
+```rust
+pub enum Option<T> {
+    None,
+    Some(T),
+}
+```
+
+`Option<T>`定义为定义为包含两个变体的枚举。一个是不带负载的 None，另一个是带一个类型参数作为其负载的 Some。`Option<T>`的实例在 Some 和 None 中取值， 表示这个实例有取空值的可能。
+
+**可以把`Option<T>`理解为把空值单独提出来了一个维度**，在没有`Option<t>`的语言中，空值是分散在其他类型中的。比如空字符串、空数组、数字 0、NULL 指针等。并且有的语言还把空值区分为空值和未定义的值，如 nil、undefined 等。
+
+Rust 做了两件事情来解决这个混乱的场面，第一，**Rust 中所有的变量定义后使用前都必须初始化，所以不存在未定义值这个情况**。第二，**Rust 把空值单独提出来统一定义成` Option<T>::None`，并在标准库层面上就做好了规范，上层的应用在设计时也应该遵循这个规范**：
+
+```rust
+let s = String::from("");
+let a: Option<String> = Some(s);
+```
+
+变量 a 是携带空字符串的` Option<String> `类型。这里，空字符串`""`的`“空”`与` None `所表示的`“无”`表达了不同的意义。
+
+如果早点发明 Option，Tony Hoare 就不会自责了，Tony Hoare 在一次分享中说，他在 1965 年发明的空引用（Null references）是一个`“十亿美元”`的错误。
+
+他是这样说的：我把它叫做我的十亿美元错误。那个时候，我正在为一个面向对象语言中的引用设计第一个全面的类型系统。我的目标是让编译器自动施加检查，来确保对引用的所有使用都是绝对安全的。但是我当时无法抵抗空引用的诱惑，就是因为它非常容易实现。这导致了难以计数的错误、漏洞和系统崩溃，在后续 40 年里这可能已经导致了十亿美元的痛苦和破坏。
+
+Rust 通过所有权并借用检查器、Option、Result 等一整套机制全面解决了 Hoare 想解决的问题。
+
+#### `Result<T, E>`的定义
+
+```rust
+pub enum Result<T, E> {
+    Ok(T),
+    Err(E),
+}
+```
+
+`Result<T, E>` 被定义为包含两个变体的枚举，这两个变体各自带一个类型参数作为其负载。Ok(T) 用来表示结果正确，Err(E) 用来表示结果有错误。
+
+对比其他语言函数错误返回的约定，C、CPP、Java 语言里有时用返回 0 来表示函数执行正确，有时又不是这样，需要根据代码所在的上下文环境来判断返回什么值代表正确，返回什么值代表错误。
+
+而 Go 语言强制对函数返回值做出了约定：
+
+```go
+ret, err := function()
+if err != nil {
+```
+
+约定要求函数返回两个值，正确的情况下，ret 存放返回值，err 为 nil。如果函数要返回错误值，那么会给 err 变量填充具体的内容，于是就出现了经典的满屏 if err ！= nil 代码，成了 Go 语言圈的一个梗。可以看到，Go 语言已经朝着把错误信息和正常返回值类型剥离开来的方向走出了一步。
+
+而 Rust 没有像 Go 那样设计，一是因为 Rust 不存在单独的 nil 这种空值，二是 Rust 直接用带类型参数的枚举就可以达到这个目的。
+
+一个枚举实例在一个时刻只能是那个枚举类型的某一个变体。所以一个函数的返回值，不论它是正确的情况还是错误的情况，都能用` Result<T, E>` 类型统一表达，这样会显得更紧凑。同时还因为`Result<T, E>`是一种类型，可以在它之上添加很多操作，用起来很方便：
+
+```rust
+let r: Result<String, String> = function();
+```
+
+这个例子表示将函数返回值赋给变量 r，返回类型是` Result<String, String>`。在正确的情况下，返回内容为 String 类型；错误的情况下，被返回的错误类型也是 String。你是不是在想：两种可以一样？当然可以，这两个类型参数可以被任意类型代入。
+
+`Result<T, E>`被用来支撑 Rust 的错误处理机制，所以非常重要。
+
+### 2. 解包
+
+有一个问题，比如` Option::Some(10) `和` 10u32 `明显已经不是同一种类型了。真正想要的值被`“包裹”`在了另外一种类型里面。这种`“包裹”`是通过枚举变体来实现的，那想获取被包在里面的值应该怎么做呢？
+
+#### ` expect()`、`unwrap()`、`unwrap_or()`
+
+其实有很多办法，先讲一类解包操作，这里列出了三种方法，分别是` expect()`、`unwrap()`、`unwrap_or()`。这里给出了它们解包的具体操作和示例代码，可以看一下有什么不同：
+
+![image-20240305151935447](./imgs/image-20240305151935447.png)
+
+示例：
+
+```rust
+// Option
+let x = Some("value");
+assert_eq!(x.expect("fruits are healthy"), "value");
+// Result
+let path = std::env::var("IMPORTANT_PATH")
+    .expect("env variable `IMPORTANT_PATH` should be set by `wrapper_script.sh`");
+```
+
+![image-20240305152013469](./imgs/image-20240305152013469.png)
+
+示例：
+
+```rust
+// Option
+let x = Some("air");
+assert_eq!(x.unwrap(), "air");
+// Result
+let x: Result<u32, &str> = Ok(2);
+assert_eq!(x.unwrap(), 2);
+```
+
+![image-20240305152052876](./imgs/image-20240305152052876.png)
+
+示例：
+
+```rust
+// Option
+assert_eq!(Some("car").unwrap_or("bike"), "car");
+assert_eq!(None.unwrap_or("bike"), "bike");
+
+// Result
+let default = 2;
+let x: Result<u32, &str> = Ok(9);
+assert_eq!(x.unwrap_or(default), 9);
+
+let x: Result<u32, &str> = Err("error");
+assert_eq!(x.unwrap_or(default), default);
+```
+
+![image-20240305152214604](./imgs/image-20240305152214604.png)
+
+示例：
+
+```rust
+// Option
+let x: Option<u32> = None;
+let y: Option<u32> = Some(12);
+
+assert_eq!(x.unwrap_or_default(), 0);
+assert_eq!(y.unwrap_or_default(), 12);
+
+// Result
+let good_year_from_input = "1909";
+let bad_year_from_input = "190blarg";
+let good_year = good_year_from_input.parse().unwrap_or_default();
+let bad_year = bad_year_from_input.parse().unwrap_or_default();
+
+assert_eq!(1909, good_year);
+assert_eq!(0, bad_year);
+```
+
+可以看到，解包操作挺费劲的。如果我们总是先用` Option<T>`或` Result<T, E>`把值包裹起来，用的时候再手动解包，那其实说明没有真正抓住到 Option 和 Result 的设计要义。在 Rust 中，很多时候不需要解包也能操作里面的值，这样就不用做看起来多此一举的解包操作了。
+
+#### 不解包的情况下的操作
+
+不解包的情况下如果想要获取被包在里面的值就需要用到` Option<T> `和`Result<T, E> `里的一些常用方法。
+
+##### `Option<T> `上的常用方法和示例
+
+- map()：在 Option 是 Some 的情况下，通过 map 中提供的函数或闭包把 Option 里的类型转换成另一种类型。在 Option 是 None 的情况下，保持 None 不变。map() 会消耗原类型，也就是获取所有权。
+
+  ```rust
+  let maybe_some_string = Some(String::from("Hello, World!"));
+  let maybe_some_len = maybe_some_string.map(|s| s.len());
+  assert_eq!(maybe_some_len, Some(13));
+   
+  let x: Option<&str> = None;
+  assert_eq!(x.map(|s| s.len()), None);
+  ```
+
+- cloned()：通过克隆 Option 里面的内容，把` Option<&T> `转换成` Option<T>`。
+
+  ```rust
+  let x = 12;
+  let opt_x = Some(&x);
+  assert_eq!(opt_x, Some(&12));
+  let cloned = opt_x.cloned();
+  assert_eq!(cloned, Some(12));
+  ```
+
+- is_some()：如果 Option 是 Some 值，返回 true。
+
+  ```rust
+  let x: Option<u32> = Some(2);
+  assert_eq!(x.is_some(), true);
+   
+  let x: Option<u32> = None;
+  assert_eq!(x.is_some(), false);
+  ```
+
+- is_none()：如果 Option 是 None 值，返回 true。
+
+  ```rust
+  let x: Option<u32> = Some(2);
+  assert_eq!(x.is_none(), false);
+   
+  let x: Option<u32> = None;
+  assert_eq!(x.is_none(), true);
+  ```
+
+- as_ref()：把` Option<T>`或` &Option<T> `转换成` Option<&T>`。创建一个新 Option，里面的类型是原来类型的引用，就是从` Option<T> `到` Option<&T>`。原来那个` Option<T> `实例保持不变。
+
+  ```rust
+  let text: Option<String> = Some("Hello, world!".to_string());
+  let text_length: Option<usize> = text.as_ref().map(|s| s.len());
+  println!("still can print text: {text:?}");
+  ```
+
+- as_mut()：把` Option<T> `或` &mut Option<T> `转换成` Option<&mut T>`。
+
+  ```rust
+  let mut x = Some(2);
+  match x.as_mut() {
+  Some(v) => *v = 42,
+  None => {},
+  }
+  assert_eq!(x, Some(42));
+  ```
+
+- take()：把 Option 的值拿出去，在原地留下一个 None 值。这个非常有用。相当于把值拿出来用，但是却没有消解原来那个 Option。
+
+  ```rust
+  let mut x = Some(2);
+  let y = x.take();
+  assert_eq!(x, None);
+  assert_eq!(y, Some(2));
+   
+  let mut x: Option<u32> = None;
+  let y = x.take();
+  assert_eq!(x, None);
+  assert_eq!(y, None);
+  ```
+
+- replace()：在原地替换新值，同时把原来那个值抛出来。
+
+  ```rust
+  let mut x = Some(2);
+  let old = x.replace(5);
+  assert_eq!(x, Some(5));
+  assert_eq!(old, Some(2));
+   
+  let mut x = None;
+  let old = x.replace(3);
+  assert_eq!(x, Some(3));
+  assert_eq!(old, None);
+  ```
+
+- and_then()：如果 Option 是 None，返回 None；如果 Option 是 Some，就把参数里面提供的函数或闭包应用到被包裹的内容上，并返回运算后的结果。
+
+  ```rust
+  fn sq_then_to_string(x: u32) -> Option<String> {
+  x.checked_mul(x).map(|sq| sq.to_string())
+  }
+   
+  assert_eq!(Some(2).and_then(sq_then_to_string), Some(4.to_string()));
+  assert_eq!(Some(1_000_000).and_then(sq_then_to_string), None); // overflowed!
+  assert_eq!(None.and_then(sq_then_to_string), None);
+  ```
+
+##### `Result<T, E> `上的常用方法和示例
+
+- map()：当 Result 是 Ok 的时候，把 Ok 里的类型通过参数里提供的函数运算并且可以转换成另外一种类型。当 Result 是 Err 的时候，原样返回 Err 和它携带的内容。
+
+  ```RUST
+  let line = "1\n2\n3\n4\n";
+   
+  for num in line.lines() {
+  match num.parse::<i32>().map(|i| i * 2) {
+  Ok(n) => println!("{n}"),
+  Err(..) => {}
+  }
+  }
+  ```
+
+- is_ok()：如果 Result 是 Ok，返回 true。
+
+  ```RUST
+  let x: Result<i32, &str> = Ok(-3);
+  assert_eq!(x.is_ok(), true);
+   
+  let x: Result<i32, &str> = Err("Some error message");
+  assert_eq!(x.is_ok(), false);
+  ```
+
+- is_err()：如果 Result 是 Err，返回 true。
+
+  ```rust
+  let x: Result<i32, &str> = Ok(-3);
+  assert_eq!(x.is_err(), false);
+   
+  let x: Result<i32, &str> = Err("Some error message");
+  assert_eq!(x.is_err(), true);
+  ```
+
+- as_ref()：创建一个新 Result，里面的两种类型分别是原来两种类型的引用，就是从` Result<T, E> `到` Result<&T, &E>`。原来那个` Result<T, E> `实例保持不变。
+
+  ```rust
+  let x: Result<u32, &str> = Ok(2);
+  assert_eq!(x.as_ref(), Ok(&2));
+   
+  let x: Result<u32, &str> = Err("Error");
+  assert_eq!(x.as_ref(), Err(&"Error"));
+  ```
+
+- as_mut()：创建一个新 Result，里面的两种类型分别是原来两种类型的可变引用，就是从` Result<T, E>`到` Result<&mut T, &mut E>`。原来那个` Result<T, E>` 实例保持不变。
+
+  ```rust
+  fn mutate(r: &mut Result<i32, i32>) {
+  match r.as_mut() {
+  Ok(v) => *v = 42,
+  Err(e) => *e = 0,
+  }
+  }
+  let mut x: Result<i32, i32> = Ok(2);
+  mutate(&mut x);
+  assert_eq!(x.unwrap(), 42);
+  let mut x: Result<i32, i32> = Err(13);
+  mutate(&mut x);
+  assert_eq!(x.unwrap_err(), 0);
+  ```
+
+- and_then()：当 Result 是 Ok 时，把这个方法提供的函数或闭包应用到 Ok 携带的内容上面，并返回一个新的 Result。当 Result 是 Err 的时候，这个方法直接传递返回这个 Err 和它的负载。这个方法常常用于一路链式操作，前提是过程里的每一步都需要返回 Result。
+
+  ```rust
+  fn sq_then_to_string(x: u32) -> Result<String, &'static str> {
+  x.checked_mul(x).map(|sq| sq.to_string()).ok_or("overflowed")
+  }
+   
+  assert_eq!(Ok(2).and_then(sq_then_to_string), Ok(4.to_string()));
+  assert_eq!(Ok(1_000_000).and_then(sq_then_to_string), Err("overflowed"));
+  assert_eq!(Err("not a number").and_then(sq_then_to_string), Err("not a number"));
+  ```
+
+- map_err()：当 Result 是 Ok 时，传递原样返回。当 Result 是 Err 时，对 Err 携带的内容使用这个方法提供的函数或闭包进行运算及类型转换。这个方法常常用于转换 Result 的 Err 的负载的类型，在错误处理流程中大量使用。
+
+  ```rust
+  fn stringify(x: u32) -> String { format!("error code: {x}") }
+  let x: Result<u32, u32> = Ok(2);
+  assert_eq!(x.map_err(stringify), Ok(2));
+  let x: Result<u32, u32> = Err(13);
+  assert_eq!(x.map_err(stringify), Err("error code: 13".to_string()));
+  ```
+
+  

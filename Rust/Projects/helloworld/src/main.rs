@@ -1,6 +1,13 @@
 fn main() {
-    let a = 1.0f32;
-    let b = 10 as f32;    // 添加了 as f32
-    
-    let c = a * b;
+    // Option
+    assert_eq!(Some("car").unwrap_or("bike"), "car");
+    assert_eq!(None.unwrap_or("bike"), "bike");
+
+    // Result
+    let default = 2;
+    let x: Result<u32, &str> = Ok(9);
+    assert_eq!(x.unwrap_or(default), 9);
+
+    let x: Result<u32, &str> = Err("error");
+    assert_eq!(x.unwrap_or(default), default);
 }
