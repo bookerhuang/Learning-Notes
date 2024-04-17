@@ -1,0 +1,5 @@
+cargo:rustc-cfg=rustc_1_70
+cargo:rustc-cfg=rustc_1_46
+cargo:rerun-if-env-changed=RUST_BIGDECIMAL_DEFAULT_PRECISION
+cargo:rerun-if-env-changed=RUST_BIGDECIMAL_DEFAULT_ROUNDING_MODE
+cargo:rerun-if-env-changed=RUST_BIGDECIMAL_EXPONENTIAL_FORMAT_THRESHOLD
